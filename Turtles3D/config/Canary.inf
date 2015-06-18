@@ -1,0 +1,5 @@
+main-class=edu.knox.minecraft.plugintest.HelloWorld
+author = Spacdog
+version = 0.0.1
+language = java
+# dependencies = List of Plugins your Plugin depends on
