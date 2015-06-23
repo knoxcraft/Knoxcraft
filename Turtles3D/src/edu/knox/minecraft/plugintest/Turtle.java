@@ -2,6 +2,7 @@ package edu.knox.minecraft.plugintest;
 
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
+import net.canarymod.api.world.position.Vector3D;
 
 public class Turtle
 {
@@ -59,7 +60,10 @@ public class Turtle
         this.z=z;
     }
     
-    public void forward() {
-        world.setBlockAt(x+1, y, z, BlockType.OakPlanks);
+    public void forward(Vector3D forDir) {
+    	x += forDir.getBlockX();
+    	y += forDir.getBlockY();
+    	z += forDir.getBlockZ();
+        world.setBlockAt(x, y, z, BlockType.OakPlanks);
     }
 }

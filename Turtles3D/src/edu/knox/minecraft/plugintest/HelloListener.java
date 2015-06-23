@@ -20,7 +20,7 @@ public class HelloListener implements PluginListener, CommandListener {
     
     @HookHandler
     public void onLogin(ConnectionHook hook) {
-        hook.getPlayer().message(Colors.GREEN+"'Lo Thar, "+hook.getPlayer().getName());
+        //hook.getPlayer().message(Colors.GREEN+"'Lo Thar, "+hook.getPlayer().getName());
     }
     
     @HookHandler
@@ -29,7 +29,7 @@ public class HelloListener implements PluginListener, CommandListener {
         //this.world.
         // There won't be any players yet
         for (Player p : this.world.getPlayerList()) {
-            p.message(Colors.BLUE+"World loaded");
+           // p.message(Colors.BLUE+"World loaded");
         }
     }
     
