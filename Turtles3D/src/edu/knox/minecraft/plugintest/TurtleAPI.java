@@ -93,6 +93,46 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	private Position getRelPos(){
 		return null;
 	}
+	
+	private void getString(MessageReceiver sender, boolean b){
+		//Get the Boolean value 
+		String [] str = new String [5];
+		str[0] = "/c";
+		str[1] = b + "";
+				
+		//return status of BP using TurtleConsole
+		TurtleConsole(sender, str);
+	}
+	
+	private void getString(MessageReceiver sender, BlockType b){
+		//Get the Boolean value 
+		String [] str = new String [5];
+		str[0] = "/c";
+		str[1] = b + "";
+				
+		//return status of BP using TurtleConsole
+		TurtleConsole(sender, str);
+	}
+	
+	private void getString(MessageReceiver sender, Direction b){
+		//Get the Boolean value 
+		String [] str = new String [5];
+		str[0] = "/c";
+		str[1] = b + "";
+				
+		//return status of BP using TurtleConsole
+		TurtleConsole(sender, str);
+	}
+	
+	private void getString(MessageReceiver sender, Position b){
+		//Get the Boolean value 
+		String [] str = new String [5];
+		str[0] = "/c";
+		str[1] = b + "";
+				
+		//return status of BP using TurtleConsole
+		TurtleConsole(sender, str);
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void disable() {
@@ -153,7 +193,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		tt = true;
 		//MAKE A TURTLE
 		
-		
+		getString(sender, tt);
 	}
 	//Turn off
 	@Command(
@@ -166,6 +206,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		//Turning off Turtle
 		tt = false;
 		turtle = null;
+		getString(sender, tt);
 	}
 
 	//Turn on/off (toggle)
@@ -224,13 +265,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/bp?")
 	public void TurtleBlockPlaceStatus(MessageReceiver sender, String[] args)
 	{
-		//Get the Boolean value 
-		String [] str = new String [5];
-		str[0] = "/c";
-		str[1] = bp + "";
-				
-		//return status of BP using TurtleConsole
-		TurtleConsole(sender, str);
+		getString(sender, bp);
 	}
 	
 	
@@ -310,7 +345,8 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/rd'")
 	public void TurtleReturnDirection(MessageReceiver sender, String[] args)
 	{
-		//return position of turtle	
+		//return direction of turtle
+		
 
 	}
 	//set Block Type (int based)
