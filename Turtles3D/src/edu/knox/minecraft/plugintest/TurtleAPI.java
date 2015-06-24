@@ -21,7 +21,8 @@ import net.canarymod.plugin.PluginListener;
 
 public class TurtleAPI  extends Plugin implements CommandListener, PluginListener {
 
-	TurtleAPI turtle;
+	Turtle turtle;
+	BlockType bt;
 	//World in which all actions occur
 	private World world;
 	//in world position
@@ -93,6 +94,46 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	private Position getRelPos(){
 		return null;
 	}
+	
+	private void getString(MessageReceiver sender, boolean b){
+		//Get the Boolean value 
+		String [] str = new String [5];
+		str[0] = "/c";
+		str[1] = b + "";
+				
+		//return status of BP using TurtleConsole
+		TurtleConsole(sender, str);
+	}
+	
+	private void getString(MessageReceiver sender, BlockType b){
+		//Get the Boolean value 
+		String [] str = new String [5];
+		str[0] = "/c";
+		str[1] = b + "";
+				
+		//return status of BP using TurtleConsole
+		TurtleConsole(sender, str);
+	}
+	
+	private void getString(MessageReceiver sender, Direction b){
+		//Get the Boolean value 
+		String [] str = new String [5];
+		str[0] = "/c";
+		str[1] = b + "";
+				
+		//return status of BP using TurtleConsole
+		TurtleConsole(sender, str);
+	}
+	
+	private void getString(MessageReceiver sender, Position b){
+		//Get the Boolean value 
+		String [] str = new String [5];
+		str[0] = "/c";
+		str[1] = b + "";
+				
+		//return status of BP using TurtleConsole
+		TurtleConsole(sender, str);
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void disable() {
@@ -123,7 +164,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 	//Turn On
 	@Command(
-			aliases = { "ton" },
+			aliases = { "ton, TurtleOn" },
 			description = "Turtle On",
 			permissions = { "" },
 			toolTip = "/ton")
@@ -151,10 +192,12 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 		//Turning on Turtle
 		tt = true;
+		
+		getString(sender, tt);
 	}
 	//Turn off
 	@Command(
-			aliases = { "toff" },
+			aliases = { "toff, TurtleOff" },
 			description = "Turtle Off",
 			permissions = { "" },
 			toolTip = "/toff")
@@ -163,6 +206,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		//Turning off Turtle
 		tt = false;
 		turtle = null;
+		getString(sender, tt);
 	}
 
 	//Turn on/off (toggle)
@@ -223,13 +267,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/bp?")
 	public void TurtleBlockPlaceStatus(MessageReceiver sender, String[] args)
 	{
-		//Get the Boolean value 
-		String [] str = new String [5];
-		str[0] = "/c";
-		str[1] = bp + "";
-				
-		//return status of BP using TurtleConsole
-		TurtleConsole(sender, str);
+		getString(sender, bp);
 	}
 	
 	
@@ -299,6 +337,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		//return position of turtle (relative position)
 		
 		//   getRelPos();
+		getString(sender, relPos);
 
 	}
 	//return Direction (status)
@@ -310,7 +349,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	public void TurtleReturnDirection(MessageReceiver sender, String[] args)
 	{
 		//return position of turtle	
-
+		getString(sender, relDir);
 	}
 	//set Block Type (int based)
 	@Command(
@@ -321,7 +360,8 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	public void TurtleSetBlockType(MessageReceiver sender, String[] args)
 	{
 		//set current BT of turtle	
-
+		BlockType temp = 
+		bt = temp;
 	}
 
 	//set Block type (string/BlockType based)
