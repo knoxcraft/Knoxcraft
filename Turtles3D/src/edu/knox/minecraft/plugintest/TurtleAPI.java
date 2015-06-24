@@ -21,6 +21,7 @@ import net.canarymod.plugin.PluginListener;
 
 public class TurtleAPI  extends Plugin implements CommandListener, PluginListener {
 
+	TurtleAPI turtle;
 	//World in which all actions occur
 	private World world;
 	//in world position
@@ -169,6 +170,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	{
 		//Turning off Turtle
 		tt = false;
+		turtle = null;
 	}
 
 	//Turn on/off (toggle)
@@ -216,10 +218,11 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/bp")
 	public void TurtleBlockPlace(MessageReceiver sender, String[] args)
 	{
-		//if Off, Turning on BP
-		//if On, Turning off BP	
-
+		bp = !bp;
+		TurtleBlockPlaceStatus(sender, args);
 	}
+	
+	
 	//Placement On? (status)
 	@Command(
 			aliases = { "bp?" },
@@ -228,9 +231,16 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/bp?")
 	public void TurtleBlockPlaceStatus(MessageReceiver sender, String[] args)
 	{
-		//return status of BP
-
+		//Get the Boolean value 
+		String [] str = new String [5];
+		str[0] = "/c";
+		str[1] = bp + "";
+				
+		//return status of BP using TurtleConsole
+		TurtleConsole(sender, str);
 	}
+	
+	
 	//Set position (based on relative grid)
 	@Command(
 			aliases = { "sp" },
