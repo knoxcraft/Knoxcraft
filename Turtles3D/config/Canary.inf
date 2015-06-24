@@ -1,4 +1,4 @@
-main-class=edu.knox.minecraft.plugintest.HelloWorld
+main-class=edu.knox.minecraft.plugintest.turtleTester
 author = ppypp and emhastings
 version = 0.0.0.1
 language = java
