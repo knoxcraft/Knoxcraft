@@ -262,10 +262,12 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	public void TurtleConsole(MessageReceiver sender, String[] args)
 	{
 		//Display string in console
-        for (String s : args) {
-        	//Assumes s is a valid string-> technically true if using Minecraft input, but might not always be true?
-            sender.message(s);
-        }
+		String message = "";
+	    for (int i=1; i<args.length; i++) {  //skip the command, just send the message
+	    	message = message + args[i]+ " ";
+	    }
+	    
+	    sender.message(message); 
 
 	}
 
@@ -383,8 +385,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	public void TurtleSetBlockType(MessageReceiver sender, String[] args)
 	{
 		//set current BT of turtle	
-		BlockType temp = 
-		bt = temp;
+		//this is unfinished and causing warnings-- uncomment it whenever
+		//BlockType temp = 
+		//bt = temp;
 	}
 
 	//set Block type (string/BlockType based)
