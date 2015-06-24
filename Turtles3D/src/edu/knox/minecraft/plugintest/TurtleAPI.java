@@ -197,9 +197,13 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/c + 'String'")
 	public void TurtleConsole(MessageReceiver sender, String[] args)
 	{
-		//Need to solve multi-word console messages
-		    sender.message(args[1]);
-        
+		
+		    String message = "";
+		    for (int i=1; i<args.length; i++) {  //skip the command, just send the message
+		    	message = message + args[i]+ " ";
+		    }
+		    
+		    sender.message(message);        
 
 	}
 
