@@ -3,6 +3,7 @@ package edu.knox.minecraft.plugintest;
 import net.canarymod.Canary;
 import net.canarymod.api.entity.living.humanoid.Player;
 import net.canarymod.api.world.World;
+import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
 import net.canarymod.api.world.position.Position;
 import net.canarymod.chat.MessageReceiver;
@@ -42,6 +43,8 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	//HELPER FUNCTIONS
 	private void updateCurPos(){
 		//curPos = truePos + relPos;
+		
+		
 	}
 	private Position getRelPos(){
 		return null;
@@ -103,7 +106,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 
 		//Turning on Turtle
-
+		tt = true;
 	}
 	//Turn off
 	@Command(
@@ -114,7 +117,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	public void TurtleOff(MessageReceiver sender, String[] args)
 	{
 		//Turning off Turtle
-
+		tt = false;
 	}
 
 	//Turn on/off (toggle)
@@ -125,18 +128,18 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/tt")
 	public void TurtleToggle(MessageReceiver sender, String[] args)
 	{
-		//if Off, Turning on Turtle
-		if (tt){
+		if (tt)
+		{ //if On, Turning off Turtle
 			TurtleOff(sender, args);
-		}else{
+		}
+		else
+		{ //if Off, Turning on Turtle
 			TurtleOn(sender, args);
 		}
-		//if On, Turning off Turtle
-
 	}
 
 
-	//Other Commands
+	//Other Commands*******************************************************************************
 
 	//Console output
 	@Command(
@@ -296,6 +299,17 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		// Move should act in a loop to go 1 -> just happens. To go 10, loop 10 times
 		//Allows easier pos/ bp coding
 		
+		//If block place True
+		if (bp) {
+			Position pos = sender.asPlayer().getPosition();
+	    	//change
+	    	int type = Integer.parseInt(args[1]);
+	    	BlockType t = BlockType.fromId(type);
+	    	world.setBlockAt(pos, t);
+		}else {
+			//Place nothing
+			
+		}
 	}
 
 	//turn (number based) (degrees)
