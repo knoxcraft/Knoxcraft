@@ -87,12 +87,34 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//HELPER FUNCTIONS
 	private void updateCurPos(){
+		int xt = truePos.getBlockX();
+		int yt = truePos.getBlockY();
+		int zt = truePos.getBlockZ();		
+		
+		int xr = relPos.getBlockX();
+		int yr = relPos.getBlockY();
+		int zr = relPos.getBlockZ();
+		
 		//curPos = truePos + relPos;
 		
+		curPos.setX(xt+xr);
+		curPos.setY(yt+yr);
+		curPos.setZ(zt+zr);
 		
 	}
-	private Position getRelPos(){
-		return null;
+	private void getRelPos(){
+		int xc = curPos.getBlockX();
+		int yc = curPos.getBlockY();
+		int zc = curPos.getBlockZ();
+		
+		int xt = truePos.getBlockX();
+		int yt = truePos.getBlockY();
+		int zt = truePos.getBlockZ();	
+		
+		relPos.setX(xc-xt);
+		relPos.setY(yc-yt);
+		relPos.setZ(zc-zt);
+		
 	}
 	
 	private void getString(MessageReceiver sender, boolean b){
@@ -107,9 +129,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	
 	private void getString(MessageReceiver sender, BlockType b){
 		//Get the Boolean value 
-		String [] str = new String [5];
+		String []str = new String [5];
 		str[0] = "/c";
-		str[1] = b + "";
+		str[1] = b.toString() + "";
 				
 		//return status of BP using TurtleConsole
 		TurtleConsole(sender, str);
@@ -119,7 +141,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		//Get the Boolean value 
 		String [] str = new String [5];
 		str[0] = "/c";
-		str[1] = b + "";
+		str[1] = b.toString() + "";
 				
 		//return status of BP using TurtleConsole
 		TurtleConsole(sender, str);
@@ -129,7 +151,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		//Get the Boolean value 
 		String [] str = new String [5];
 		str[0] = "/c";
-		str[1] = b + "";
+		str[1] = b.toString() + "";
 				
 		//return status of BP using TurtleConsole
 		TurtleConsole(sender, str);
@@ -192,7 +214,8 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 		//Turning on Turtle
 		tt = true;
-		
+		getString(sender, truePos);
+		getString(sender, trueDir);
 		getString(sender, tt);
 	}
 	//Turn off
