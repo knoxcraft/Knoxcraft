@@ -1,0 +1,3 @@
+bin=bin
+dest=target
+install.location=/path/to/Canarymod/plugins
