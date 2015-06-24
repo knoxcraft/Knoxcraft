@@ -9,7 +9,7 @@ import net.canarymod.commandsys.CommandListener;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
 
-public class TurlteTester extends Plugin implements CommandListener, PluginListener {
+public class TurtleTester extends Plugin implements CommandListener, PluginListener {
 
 		private World world;
 		
