@@ -39,6 +39,57 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	//Block Place on/off
 	private boolean bp;
 	
+	///***************???????????/
+	//OLD CODE
+//	 @Command(
+//	            aliases = { "turtleoff", "toff" },
+//	            description = "Turns off turtle mode",
+//	            permissions = { "" },
+//	            toolTip = "/turtleoff")
+//	    public void turtleOffCommand(MessageReceiver sender, String[] args)
+//	    {
+//	    	turtleMode = false;
+//	    	turtle = null;
+//	    	
+//	    	//alert player
+//	    	sender.message("Turtle mode off");
+//	    }
+//	    
+//	    @Command(
+//	            aliases = { "forward"},
+//	            description = "Move the turtle forward dropping blocks",
+//	            permissions = { "" },
+//	            toolTip = "/forward [spaces]")
+//	    public void turtleForwardCommand(MessageReceiver sender, String[] args)
+//	    {
+//	    	if (turtleMode)  {
+//	    		//did the user specify a number of spaces?
+//	    		int spaces = 1;   		
+//	    		if (args.length > 1)  {
+//	    			spaces = Integer.parseInt(args[1]);
+//	    		}
+//	    		
+//	    		//move forward the desired number of spaces
+//	    		Vector3D forDir = sender.asPlayer().getForwardVector();
+//	    		for (int i=0; i<spaces; i++)  {
+//	    			turtle.forward(forDir);
+//	    		}
+//	    		
+//	    	}  else {
+//	    		//alert player
+//	        	sender.message("Turtle mode is not on.");
+//	    	}
+	//END OF OLD CODE
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//Constructors
+	//Make a Turtle
+	
+	public TurtleAPI(World world) {
+		this.world = world;
+	}
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//HELPER FUNCTIONS
 	private void updateCurPos(){
