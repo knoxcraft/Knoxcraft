@@ -126,7 +126,11 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	public void TurtleToggle(MessageReceiver sender, String[] args)
 	{
 		//if Off, Turning on Turtle
-
+		if (tt){
+			TurtleOff(sender, args);
+		}else{
+			TurtleOn(sender, args);
+		}
 		//if On, Turning off Turtle
 
 	}
