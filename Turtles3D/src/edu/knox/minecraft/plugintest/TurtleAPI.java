@@ -164,7 +164,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 	//Turn On
 	@Command(
-			aliases = { "ton" , "TurtleOn"},
+			aliases = { "ton" },
 			description = "Turtle On",
 			permissions = { "" },
 			toolTip = "/ton")
@@ -192,13 +192,16 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 		//Turning on Turtle
 		tt = true;
+<<<<<<< HEAD
 		//MAKE A TURTLE
 		
 		getString(sender, tt);
+=======
+>>>>>>> parent of 9549e85... console changes
 	}
 	//Turn off
 	@Command(
-			aliases = { "toff", "TurtleOff" },
+			aliases = { "toff" },
 			description = "Turtle Off",
 			permissions = { "" },
 			toolTip = "/toff")
@@ -239,9 +242,11 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/c + 'String'")
 	public void TurtleConsole(MessageReceiver sender, String[] args)
 	{
-		//Need to solve multi-word console messages
-		    sender.message(args[1]);
-        
+		//Display string in console
+        for (String s : args) {
+        	//Assumes s is a valid string-> technically true if using Minecraft input, but might not always be true?
+            sender.message(s);
+        }
 
 	}
 
