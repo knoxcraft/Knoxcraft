@@ -15,7 +15,7 @@
 	<property file="build.properties"/>
 
     <target name="build" depends="depends" description="description">
-        <jar destfile="${dest}/canarymodtest.jar">
+        <jar destfile="${dest}/Turtle.jar">
         	<fileset file="${bin}/**"/>
         	<fileset file="config/Canary.inf"/>
     	</jar>
@@ -26,7 +26,7 @@
     </target>
 	
 	<target name="install" depends="build">
-		<copy file="${dest}/canarymodtest.jar" todir="${install.location}"/>
+		<copy file="${dest}/Turtle.jar" todir="${install.location}"/>
 	</target>
 
 </project>
