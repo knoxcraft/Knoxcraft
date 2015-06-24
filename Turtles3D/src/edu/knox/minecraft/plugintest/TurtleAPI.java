@@ -552,7 +552,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 	//Turn On
 	@Command(
-			aliases = { "ton" , "TurtleOn"},
+			aliases = { "ton" },
 			description = "Turtle On",
 			permissions = { "" },
 			toolTip = "/ton")
@@ -580,13 +580,10 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 		//Turning on Turtle
 		tt = true;
-		//MAKE A TURTLE
-		
-		
 	}
 	//Turn off
 	@Command(
-			aliases = { "toff", "TurtleOff" },
+			aliases = { "toff" },
 			description = "Turtle Off",
 			permissions = { "" },
 			toolTip = "/toff")
@@ -626,6 +623,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/c + 'String'")
 	public void TurtleConsole(MessageReceiver sender, String[] args)
 	{
+<<<<<<< HEAD
 		
 		    String message = "";
 		    for (int i=1; i<args.length; i++) {  //skip the command, just send the message
@@ -633,6 +631,13 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		    }
 		    
 		    sender.message(message);        
+=======
+		//Display string in console
+        for (String s : args) {
+        	//Assumes s is a valid string-> technically true if using Minecraft input, but might not always be true?
+            sender.message(s);
+        }
+>>>>>>> parent of 9549e85... console changes
 
 	}
 
