@@ -197,6 +197,22 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		//return status of BP using TurtleConsole
 		TurtleConsole(sender, str);
 	}
+	
+	/**
+	 * Checks whether turtle mode is on.  If so, returns true.  If not, alerts user and returns false.
+	 * @return
+	 */
+	private boolean checkTT(MessageReceiver sender)  {
+		if (tt)  { //turtle mode is on-- no problems
+			return true;
+		}  else  {  //turtle mode is off-- need to alert user
+			String [] str = new String [2];
+			str[0] = "/c";
+			str[1] = "Turtle mode is not on.";
+			TurtleConsole(sender, str);
+			return false;
+		}
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void disable() {
@@ -321,6 +337,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/bp")
 	public void TurtleBlockPlace(MessageReceiver sender, String[] args)
 	{
+		if (!checkTT(sender))  //Don't allow if turtle mode is not on
+			return;
+		
 		bp = !bp;
 		TurtleBlockPlaceStatus(sender, args);
 	}
@@ -334,6 +353,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/bp?")
 	public void TurtleBlockPlaceStatus(MessageReceiver sender, String[] args)
 	{
+		if (!checkTT(sender))  //Don't allow if turtle mode is not on
+			return;
+		
 		getString(sender, bp);
 	}
 	
@@ -346,6 +368,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/sp'")
 	public void TurtleSetPosition(MessageReceiver sender, String[] args)
 	{
+		if (!checkTT(sender))  //Don't allow if turtle mode is not on
+			return;
+		
 		//Chnage location to new location based on relative coordinates
 		relPos = new Position (Integer.parseInt(args[1]), Integer.parseInt(args[2]),Integer.parseInt(args[3]));
 	}
@@ -359,6 +384,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/sd'")
 	public void TurtleSetDirection(MessageReceiver sender, String[] args)
 	{
+		if (!checkTT(sender))  //Don't allow if turtle mode is not on
+			return;
+		
 		relDir = Direction.getFromIntValue(Integer.parseInt(args[1]));
 		// 0 = NORTH
 		// 2 = EAST
@@ -376,6 +404,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/rp'")
 	public void TurtleReturnPosition(MessageReceiver sender, String[] args)
 	{
+		if (!checkTT(sender))  //Don't allow if turtle mode is not on
+			return;
+		
 		//return position of turtle (relative position)
 		
 		//   getRelPos();
@@ -391,6 +422,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/rd'")
 	public void TurtleReturnDirection(MessageReceiver sender, String[] args)
 	{
+		if (!checkTT(sender))  //Don't allow if turtle mode is not on
+			return;
+		
 		//return position of turtle	
 		getString(sender, relDir);
 	}
@@ -403,7 +437,13 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/sb'")
 	public void TurtleSetBlockType(MessageReceiver sender, String[] args)
 	{
+<<<<<<< HEAD
 		BlockType temp;
+=======
+		if (!checkTT(sender))  //Don't allow if turtle mode is not on
+			return;
+		
+>>>>>>> origin/master
 		//set current BT of turtle	
 		if (args[2] == null)
 		{
@@ -427,6 +467,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/rb'")
 	public void TurtleReturnBlockType(MessageReceiver sender, String[] args)
 	{
+		if (!checkTT(sender))  //Don't allow if turtle mode is not on
+			return;
+		
 		//return current BT of turtle	
 		getString(sender, bt);
 	}
@@ -440,6 +483,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/m or /f or /b")
 	public void TurtleMove(MessageReceiver sender, String[] args)
 	{
+		if (!checkTT(sender))  //Don't allow if turtle mode is not on
+			return;
+		
 		//move turtle	
 		// Move should act in a loop to go 1 -> just happens. To go 10, loop 10 times
 		//Allows easier pos/ bp coding
@@ -478,6 +524,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/t'")
 	public void TurtleTurn(MessageReceiver sender, String[] args)
 	{
+		if (!checkTT(sender))  //Don't allow if turtle mode is not on
+			return;
+		
 		//turn turtle (left or right)
 
 	}
