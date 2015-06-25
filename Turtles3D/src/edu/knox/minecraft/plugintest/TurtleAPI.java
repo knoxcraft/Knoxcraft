@@ -399,12 +399,12 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 
 		//set current BT of turtle	
-		//if (args[2].is)
-		//{
+		if (!(args.length == 3))
+		{
 			temp = BlockType.fromId(Integer.parseInt(args[1]));
-		//}//else{
-		//	temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-		//}
+		}else{
+			temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+		}
 		
 		bt = temp;
 
