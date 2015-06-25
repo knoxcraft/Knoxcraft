@@ -1,7 +1,6 @@
 package edu.knox.minecraft.plugintest;
 
 import net.canarymod.Canary;
-import net.canarymod.api.entity.living.humanoid.Player;
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
@@ -13,7 +12,6 @@ import net.canarymod.commandsys.CommandListener;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
 
-//Or we could keep rel pos/dir because they get set up intially (or should be)
 
 //Things need to be overly simple during testing for ease of use
 
@@ -23,7 +21,7 @@ import net.canarymod.plugin.PluginListener;
 public class TurtleAPI  extends Plugin implements CommandListener, PluginListener {
 
 	Turtle turtle;
-	BlockType bt;
+	BlockType bt = BlockType.Stone;
 	//World in which all actions occur
 	private World world;
 	//in world position
@@ -37,11 +35,11 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	private Direction curDir;
 
 	//Turtle on/off
-	private boolean tt;
+	private boolean tt = false;
 	//Block Place on/off
-	private boolean bp;
+	private boolean bp = false;
 	//flipped direction
-	private boolean fd;	
+	private boolean fd = false;	
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//HELPER FUNCTIONS
@@ -209,6 +207,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/ton")
 	public void TurtleOn(MessageReceiver sender, String[] args)
 	{
+		
+		//GET WORLD
+		world = sender.asPlayer().getWorld();
 		//Relative pos stuff
 
 		//Get True Position and Direction
