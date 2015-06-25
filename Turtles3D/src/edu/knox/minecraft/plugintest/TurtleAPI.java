@@ -35,123 +35,123 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	//current position (made by combining relative and real) -> this gets sent to the game 
 	private Position curPos;
 	private Direction curDir;
-	
+
 	//Turtle on/off
 	private boolean tt;
 	//Block Place on/off
 	private boolean bp;
 	//flipped direction
 	private boolean fd;	
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//HELPER FUNCTIONS
-	
+
 	private void updateCurPos(){
 		int xt = truePos.getBlockX();
 		int yt = truePos.getBlockY();
 		int zt = truePos.getBlockZ();		
-		
+
 		int xr = relPos.getBlockX();
 		int yr = relPos.getBlockY();
 		int zr = relPos.getBlockZ();
-		
+
 		//curPos = truePos + relPos;
-		
+
 		curPos.setX(xt+xr);
 		curPos.setY(yt+yr);
 		curPos.setZ(zt+zr);
-		
+
 	}
-	
+
 	private void updateCurDir(){
-		
+
 	}
-	
+
 	private void getRelPos(){
 		int xc = curPos.getBlockX();
 		int yc = curPos.getBlockY();
 		int zc = curPos.getBlockZ();
-		
+
 		int xt = truePos.getBlockX();
 		int yt = truePos.getBlockY();
 		int zt = truePos.getBlockZ();	
-		
+
 		relPos.setX(xc-xt);
 		relPos.setY(yc-yt);
 		relPos.setZ(zc-zt);
-		
+
 	}
-	
+
 	private void flipDir(){
 		int y = relDir.getIntValue();
 		switch(y){
-			case(0):
-				
+		case(0):
+
 			break;
-			case(1):
-				
-				break;
-			case(2):
-				
-				break;
-			case(3):
-				
-				break;
-			case(4):
-				
-				break;
-			case(5):
-				
-				break;
-			case(6):
-				
-				break;
-			case(7):
-				
-				break;		
+		case(1):
+
+			break;
+		case(2):
+
+			break;
+		case(3):
+
+			break;
+		case(4):
+
+			break;
+		case(5):
+
+			break;
+		case(6):
+
+			break;
+		case(7):
+
+			break;		
 		}				
 	}
-	
+
 	private void getString(MessageReceiver sender, boolean b){
 		//Get the Boolean value 
 		String [] str = new String [2];
 		str[0] = "/c";
 		str[1] = b + "";
-				
+
 		//return status of BP using TurtleConsole
 		TurtleConsole(sender, str);
 	}
-	
+
 	private void getString(MessageReceiver sender, BlockType b){
 		//Get the Boolean value 
 		String []str = new String [2];
 		str[0] = "/c";
 		str[1] = b.toString() + "";
-				
+
 		//return status of BP using TurtleConsole
 		TurtleConsole(sender, str);
 	}
-	
+
 	private void getString(MessageReceiver sender, Direction b){
 		//Get the Boolean value 
 		String [] str = new String [2];
 		str[0] = "/c";
 		str[1] = b.toString() + "";
-				
+
 		//return status of BP using TurtleConsole
 		TurtleConsole(sender, str);
 	}
-	
+
 	private void getString(MessageReceiver sender, Position b){
 		//Get the Boolean value 
 		String [] str = new String [2];
 		str[0] = "/c";
 		str[1] = b.toString() + ""; //Need to overload / fix this output
-				
+
 		//return status of BP using TurtleConsole
 		TurtleConsole(sender, str);
 	}
-	
+
 	/**
 	 * Checks whether turtle mode is on.  If so, returns true.  If not, alerts user and returns false.
 	 * @return
@@ -168,14 +168,19 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
+	/**
+	 * Called when plugin is disabled.  Currently does nothing.
+	 */
 	@Override
 	public void disable() {
 		// TODO Auto-generated method stub
-		//IGNORE :)
-
 	}
 
+	/**
+	 * Called when plugin is enabled. 
+	 * @return
+	 */
 	@Override
 	public boolean enable() {
 		try {
@@ -191,25 +196,25 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 	//API TIME
 
-
-	//Activate commands-> Set up relAative position
-	// 0,0,0 is player location -> forward is player direction
-
-
-	//Turn On
+	/**
+	 * Turn on turtle mode.  Sets up relative position. 
+	 * (0,0,0) is player position.  Forward is player direction.
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "ton, TurtleOn" },
+			aliases = { "ton", "TurtleOn" },
 			description = "Turtle On",
 			permissions = { "" },
 			toolTip = "/ton")
 	public void TurtleOn(MessageReceiver sender, String[] args)
 	{
 		//Relative pos stuff
-		
+
 		//Get True Position and Direction
 		truePos = sender.asPlayer().getPosition();
 		trueDir = sender.asPlayer().getCardinalDirection();
-		
+
 		//Make the Relative Position
 		relPos = new Position(0,0,0);
 		relDir = Direction.getFromIntValue(0);
@@ -220,10 +225,6 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		//Also, better way?
 		//If doesn't work-> set to North ONLY, as way to start debugging
 		relDir = trueDir; //??
-		
-		
-		
-
 
 		//Turning on Turtle
 		tt = true;
@@ -231,9 +232,14 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		getString(sender, trueDir);
 		getString(sender, tt);
 	}
-	//Turn off
+
+	/**
+	 * Turn off turtle mode.
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "toff, TurtleOff" },
+			aliases = { "toff", "TurtleOff" },
 			description = "Turtle Off",
 			permissions = { "" },
 			toolTip = "/toff")
@@ -245,9 +251,13 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		getString(sender, tt);
 	}
 
-	//Turn on/off (toggle)
+	/**
+	 * Toggle turtle mode on/off.
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "tt" },
+			aliases = { "tt", "TurtleToggle" },
 			description = "Turtle Toggle",
 			permissions = { "" },
 			toolTip = "/tt")
@@ -266,9 +276,14 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 	//Other Commands*******************************************************************************
 
-	//Console output
+	/**
+	 * Output a message to the player console.
+	 * Expects args[0] = "c"   
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "c" },
+			aliases = { "c", "TurtleConsole" },
 			description = "Turtle Console",
 			permissions = { "" },
 			toolTip = "/c + 'String'")
@@ -276,17 +291,23 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	{
 		//Display string in console
 		String message = "";
-	    for (int i=1; i<args.length; i++) {  //skip the command, just send the message
-	    	message = message + args[i]+ " ";
-	    }
-	    
-	    sender.message(message); 
+		for (int i=1; i<args.length; i++) {  //skip the command, just send the message
+			message = message + args[i]+ " ";
+		}
+
+		sender.message(message); 
 
 	}
 
-	//Place Block on/off -> IF placement off -> dont change vs AIr placement)
+	/**
+	 * Toggle block placement mode on/off.
+	 * 
+	 * TODO:  IF placement off -> dont change vs AIr placement
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "bp" },
+			aliases = { "bp", "BlockPlacement" },
 			description = "Turtle Block Placement",
 			permissions = { "" },
 			toolTip = "/bp")
@@ -294,15 +315,19 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
 			return;
-		
+
 		bp = !bp;
 		TurtleBlockPlaceStatus(sender, args);
 	}
-	
-	
-	//Placement On? (status)
+
+
+	/**
+	 * Checks whether block placement mode is on.
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "bp?" },
+			aliases = { "bp?", "CheckBlockPlacement" },
 			description = "Turtle Block Placement",
 			permissions = { "" },
 			toolTip = "/bp?")
@@ -310,14 +335,17 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
 			return;
-		
+
 		getString(sender, bp);
 	}
-	
-	
-	//Set position (based on relative grid)
+
+	/**
+	 * Set turtle position (relative coords)
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "sp" },
+			aliases = { "sp", "SetPosition" },
 			description = "Turtle Setpos",
 			permissions = { "" },
 			toolTip = "/sp'")
@@ -325,15 +353,19 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
 			return;
-		
-		//Chnage location to new location based on relative coordinates
+
+		//Change location to new location based on relative coordinates
 		relPos = new Position (Integer.parseInt(args[1]), Integer.parseInt(args[2]),Integer.parseInt(args[3]));
 	}
-	//Set direction (textbased)(North, South, East, West)
-	//Number based for simplicity in early tests?
 
+	/**
+	 * Set turtle direction.  Textbased (North, South, East, West)
+	 * Number based for simplicity in early tests?
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "sd" },
+			aliases = { "sd", "SetDirection" },
 			description = "Turtle Setdir",
 			permissions = { "" },
 			toolTip = "/sd'")
@@ -341,7 +373,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
 			return;
-		
+
 		relDir = Direction.getFromIntValue(Integer.parseInt(args[1]));
 		// 0 = NORTH
 		// 2 = EAST
@@ -351,9 +383,13 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 	}
 
-	//Return current pos
+	/**
+	 * Return current position (relative)
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "rp" },
+			aliases = { "rp", "ReturnDirection" },
 			description = "Turtle retpos",
 			permissions = { "" },
 			toolTip = "/rp'")
@@ -361,17 +397,20 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
 			return;
-		
+
 		//return position of turtle (relative position)
-		
+
 		//   getRelPos();
 		getString(sender, relPos);
-
 	}
-	
-	//return Direction (status)
+
+	/**
+	 * Return current direction (relative)
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "rd" },
+			aliases = { "rd", "ReturnDirection" },
 			description = "Turtle retdir",
 			permissions = { "" },
 			toolTip = "/rd'")
@@ -379,14 +418,18 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
 			return;
-		
+
 		//return position of turtle	
 		getString(sender, relDir);
 	}
-	
-	//set Block Type (int based)
+
+	/**
+	 * Set block type (int based)
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "sb" },
+			aliases = { "sb", "SetBlockType" },
 			description = "Turtle set bt",
 			permissions = { "" },
 			toolTip = "/sb'")
@@ -394,7 +437,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
 			return;
-		
+
 		BlockType temp;
 
 
@@ -405,17 +448,25 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		}else{
 			temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
 		}
-		
+
 		bt = temp;
 
 	}
 
-	//set Block type (string/BlockType based)
+	/**
+	 * set Block type (string/BlockType based)
+	 * @param sender
+	 * @param args
+	 */
 	//TODO implementation
 
-	//return block type
+	/**
+	 * Return current block type
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "rb" },
+			aliases = { "rb", "ReturnBlockType" },
 			description = "Turtle ret bt",
 			permissions = { "" },
 			toolTip = "/rb'")
@@ -423,15 +474,18 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
 			return;
-		
+
 		//return current BT of turtle	
 		getString(sender, bt);
 	}
 
-
-	//move (forward/back)
+	/**
+	 * Move (forward/back)
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "m" , "f", "b"},
+			aliases = { "m" , "f", "b", "move", "forward", "back"},
 			description = "Turtle move",
 			permissions = { "" },
 			toolTip = "/m or /f or /b")
@@ -439,7 +493,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
 			return;
-		
+
 		//move turtle	
 		// Move should act in a loop to go 1 -> just happens. To go 10, loop 10 times
 		//Allows easier pos/ bp coding
@@ -453,12 +507,12 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		for (int i = x; i > 0; i--){
 			//If block place True
 			if (bp) {
-				
-		    	world.setBlockAt(relPos, bt);
+
+				world.setBlockAt(relPos, bt);
 			}else {
 				//Place nothing
 			}
-			
+
 			relPos = turtle.move(relPos, relDir, false, false);
 		}
 		if (fd = true){
@@ -467,12 +521,20 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		}
 	}
 
-	//turn (number based) (degrees)
+	/**
+	 * turn (number based) (degrees)
+	 * @param sender
+	 * @param args
+	 */
 	//TODO implementation -> will allow diagonals
 
-	//turn (Right/Left) (text based)
+	/**
+	 * Turn (Right/Left) (text based)
+	 * @param sender
+	 * @param args
+	 */	
 	@Command(
-			aliases = { "t" },
+			aliases = { "t", "turn" },
 			description = "Turtle turn",
 			permissions = { "" },
 			toolTip = "/t'")
@@ -480,17 +542,18 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
 			return;
-		
+
 		//turn turtle (left or right)
 
 	}
 
-	//turn (number based) (degrees)
-	//TODO implementation -> will allow diagonals
-
-	//turn (Right/Left) (text based)
+	/**
+	 * Moves turtle up/down
+	 * @param sender
+	 * @param args
+	 */
 	@Command(
-			aliases = { "u", "d" },
+			aliases = { "u", "d", "up", "down" },
 			description = "Turtle up/down",
 			permissions = { "" },
 			toolTip = "/u or /d'")
@@ -498,25 +561,25 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	{
 		//move up or down turtle (left or right)
 		//move turtle	
-				// Move should act in a loop to go 1 -> just happens. To go 10, loop 10 times
-				//Allows easier pos/ bp coding
-				int x = Integer.parseInt(args[1]);
-				boolean dir = true;
-				//check if negative
-				if (x < 0){
-					x = -x;
-					dir = !dir;
-				}
-				for (int i = x; i > 0; i--){
-					//If block place True
-					if (bp) {
-						
-				    	world.setBlockAt(relPos, bt);
-					}else {
-						//Place nothing
-					}
-					
-					relPos = turtle.move(relPos, relDir, dir, !dir);//RelDir dont matter
-				}				
+		// Move should act in a loop to go 1 -> just happens. To go 10, loop 10 times
+		//Allows easier pos/ bp coding
+		int x = Integer.parseInt(args[1]);
+		boolean dir = true;
+		//check if negative
+		if (x < 0){
+			x = -x;
+			dir = !dir;
+		}
+		for (int i = x; i > 0; i--){
+			//If block place True
+			if (bp) {
+
+				world.setBlockAt(relPos, bt);
+			}else {
+				//Place nothing
+			}
+
+			relPos = turtle.move(relPos, relDir, dir, !dir);//RelDir dont matter
+		}				
 	}
 }
