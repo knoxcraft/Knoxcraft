@@ -303,7 +303,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	public void TurtleSetPosition(MessageReceiver sender, String[] args)
 	{
 		//Chnage location to new location based on relative coordinates
-
+		relPos = new Position (Integer.parseInt(args[1]), Integer.parseInt(args[2]),Integer.parseInt(args[3]));
 	}
 	//Set direction (textbased)(North, South, East, West)
 	//Number based for simplicity in early tests?
@@ -315,37 +315,12 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/sd'")
 	public void TurtleSetDirection(MessageReceiver sender, String[] args)
 	{
-		//Chnage direction
-		//CANARY MOD API CODE SECTION :::
-		//			switch (value) {
-		//			025            case 0:
-		//			026                return NORTH;
-		//			027
-		//			028            case 1:
-		//			029                return NORTHEAST;
-		//			030
-		//			031            case 2:
-		//			032                return EAST;
-		//			033
-		//			034            case 3:
-		//			035                return SOUTHEAST;
-		//			036
-		//			037            case 4:
-		//			038                return SOUTH;
-		//			039
-		//			040            case 5:
-		//			041                return SOUTHWEST;
-		//			042
-		//			043            case 6:
-		//			044                return WEST;
-		//			045
-		//			046            case 7:
-		//			047                return NORTHWEST;
-		//			048
-		//			049            default:
-		//			050                return ERROR;
-		//			051        }
-		//////////////////////////////::::::
+		relDir = Direction.getFromIntValue(Integer.parseInt(args[1]));
+		// 0 = NORTH
+		// 2 = EAST
+		// 4 = SOUTH
+		// 6 = WEST
+		// Else = ERROR
 
 	}
 
@@ -363,6 +338,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		getString(sender, relPos);
 
 	}
+	
 	//return Direction (status)
 	@Command(
 			aliases = { "rd" },
@@ -374,6 +350,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		//return position of turtle	
 		getString(sender, relDir);
 	}
+	
 	//set Block Type (int based)
 	@Command(
 			aliases = { "sb" },
@@ -383,7 +360,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	public void TurtleSetBlockType(MessageReceiver sender, String[] args)
 	{
 		//set current BT of turtle	
-		BlockType temp = 
+		BlockType temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
 		bt = temp;
 	}
 
@@ -415,17 +392,18 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		// Move should act in a loop to go 1 -> just happens. To go 10, loop 10 times
 		//Allows easier pos/ bp coding
 		
-		//If block place True
-		if (bp) {
-			Position pos = sender.asPlayer().getPosition();
-	    	//change
-	    	int type = Integer.parseInt(args[1]);
-	    	BlockType t = BlockType.fromId(type);
-	    	world.setBlockAt(pos, t);
-		}else {
-			//Place nothing
+		for (int i = Integer.parseInt(args[1]); i > 0; i--){
+			//If block place True
+			if (bp) {
+				
+		    	world.setBlockAt(relPos, bt);
+			}else {
+				//Place nothing
+			}
 			
+			relPos = turtle.move(relPos, relDir, false);
 		}
+		
 	}
 
 	//turn (number based) (degrees)
