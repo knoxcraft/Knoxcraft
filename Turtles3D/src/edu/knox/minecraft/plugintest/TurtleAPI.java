@@ -127,7 +127,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	
 	private void getString(MessageReceiver sender, boolean b){
 		//Get the Boolean value 
-		String [] str = new String [5];
+		String [] str = new String [2];
 		str[0] = "/c";
 		str[1] = b + "";
 				
@@ -137,7 +137,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	
 	private void getString(MessageReceiver sender, BlockType b){
 		//Get the Boolean value 
-		String []str = new String [5];
+		String []str = new String [2];
 		str[0] = "/c";
 		str[1] = b.toString() + "";
 				
@@ -147,7 +147,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	
 	private void getString(MessageReceiver sender, Direction b){
 		//Get the Boolean value 
-		String [] str = new String [5];
+		String [] str = new String [2];
 		str[0] = "/c";
 		str[1] = b.toString() + "";
 				
@@ -157,9 +157,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	
 	private void getString(MessageReceiver sender, Position b){
 		//Get the Boolean value 
-		String [] str = new String [5];
+		String [] str = new String [2];
 		str[0] = "/c";
-		str[1] = b.toString() + "";
+		str[1] = b.toString() + ""; //Need to overload / fix this output
 				
 		//return status of BP using TurtleConsole
 		TurtleConsole(sender, str);
@@ -388,7 +388,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	public void TurtleReturnBlockType(MessageReceiver sender, String[] args)
 	{
 		//return current BT of turtle	
-
+		getString(sender, bt);
 	}
 
 
