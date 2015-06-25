@@ -42,6 +42,8 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	private boolean tt;
 	//Block Place on/off
 	private boolean bp;
+	//flipped direction
+	private boolean fd;
 	
 	///***************???????????/
 	//OLD CODE
@@ -123,7 +125,38 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		
 	}
 	
-	
+	private void flipDir(){
+		int y = relDir.getIntValue();
+		switch(y){
+			case(0):
+				
+			break;
+			case(1):
+				
+				break;
+			case(2):
+				
+				break;
+			case(3):
+				
+				break;
+			case(4):
+				
+				break;
+			case(5):
+				
+				break;
+			case(6):
+				
+				break;
+			case(7):
+				
+				break;
+		
+		
+		}
+				
+	}
 	
 	private void getString(MessageReceiver sender, boolean b){
 		//Get the Boolean value 
@@ -370,8 +403,15 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/sb'")
 	public void TurtleSetBlockType(MessageReceiver sender, String[] args)
 	{
+		BlockType temp;
 		//set current BT of turtle	
-		BlockType temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+		if (args[2] == null)
+		{
+			temp = BlockType.fromId(Integer.parseInt(args[1]));
+		}else{
+			temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+		}
+		
 		bt = temp;
 
 	}
@@ -394,17 +434,23 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 	//move (forward/back)
 	@Command(
-			aliases = { "m" },
+			aliases = { "m" , "f", "b"},
 			description = "Turtle move",
 			permissions = { "" },
-			toolTip = "/m'")
+			toolTip = "/m or /f or /b")
 	public void TurtleMove(MessageReceiver sender, String[] args)
 	{
 		//move turtle	
 		// Move should act in a loop to go 1 -> just happens. To go 10, loop 10 times
 		//Allows easier pos/ bp coding
-		
-		for (int i = Integer.parseInt(args[1]); i > 0; i--){
+		int x = Integer.parseInt(args[1]);
+		//check if negative
+		if (x < 0){
+			x = -x;
+			flipDir();
+			fd = true;
+		}
+		for (int i = x; i > 0; i--){
 			//If block place True
 			if (bp) {
 				
@@ -413,9 +459,12 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 				//Place nothing
 			}
 			
-			relPos = turtle.move(relPos, relDir, false);
+			relPos = turtle.move(relPos, relDir, false, false);
 		}
-		
+		if (fd = true){
+			fd = false;
+			flipDir();
+		}
 	}
 
 	//turn (number based) (degrees)
@@ -433,6 +482,41 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 	}
 
+	//turn (number based) (degrees)
+	//TODO implementation -> will allow diagonals
+
+	//turn (Right/Left) (text based)
+	@Command(
+			aliases = { "u", "d" },
+			description = "Turtle up/down",
+			permissions = { "" },
+			toolTip = "/u or /d'")
+	public void TurtleUpDown(MessageReceiver sender, String[] args)
+	{
+		//move up or down turtle (left or right)
+		//move turtle	
+				// Move should act in a loop to go 1 -> just happens. To go 10, loop 10 times
+				//Allows easier pos/ bp coding
+				int x = Integer.parseInt(args[1]);
+				boolean dir = true;
+				//check if negative
+				if (x < 0){
+					x = -x;
+					dir = !dir;
+				}
+				for (int i = x; i > 0; i--){
+					//If block place True
+					if (bp) {
+						
+				    	world.setBlockAt(relPos, bt);
+					}else {
+						//Place nothing
+					}
+					
+					relPos = turtle.move(relPos, relDir, dir, !dir);//RelDir dont matter
+				}
+				
+	}
 
 
 }

@@ -9,7 +9,7 @@ public class Turtle {
 	//Constructor
 	
 	//Move (adjust relPos)
-	public Position move (Position p, Direction d, boolean b){ 
+	public Position move (Position p, Direction d, boolean up, boolean down){ 
 		//Boolean is for vertical changes-> ignore position and direction if veritcal
 		//unless canry handles vertical?? -> need to find out-> would simplify things
 		
