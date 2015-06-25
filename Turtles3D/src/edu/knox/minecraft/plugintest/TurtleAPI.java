@@ -207,6 +207,8 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/ton")
 	public void TurtleOn(MessageReceiver sender, String[] args)
 	{
+		//Make Turtle
+		turtle = new Turtle();
 		
 		//GET WORLD
 		world = sender.asPlayer().getWorld();
@@ -390,7 +392,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 * @param args
 	 */
 	@Command(
-			aliases = { "rp", "ReturnDirection" },
+			aliases = { "rp", "ReturnPosition" },
 			description = "Turtle retpos",
 			permissions = { "" },
 			toolTip = "/rp'")
@@ -430,7 +432,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 * @param args
 	 */
 	@Command(
-			aliases = { "sb", "SetBlockType" },
+			aliases = { "sb", "SetBlock" },
 			description = "Turtle set bt",
 			permissions = { "" },
 			toolTip = "/sb'")
@@ -467,7 +469,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 * @param args
 	 */
 	@Command(
-			aliases = { "rb", "ReturnBlockType" },
+			aliases = { "rb", "ReturnBlock" },
 			description = "Turtle ret bt",
 			permissions = { "" },
 			toolTip = "/rb'")
