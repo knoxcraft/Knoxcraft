@@ -13,6 +13,8 @@ import net.canarymod.commandsys.CommandListener;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
 
+// If tt is not true-> no other command works??
+//Or we could keep rel pos/dir because they get set up intially (or should be)
 
 //Things need to be overly simple during testing for ease of use
 
@@ -102,6 +104,10 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		curPos.setZ(zt+zr);
 		
 	}
+	
+	private void updateCurDir(){
+		
+	}
 	private void getRelPos(){
 		int xc = curPos.getBlockX();
 		int yc = curPos.getBlockY();
@@ -116,6 +122,8 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		relPos.setZ(zc-zt);
 		
 	}
+	
+	
 	
 	private void getString(MessageReceiver sender, boolean b){
 		//Get the Boolean value 
@@ -200,8 +208,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		
 		//Make the Relative Position
 		relPos = new Position(0,0,0);
-		
+		relDir = Direction.getFromIntValue(0);
 		updateCurPos();
+		updateCurDir();
 		//Faces player direction
 		//Need to build in safety checks
 		//Also, better way?
