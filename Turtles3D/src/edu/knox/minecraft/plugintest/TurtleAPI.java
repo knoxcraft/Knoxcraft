@@ -13,7 +13,6 @@ import net.canarymod.commandsys.CommandListener;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
 
-// If tt is not true-> no other command works??
 //Or we could keep rel pos/dir because they get set up intially (or should be)
 
 //Things need to be overly simple during testing for ease of use
@@ -34,7 +33,6 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	private Position relPos;
 	private Direction relDir;
 	//current position (made by combining relative and real) -> this gets sent to the game 
-	//By subtracting truePos from curPos, you can get relPos -> MaKE helper methodd to handle this!!!!
 	private Position curPos;
 	private Direction curDir;
 	
@@ -43,53 +41,11 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	//Block Place on/off
 	private boolean bp;
 	//flipped direction
-	private boolean fd;
-	
-	///***************???????????/
-	//OLD CODE
-//	 @Command(
-//	            aliases = { "turtleoff", "toff" },
-//	            description = "Turns off turtle mode",
-//	            permissions = { "" },
-//	            toolTip = "/turtleoff")
-//	    public void turtleOffCommand(MessageReceiver sender, String[] args)
-//	    {
-//	    	turtleMode = false;
-//	    	turtle = null;
-//	    	
-//	    	//alert player
-//	    	sender.message("Turtle mode off");
-//	    }
-//	    
-//	    @Command(
-//	            aliases = { "forward"},
-//	            description = "Move the turtle forward dropping blocks",
-//	            permissions = { "" },
-//	            toolTip = "/forward [spaces]")
-//	    public void turtleForwardCommand(MessageReceiver sender, String[] args)
-//	    {
-//	    	if (turtleMode)  {
-//	    		//did the user specify a number of spaces?
-//	    		int spaces = 1;   		
-//	    		if (args.length > 1)  {
-//	    			spaces = Integer.parseInt(args[1]);
-//	    		}
-//	    		
-//	    		//move forward the desired number of spaces
-//	    		Vector3D forDir = sender.asPlayer().getForwardVector();
-//	    		for (int i=0; i<spaces; i++)  {
-//	    			turtle.forward(forDir);
-//	    		}
-//	    		
-//	    	}  else {
-//	    		//alert player
-//	        	sender.message("Turtle mode is not on.");
-//	    	}
-	//END OF OLD CODE
-	
+	private boolean fd;	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//HELPER FUNCTIONS
+	
 	private void updateCurPos(){
 		int xt = truePos.getBlockX();
 		int yt = truePos.getBlockY();
@@ -110,6 +66,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	private void updateCurDir(){
 		
 	}
+	
 	private void getRelPos(){
 		int xc = curPos.getBlockX();
 		int yc = curPos.getBlockY();
@@ -151,11 +108,8 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 				break;
 			case(7):
 				
-				break;
-		
-		
-		}
-				
+				break;		
+		}				
 	}
 	
 	private void getString(MessageReceiver sender, boolean b){
@@ -214,6 +168,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	@Override
 	public void disable() {
 		// TODO Auto-generated method stub
@@ -437,13 +392,11 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/sb'")
 	public void TurtleSetBlockType(MessageReceiver sender, String[] args)
 	{
-<<<<<<< HEAD
-		BlockType temp;
-=======
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
 			return;
 		
->>>>>>> origin/master
+		BlockType temp;
+
 		//set current BT of turtle	
 		if (args[2] == null)
 		{
@@ -563,9 +516,6 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 					}
 					
 					relPos = turtle.move(relPos, relDir, dir, !dir);//RelDir dont matter
-				}
-				
+				}				
 	}
-
-
 }
