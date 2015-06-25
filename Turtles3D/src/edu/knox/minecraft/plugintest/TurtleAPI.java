@@ -21,7 +21,7 @@ import net.canarymod.plugin.PluginListener;
 public class TurtleAPI  extends Plugin implements CommandListener, PluginListener {
 
 	Turtle turtle;
-	BlockType bt;
+	BlockType bt = BlockType.Stone;
 	//World in which all actions occur
 	private World world;
 	//in world position
@@ -202,6 +202,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			toolTip = "/ton")
 	public void TurtleOn(MessageReceiver sender, String[] args)
 	{
+		
+		//GET WORLD
+		world = sender.asPlayer().getWorld();
 		//Relative pos stuff
 		
 		//Get True Position and Direction
