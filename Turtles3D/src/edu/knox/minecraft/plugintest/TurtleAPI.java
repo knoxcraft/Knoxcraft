@@ -213,8 +213,8 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		//Make the Relative Position
 		relPos = new Position(0,0,0);
 		relDir = Direction.getFromIntValue(0);
-		updateCurPos();
-		updateCurDir();
+		//updateCurPos();
+		//updateCurDir();
 		//Faces player direction
 		//Need to build in safety checks
 		//Also, better way?
@@ -397,13 +397,14 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		
 		BlockType temp;
 
+
 		//set current BT of turtle	
-		if (args[2] == null)
-		{
+		//if (args[2].is)
+		//{
 			temp = BlockType.fromId(Integer.parseInt(args[1]));
-		}else{
-			temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-		}
+		//}//else{
+		//	temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+		//}
 		
 		bt = temp;
 
