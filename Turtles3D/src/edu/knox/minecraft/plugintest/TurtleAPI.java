@@ -152,7 +152,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
     /**
      * Checks whether turtle mode is on.  If so, returns true.  If not, alerts user and returns false.
-     * @return
+     * @return Status of turtle mode
      */
     private boolean checkTT(MessageReceiver sender)  {
         if (tt)  { //turtle mode is on-- no problems
@@ -161,6 +161,22 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
             String [] str = new String [2];
             str[0] = "/c";
             str[1] = "Turtle mode is not on.";
+            TurtleConsole(sender, str);
+            return false;
+        }
+    }
+    
+    /**
+     * Checks whether block placement mode is on.  If so, returns true.  If not, alerts user and returns false.
+     * @return Status of block placement mode
+     */
+    private boolean checkBP(MessageReceiver sender)  {
+        if (bp)  { //block placement mode is on-- no problems
+            return true;
+        }  else  {  //block placement mode is off-- need to alert user
+            String [] str = new String [2];
+            str[0] = "/c";
+            str[1] = "Block placement mode is not on.";
             TurtleConsole(sender, str);
             return false;
         }
@@ -212,6 +228,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
         //GET WORLD
         world = sender.asPlayer().getWorld();
+        
         //Relative pos stuff
 
         //Get True Position and Direction
@@ -276,7 +293,6 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
         }
     }
 
-
     //Other Commands*******************************************************************************
 
     /**
@@ -299,7 +315,6 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
         }
 
         sender.message(message); 
-
     }
 
     /**
@@ -322,7 +337,6 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
         bp = !bp;
         TurtleBlockPlaceStatus(sender, args);
     }
-
 
     /**
      * Checks whether block placement mode is on.
@@ -383,7 +397,6 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
         // 4 = SOUTH
         // 6 = WEST
         // Else = ERROR
-
     }
 
     /**
@@ -440,9 +453,11 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
-
+        
+        if (!checkTT(sender))  //don't allow if block placement mode isn't on either
+            return;
+        
         BlockType temp;
-
 
         //set current BT of turtle	
         if (!(args.length == 3))
@@ -453,7 +468,6 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
         }
 
         bt = temp;
-
     }
 
     /**
@@ -478,6 +492,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
+        if (!checkTT(sender))  //don't allow if block placement mode isn't on either
+            return;
+        
         //return current BT of turtle	
         getString(sender, bt);
     }
@@ -562,6 +579,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
             toolTip = "/u or /d")
     public void TurtleUpDown(MessageReceiver sender, String[] args)
     {
+        if (!checkTT(sender))  //Don't allow if turtle mode is not on
+            return;
+        
         //move up or down turtle (left or right)
         //move turtle	
         // Move should act in a loop to go 1 -> just happens. To go 10, loop 10 times
