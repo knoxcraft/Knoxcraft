@@ -1,0 +1,9 @@
+{
+	"scriptname" : "script-test",
+	"commands" : [
+		{"cmd" : "forward",
+			"args" : {"dist", 10}},
+		{"cmd" : "turn",
+			"args" : {"dir" : "right", "degrees" : 90}}
+	]
+}
