@@ -431,30 +431,30 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 * @param sender
 	 * @param args
 	 */
-	@Command(
-			aliases = { "sb", "SetBlock" },
-			description = "Turtle set bt",
-			permissions = { "" },
-			toolTip = "/sb'")
-	public void TurtleSetBlockType(MessageReceiver sender, String[] args)
-	{
-		if (!checkTT(sender))  //Don't allow if turtle mode is not on
-			return;
-
-		BlockType temp;
-
-
-		//set current BT of turtle	
-		if (!(args.length == 3))
-		{
-			temp = BlockType.fromId(Integer.parseInt(args[1]));
-		}else{
-			temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-		}
-
-		bt = temp;
-
-	}
+//	@Command(
+//			aliases = { "sb", "SetBlockType" },
+//			description = "Turtle set bt",
+//			permissions = { "" },
+//			toolTip = "/sb'")
+//	public void TurtleSetBlockType(MessageReceiver sender, String[] args)
+//	{
+//		if (!checkTT(sender))  //Don't allow if turtle mode is not on
+//			return;
+//
+//		BlockType temp;
+//
+//
+//		//set current BT of turtle	
+//		if (!(args.length == 3))
+//		{
+//			temp = BlockType.fromId(Integer.parseInt(args[1]));
+//		}else{
+//			temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+//		}
+//
+//		bt = temp;
+//
+//	}
 
 	/**
 	 * set Block type (string/BlockType based)
@@ -469,7 +469,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 * @param args
 	 */
 	@Command(
-			aliases = { "rb", "ReturnBlock" },
+			aliases = { "rb", "ReturnBlockType" },
 			description = "Turtle ret bt",
 			permissions = { "" },
 			toolTip = "/rb'")
