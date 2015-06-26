@@ -454,7 +454,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
         
-        if (!checkTT(sender))  //don't allow if block placement mode isn't on either
+        if (!checkBP(sender))  //don't allow if block placement mode isn't on either
             return;
         
         BlockType temp;
@@ -492,7 +492,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        if (!checkTT(sender))  //don't allow if block placement mode isn't on either
+        if (!checkBP(sender))  //don't allow if block placement mode isn't on either
             return;
         
         //return current BT of turtle	
