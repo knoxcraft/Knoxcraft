@@ -202,7 +202,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 */
 	@Command(
 			aliases = { "ton", "TurtleOn" },
-			description = "Turtle On",
+			description = "Turtle Mode On",
 			permissions = { "" },
 			toolTip = "/ton")
 	public void TurtleOn(MessageReceiver sender, String[] args)
@@ -243,7 +243,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 */
 	@Command(
 			aliases = { "toff", "TurtleOff" },
-			description = "Turtle Off",
+			description = "Turtle Mode Off",
 			permissions = { "" },
 			toolTip = "/toff")
 	public void TurtleOff(MessageReceiver sender, String[] args)
@@ -261,7 +261,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 */
 	@Command(
 			aliases = { "tt", "TurtleToggle" },
-			description = "Turtle Toggle",
+			description = "Toggle Turtle Mode",
 			permissions = { "" },
 			toolTip = "/tt")
 	public void TurtleToggle(MessageReceiver sender, String[] args)
@@ -287,9 +287,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 */
 	@Command(
 			aliases = { "c", "TurtleConsole" },
-			description = "Turtle Console",
+			description = "Displays a message on the turtle console",
 			permissions = { "" },
-			toolTip = "/c + 'String'")
+			toolTip = "/c <message>")
 	public void TurtleConsole(MessageReceiver sender, String[] args)
 	{
 		//Display string in console
@@ -311,7 +311,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 */
 	@Command(
 			aliases = { "bp", "BlockPlacement" },
-			description = "Turtle Block Placement",
+			description = "Toggle Turtle block placement mode",
 			permissions = { "" },
 			toolTip = "/bp")
 	public void TurtleBlockPlace(MessageReceiver sender, String[] args)
@@ -331,7 +331,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 */
 	@Command(
 			aliases = { "bp?", "CheckBlockPlacement" },
-			description = "Turtle Block Placement",
+			description = "Checks Turtle block placement mode",
 			permissions = { "" },
 			toolTip = "/bp?")
 	public void TurtleBlockPlaceStatus(MessageReceiver sender, String[] args)
@@ -349,9 +349,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 */
 	@Command(
 			aliases = { "sp", "SetPosition" },
-			description = "Turtle Setpos",
+			description = "Set Turtle position",
 			permissions = { "" },
-			toolTip = "/sp'")
+			toolTip = "/sp")
 	public void TurtleSetPosition(MessageReceiver sender, String[] args)
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
@@ -369,9 +369,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 */
 	@Command(
 			aliases = { "sd", "SetDirection" },
-			description = "Turtle Setdir",
+			description = "Set turtle direction",
 			permissions = { "" },
-			toolTip = "/sd'")
+			toolTip = "/sd")
 	public void TurtleSetDirection(MessageReceiver sender, String[] args)
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
@@ -393,9 +393,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 */
 	@Command(
 			aliases = { "rp", "ReturnPosition" },
-			description = "Turtle retpos",
+			description = "Return Turtle position",
 			permissions = { "" },
-			toolTip = "/rp'")
+			toolTip = "/rp")
 	public void TurtleReturnPosition(MessageReceiver sender, String[] args)
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
@@ -414,9 +414,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 */
 	@Command(
 			aliases = { "rd", "ReturnDirection" },
-			description = "Turtle retdir",
+			description = "Return Turtle direction",
 			permissions = { "" },
-			toolTip = "/rd'")
+			toolTip = "/rd")
 	public void TurtleReturnDirection(MessageReceiver sender, String[] args)
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
@@ -431,30 +431,30 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 * @param sender
 	 * @param args
 	 */
-//	@Command(
-//			aliases = { "sb", "SetBlockType" },
-//			description = "Turtle set bt",
-//			permissions = { "" },
-//			toolTip = "/sb'")
-//	public void TurtleSetBlockType(MessageReceiver sender, String[] args)
-//	{
-//		if (!checkTT(sender))  //Don't allow if turtle mode is not on
-//			return;
-//
-//		BlockType temp;
-//
-//
-//		//set current BT of turtle	
-//		if (!(args.length == 3))
-//		{
-//			temp = BlockType.fromId(Integer.parseInt(args[1]));
-//		}else{
-//			temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-//		}
-//
-//		bt = temp;
-//
-//	}
+	@Command(
+			aliases = { "sbt", "SetBlockType" },
+			description = "Set Turtle block type",
+			permissions = { "" },
+			toolTip = "/sbt")
+	public void TurtleSetBlockType(MessageReceiver sender, String[] args)
+	{
+		if (!checkTT(sender))  //Don't allow if turtle mode is not on
+			return;
+
+		BlockType temp;
+
+
+		//set current BT of turtle	
+		if (!(args.length == 3))
+		{
+			temp = BlockType.fromId(Integer.parseInt(args[1]));
+		}else{
+			temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+		}
+
+		bt = temp;
+
+	}
 
 	/**
 	 * set Block type (string/BlockType based)
@@ -470,9 +470,9 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 */
 	@Command(
 			aliases = { "rb", "ReturnBlockType" },
-			description = "Turtle ret bt",
+			description = "Return Turtle block type",
 			permissions = { "" },
-			toolTip = "/rb'")
+			toolTip = "/rb")
 	public void TurtleReturnBlockType(MessageReceiver sender, String[] args)
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
@@ -489,7 +489,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	 */
 	@Command(
 			aliases = { "m" , "f", "b", "move", "forward", "back"},
-			description = "Turtle move",
+			description = "Turtle move forward/back",
 			permissions = { "" },
 			toolTip = "/m or /f or /b")
 	public void TurtleMove(MessageReceiver sender, String[] args)
@@ -540,7 +540,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			aliases = { "t", "turn" },
 			description = "Turtle turn",
 			permissions = { "" },
-			toolTip = "/t'")
+			toolTip = "/t")
 	public void TurtleTurn(MessageReceiver sender, String[] args)
 	{
 		if (!checkTT(sender))  //Don't allow if turtle mode is not on
@@ -559,7 +559,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 			aliases = { "u", "d", "up", "down" },
 			description = "Turtle up/down",
 			permissions = { "" },
-			toolTip = "/u or /d'")
+			toolTip = "/u or /d")
 	public void TurtleUpDown(MessageReceiver sender, String[] args)
 	{
 		//move up or down turtle (left or right)
