@@ -53,7 +53,7 @@ public final class HttpUploadServer {
                     pipeline.addLast(new HttpResponseEncoder());
 
                     // Remove the following line if you don't want automatic content compression.
-                    //pipeline.addLast(new HttpContentCompressor());
+                    pipeline.addLast(new HttpContentCompressor());
 
                     pipeline.addLast(new HttpUploadServerHandler());
                 }
