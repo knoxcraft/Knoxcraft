@@ -1,0 +1,5 @@
+main-class=edu.knoxcraft.http.server.HttpUploadServer
+author = ppypp and emhastings
+version = 0.0.0.1
+language = java
+# dependencies = List of Plugins your Plugin depends on
