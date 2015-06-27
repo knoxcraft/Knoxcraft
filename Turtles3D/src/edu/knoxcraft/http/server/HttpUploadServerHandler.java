@@ -47,8 +47,11 @@ import io.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
 import io.netty.util.CharsetUtil;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import sun.security.action.GetLongAction;
+import net.canarymod.Canary;
+import net.canarymod.logger.Logman;
+import edu.knoxcraft.hooks.UploadJSONHook;
 
 /**
  * Based on: https://netty.io/4.0/xref/io/netty/example/http/upload/package-summary.html
@@ -58,14 +61,13 @@ import java.util.logging.Logger;
  */
 public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
-    private static final Logger logger = Logger.getLogger(HttpUploadServerHandler.class.getName());
-
+    // Relies on HttpUploadServer classloading first, which should happen
+    // because HttpUploadServer references this class in its enable() method
+    private static Logman logger=HttpUploadServer.logger;
     private HttpRequest request;
-
     private boolean readingChunks;
-
     private final StringBuilder responseContent = new StringBuilder();
-
+    
     // Disk if size exceed
     //private static final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE); 
 
@@ -132,6 +134,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                 readHttpDataChunkByChunk();
                 // example of reading only if at the end
                 if (chunk instanceof LastHttpContent) {
+                    responseContent.append("Thank you!\n");
                     writeResponse(ctx.channel());
                     readingChunks = false;
                     reset();
@@ -175,6 +178,10 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                 System.out.printf("filename: %s\n",filename);
                 String s=fileUpload.getString();
                 System.out.printf("%s\n", s);
+                // Generate a callback to the Turtles3D plugin
+                // that is listening for hooks
+                logger.info("Trying to generate a hook for the json");
+                Canary.hooks().callHook(new UploadJSONHook(s));
             } else {
                 throw new IOException("File to be continued but should not!");
             }
@@ -236,7 +243,8 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.log(Level.WARNING, responseContent.toString(), cause);
+        //logger.log(Level.WARNING, responseContent.toString(), cause);
+        
         ctx.channel().close();
     }
 }

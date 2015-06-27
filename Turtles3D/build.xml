@@ -9,24 +9,34 @@
      ====================================================================== -->
 <project name="project" default="build">
     <description>
-            description
+		description
     </description>
 	
 	<property file="build.properties"/>
-
-    <target name="build" depends="depends" description="description">
-        <jar destfile="${dest}/Turtle.jar">
+	
+	<target name="httpserver" depends="depends" description="package the http server plugin">
+		<copy file="config/httpserver.inf" tofile="${bin}/Canary.inf"/>
+		<jar destfile="${dest}/HttpServer.jar">
         	<fileset file="${bin}/**"/>
-        	<fileset file="config/Canary.inf"/>
     	</jar>
-    </target>
+	</target>
+	
+	<target name="knoxcraft" depends="depends" description="package the Knoxcraft plugin">
+		<copy file="config/turtles3d.inf" tofile="${bin}/Canary.inf"/>
+		<jar destfile="${dest}/Turtles3D.jar">
+			<fileset file="${bin}/**"/>
+		</jar>
+	</target>
+
+    <target name="build" depends="httpserver,knoxcraft" description="description"/>
 
     <target name="depends">
     	<mkdir dir="${dest}"/>
     </target>
 	
 	<target name="install" depends="build">
-		<copy file="${dest}/Turtle.jar" todir="${install.location}"/>
+		<copy file="${dest}/Turtles3D.jar" todir="${install.location}"/>
+		<copy file="${dest}/HttpServer.jar" todir="${install.location}"/>
 	</target>
 
 </project>

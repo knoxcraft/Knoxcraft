@@ -1,7 +1,6 @@
 package edu.knox.minecraft.plugintest;
 
 import net.canarymod.Canary;
-import net.canarymod.api.entity.living.humanoid.Player;
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
@@ -10,8 +9,17 @@ import net.canarymod.chat.MessageReceiver;
 import net.canarymod.commandsys.Command;
 import net.canarymod.commandsys.CommandDependencyException;
 import net.canarymod.commandsys.CommandListener;
+import net.canarymod.hook.HookHandler;
+import net.canarymod.logger.Logman;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import edu.knoxcraft.hooks.UploadJSONHook;
 
 // If tt is not true-> no other command works??
 //Or we could keep rel pos/dir because they get set up intially (or should be)
@@ -21,7 +29,7 @@ import net.canarymod.plugin.PluginListener;
 //In time, need to build in string verification for correct input style (ie. All caps, etc)
 
 
-public class TurtleAPI  extends Plugin implements CommandListener, PluginListener {
+public class TurtleAPI extends Plugin implements CommandListener, PluginListener {
 
 	Turtle turtle;
 	BlockType bt;
@@ -38,10 +46,16 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	private Position curPos;
 	private Direction curDir;
 	
+	public static Logman logger;
+	
 	//Turtle on/off
 	private boolean tt;
 	//Block Place on/off
 	private boolean bp;
+	
+	public TurtleAPI() {
+	    TurtleAPI.logger = getLogman();
+	}
 	
 	///***************???????????/
 	//OLD CODE
@@ -102,7 +116,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 		curPos.setX(xt+xr);
 		curPos.setY(yt+yr);
 		curPos.setZ(zt+zr);
-		
+		Canary.hooks().callHook(null);
 	}
 	
 	private void updateCurDir(){
@@ -176,7 +190,8 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 	public boolean enable() {
 		try {
 			Canary.hooks().registerListener(this, this);
-			getLogman().info("Enabling "+getName() + " Version " + getVersion()); //getName() returns the class name, in this case TurtleAPI
+			//getName() returns the class name, in this case TurtleAPI
+			getLogman().info("Enabling "+getName() + " Version " + getVersion()); 
 			getLogman().info("Authored by "+getAuthor());
 			Canary.commands().registerCommands(this, this, false);
 			return true;
@@ -413,7 +428,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 				//Place nothing
 			}
 			
-			relPos = turtle.move(relPos, relDir, false);
+			//relPos = turtle.move(relPos, relDir, false);
 		}
 		
 	}
@@ -433,6 +448,37 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
 	}
 
-
-
+	private static int getInt(JSONObject json, String key) {
+	    return Integer.parseInt((String)json.get(key));
+	}
+	
+	@HookHandler
+	public void uploadJSON(UploadJSONHook hook) { 
+	    logger.info("Hook called");
+	    JSONParser parser=new JSONParser();
+	    try {
+	        JSONObject json=(JSONObject)parser.parse(hook.getJSON());
+	        
+	        String scriptname=(String)json.get("scriptname");
+	        logger.info(String.format("%s\n", scriptname));
+	        
+	        JSONArray lang= (JSONArray) json.get("commands");
+	        for (int i=0; i<lang.size(); i++) {
+	            JSONObject cmd=(JSONObject)lang.get(i);
+	            String commandName=(String)cmd.get("cmd");
+	            JSONObject args=(JSONObject)cmd.get("args");
+	            if (commandName.equals("forward")) {
+	                int distance=getInt(args, "dist");
+	                // Move forward by the appropriate distance
+	                logger.info(String.format("Move forward by %d\n", distance));
+	            } else if (commandName.equals("turn")) {
+	                String dir=(String)args.get("dir");
+	                int degrees=getInt(args, "degrees");
+	                logger.info(String.format("turn %s %d degrees\n", dir, degrees));
+	            }
+	        }
+	    } catch (ParseException e) {
+	        throw new RuntimeException(e);
+	    }
+	}
 }
