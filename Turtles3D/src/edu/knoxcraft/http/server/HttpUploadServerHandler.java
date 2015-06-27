@@ -1,7 +1,9 @@
 /*
- * Copyright 2012 The Netty Project
+ * TODO: Fix license headers
+ * 
+ * Copyright 2015 Knoxcraft
  *
- * The Netty Project licenses this file to you under the Apache License,
+ * The  licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at:
  *
@@ -35,11 +37,9 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
-import io.netty.handler.codec.http.multipart.DefaultHttpDataFactory;
 import io.netty.handler.codec.http.multipart.DiskAttribute;
 import io.netty.handler.codec.http.multipart.DiskFileUpload;
 import io.netty.handler.codec.http.multipart.FileUpload;
-import io.netty.handler.codec.http.multipart.HttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.EndOfDataDecoderException;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
@@ -50,6 +50,12 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Based on: https://netty.io/4.0/xref/io/netty/example/http/upload/package-summary.html
+ * 
+ * @author jspacco
+ *
+ */
 public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
     private static final Logger logger = Logger.getLogger(HttpUploadServerHandler.class.getName());
@@ -61,7 +67,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
     private final StringBuilder responseContent = new StringBuilder();
 
     // Disk if size exceed
-    private static final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE); 
+    //private static final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE); 
 
     private HttpPostRequestDecoder decoder;
     static {
@@ -105,23 +111,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
             }
 
             responseContent.setLength(0);
-            decoder = new HttpPostRequestDecoder(factory, request);
-//            try {
-//                decoder = new HttpPostRequestDecoder(factory, request);
-//            } catch (ErrorDataDecoderException e1) {
-//                e1.printStackTrace();
-//                responseContent.append(e1.getMessage());
-//                writeResponse(ctx.channel());
-//                ctx.channel().close();
-//                return;
-//            } catch (IncompatibleDataDecoderException e1) {
-//                // GET Method: should not try to create a HttpPostRequestDecoder
-//                // So OK but stop here
-//                responseContent.append(e1.getMessage());
-//                responseContent.append("\r\n\r\nEND OF GET CONTENT\r\n");
-//                writeResponse(ctx.channel());
-//                return;
-//            }
+            decoder = new HttpPostRequestDecoder(request);
 
             readingChunks = HttpHeaders.isTransferEncodingChunked(request);
             if (readingChunks) {
@@ -138,15 +128,6 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                 // New chunk is received
                 HttpContent chunk = (HttpContent) msg;
                 decoder.offer(chunk);
-//                try {
-//                    decoder.offer(chunk);
-//                } catch (ErrorDataDecoderException e1) {
-//                    e1.printStackTrace();
-//                    responseContent.append(e1.getMessage());
-//                    writeResponse(ctx.channel());
-//                    ctx.channel().close();
-//                    return;
-//                }
                 // example of reading chunk by chunk (minimize memory usage due to Factory)
                 readHttpDataChunkByChunk();
                 // example of reading only if at the end
@@ -161,8 +142,6 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
         }
     }    
 
-
-
     private void reset() {
         request = null;
         // destroy the decoder to release all resources
@@ -172,6 +151,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
 
     private void readHttpDataChunkByChunk() throws IOException, EndOfDataDecoderException{
         // No idea if we need to read by chunks
+        // I think this is somehow related to the Factory that we're no longer using
         while (decoder.hasNext()) {
             InterfaceHttpData data = decoder.next();
             if (data != null) {
