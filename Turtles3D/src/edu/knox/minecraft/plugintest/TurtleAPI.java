@@ -24,13 +24,14 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
     BlockType bt = BlockType.Stone;
     //World in which all actions occur
     private World world;
-    //in world position
+    //in world position of player -> (0,0,0) for Turtle. This should probably be called originPos.
     private Position truePos;
     private Direction trueDir;
     //relative position
     private Position relPos;
     private Direction relDir;
-    //current position (made by combining relative and real) -> this gets sent to the game 
+    //current position (made by combining relative and real) -> this gets sent to the game.
+    //May want to call this truePos (instead of the other truePos) or gamePos.
     private Position curPos;
     private Direction curDir;
 
@@ -58,13 +59,12 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
         curPos.setX(xt+xr);
         curPos.setY(yt+yr);
         curPos.setZ(zt+zr);
-
     }
 
     private void updateCurDir(){
-
     }
 
+    //should this be called updateRelPos?  It doesn't return/print anything...
     private void getRelPos(){
         int xc = curPos.getBlockX();
         int yc = curPos.getBlockY();
@@ -313,7 +313,6 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
         for (int i=1; i<args.length; i++) {  //skip the command, just send the message
             message = message + args[i]+ " ";
         }
-
         sender.message(message); 
     }
 
@@ -418,6 +417,44 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
 
         //   getRelPos();
         getString(sender, relPos);
+    }
+    
+    /**
+     * Return current position of Turtle in game coords
+     * @param sender
+     * @param args
+     */
+    @Command(
+            aliases = { "rgp", "ReturnGamePosition" },
+            description = "Return Turtle position in game coords",
+            permissions = { "" },
+            toolTip = "/rgp")
+    public void TurtleReturnGamePosition(MessageReceiver sender, String[] args)
+    {
+        if (!checkTT(sender))  //Don't allow if turtle mode is not on
+            return;
+
+        //return position of turtle (game coord position)
+        getString(sender, curPos);
+    }
+    
+    /**
+     * Return position of relative origin (Player's pos at Turtle on) in game coords
+     * @param sender
+     * @param args
+     */
+    @Command(
+            aliases = { "rop", "ReturnOriginPosition" },
+            description = "Return origin position in game coords",
+            permissions = { "" },
+            toolTip = "/rop")
+    public void TurtleReturnOriginPosition(MessageReceiver sender, String[] args)
+    {
+        if (!checkTT(sender))  //Don't allow if turtle mode is not on
+            return;
+
+        //return position of origin (game coord position)
+        getString(sender, truePos);
     }
 
     /**
