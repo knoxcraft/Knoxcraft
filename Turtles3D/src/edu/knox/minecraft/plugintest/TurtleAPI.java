@@ -452,7 +452,9 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 	}
 
 	@HookHandler
-	public void uploadJSON(UploadJSONHook hook) { 
+	public void uploadJSON(UploadJSONHook hook) {
+	    // TODO: Write classes to represent commands
+	    // TODO: Convert JSON into a list of commands
 	    logger.info("Hook called");
 	    JSONParser parser=new JSONParser();
 	    try {
