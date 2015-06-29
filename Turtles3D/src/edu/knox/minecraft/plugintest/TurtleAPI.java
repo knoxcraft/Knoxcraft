@@ -1,5 +1,10 @@
 package edu.knox.minecraft.plugintest;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import net.canarymod.Canary;
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
@@ -9,9 +14,11 @@ import net.canarymod.chat.MessageReceiver;
 import net.canarymod.commandsys.Command;
 import net.canarymod.commandsys.CommandDependencyException;
 import net.canarymod.commandsys.CommandListener;
+import net.canarymod.hook.HookHandler;
 import net.canarymod.logger.Logman;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
+import edu.knoxcraft.hooks.UploadJSONHook;
 import edu.knoxcraft.http.server.HttpUploadServer;
 
 // If tt is not true-> no other command works??
@@ -655,5 +662,40 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
             relPos = turtle.move(relPos, relDir, dir, !dir);//RelDir dont matter
         }				
+    }
+    @HookHandler
+    public void uploadJSON(UploadJSONHook hook) {
+        // TODO: Write classes to represent commands
+        // TODO: Convert JSON into a list of commands
+        logger.info("Hook called");
+        JSONParser parser=new JSONParser();
+        try {
+            logger.info(hook.getJSON());
+            JSONObject json=(JSONObject)parser.parse(hook.getJSON());
+            
+            String scriptname=(String)json.get("scriptname");
+            logger.info(String.format("%s\n", scriptname));
+            
+            JSONArray lang= (JSONArray) json.get("commands");
+            for (int i=0; i<lang.size(); i++) {
+                JSONObject cmd=(JSONObject)lang.get(i);
+                String commandName=(String)cmd.get("cmd");
+                JSONObject args=(JSONObject)cmd.get("args");
+                if (commandName.equals("forward")) {
+                    //int distance=getInt(args, "dist");
+                    long distance=(long)args.get("dist");
+                    // Move forward by the appropriate distance
+                    logger.info(String.format("Move forward by %d\n", distance));
+                } else if (commandName.equals("turn")) {
+                    String dir=(String)args.get("dir");
+                    //int degrees=getInt(args, "degrees");
+                    long degrees=(long)args.get("degrees");
+                    logger.info(String.format("turn %s %d degrees\n", dir, degrees));
+                }
+            }
+        } catch (ParseException e) {
+            // TODO: log better? handle better?
+            throw new RuntimeException(e);
+        }
     }
 }
