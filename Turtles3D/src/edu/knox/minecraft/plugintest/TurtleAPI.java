@@ -9,16 +9,20 @@ import net.canarymod.chat.MessageReceiver;
 import net.canarymod.commandsys.Command;
 import net.canarymod.commandsys.CommandDependencyException;
 import net.canarymod.commandsys.CommandListener;
+import net.canarymod.logger.Logman;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
+import edu.knoxcraft.http.server.HttpUploadServer;
 
+// If tt is not true-> no other command works??
+//Or we could keep rel pos/dir because they get set up intially (or should be)
 
 //Things need to be overly simple during testing for ease of use
 
 //In time, need to build in string verification for correct input style (ie. All caps, etc)
 
 
-public class TurtleAPI  extends Plugin implements CommandListener, PluginListener {
+public class TurtleAPI extends Plugin implements CommandListener, PluginListener {
 
     Turtle turtle;
     BlockType bt = BlockType.Stone;
@@ -40,7 +44,13 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
     //Block Place on/off
     private boolean bp = false;
     //flipped direction
-    private boolean fd = false;	
+    private boolean fd = false;
+    private HttpUploadServer httpServer;
+    public static Logman logger;
+    
+    public TurtleAPI() {
+        TurtleAPI.logger = getLogman();
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //HELPER FUNCTIONS
@@ -188,7 +198,7 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
      */
     @Override
     public void disable() {
-        // TODO Auto-generated method stub
+        httpServer.disable();
     }
 
     /**
@@ -198,8 +208,12 @@ public class TurtleAPI  extends Plugin implements CommandListener, PluginListene
     @Override
     public boolean enable() {
         try {
+            getLogman().info("Registering plugin");
             Canary.hooks().registerListener(this, this);
-            getLogman().info("Enabling "+getName() + " Version " + getVersion()); //getName() returns the class name, in this case TurtleAPI
+            httpServer=new HttpUploadServer();
+            httpServer.enable();
+            //getName() returns the class name, in this case TurtleAPI
+            getLogman().info("Enabling "+getName() + " Version " + getVersion()); 
             getLogman().info("Authored by "+getAuthor());
             Canary.commands().registerCommands(this, this, false);
             return true;
