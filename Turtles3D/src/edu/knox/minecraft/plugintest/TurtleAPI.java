@@ -20,6 +20,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import edu.knoxcraft.hooks.UploadJSONHook;
+import edu.knoxcraft.http.server.HttpUploadServer;
 
 // If tt is not true-> no other command works??
 //Or we could keep rel pos/dir because they get set up intially (or should be)
@@ -45,6 +46,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 	//By subtracting truePos from curPos, you can get relPos -> MaKE helper methodd to handle this!!!!
 	private Position curPos;
 	private Direction curDir;
+	private HttpUploadServer httpServer;
 	
 	public static Logman logger;
 	
@@ -181,15 +183,16 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void disable() {
-		// TODO Auto-generated method stub
-		//IGNORE :)
-
+	    httpServer.disable();
 	}
 
 	@Override
 	public boolean enable() {
 		try {
+		    getLogman().info("Registering plugin");
 			Canary.hooks().registerListener(this, this);
+			httpServer=new HttpUploadServer();
+			httpServer.enable();
 			//getName() returns the class name, in this case TurtleAPI
 			getLogman().info("Enabling "+getName() + " Version " + getVersion()); 
 			getLogman().info("Authored by "+getAuthor());
@@ -448,15 +451,12 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
 	}
 
-	private static int getInt(JSONObject json, String key) {
-	    return Integer.parseInt((String)json.get(key));
-	}
-	
 	@HookHandler
 	public void uploadJSON(UploadJSONHook hook) { 
 	    logger.info("Hook called");
 	    JSONParser parser=new JSONParser();
 	    try {
+	        logger.info(hook.getJSON());
 	        JSONObject json=(JSONObject)parser.parse(hook.getJSON());
 	        
 	        String scriptname=(String)json.get("scriptname");
@@ -468,12 +468,14 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 	            String commandName=(String)cmd.get("cmd");
 	            JSONObject args=(JSONObject)cmd.get("args");
 	            if (commandName.equals("forward")) {
-	                int distance=getInt(args, "dist");
+	                //int distance=getInt(args, "dist");
+	                long distance=(long)args.get("dist");
 	                // Move forward by the appropriate distance
 	                logger.info(String.format("Move forward by %d\n", distance));
 	            } else if (commandName.equals("turn")) {
 	                String dir=(String)args.get("dir");
-	                int degrees=getInt(args, "degrees");
+	                //int degrees=getInt(args, "degrees");
+	                long degrees=(long)args.get("degrees");
 	                logger.info(String.format("turn %s %d degrees\n", dir, degrees));
 	            }
 	        }

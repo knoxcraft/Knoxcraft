@@ -14,21 +14,14 @@
 	
 	<property file="build.properties"/>
 	
-	<target name="httpserver" depends="depends" description="package the http server plugin">
-		<copy file="config/httpserver.inf" tofile="${bin}/Canary.inf"/>
-		<jar destfile="${dest}/HttpServer.jar">
-        	<fileset file="${bin}/**"/>
-    	</jar>
-	</target>
-	
-	<target name="knoxcraft" depends="depends" description="package the Knoxcraft plugin">
-		<copy file="config/turtles3d.inf" tofile="${bin}/Canary.inf"/>
-		<jar destfile="${dest}/Turtles3D.jar">
+	<target name="turtles3d" depends="depends" description="package the Turtles3D plugin">
+		<copy file="config/Canary.inf" tofile="${bin}/Canary.inf" overwrite="true"/>
+		<jar destfile="${dest}/Turtles3D.jar" update="true">
 			<fileset file="${bin}/**"/>
 		</jar>
 	</target>
 
-    <target name="build" depends="httpserver,knoxcraft" description="description"/>
+    <target name="build" depends="turtles3d" description="description"/>
 
     <target name="depends">
     	<mkdir dir="${dest}"/>
@@ -36,7 +29,6 @@
 	
 	<target name="install" depends="build">
 		<copy file="${dest}/Turtles3D.jar" todir="${install.location}"/>
-		<copy file="${dest}/HttpServer.jar" todir="${install.location}"/>
 	</target>
 
 </project>

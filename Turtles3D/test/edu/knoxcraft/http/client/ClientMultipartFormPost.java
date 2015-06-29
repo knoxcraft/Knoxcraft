@@ -50,7 +50,7 @@ public class ClientMultipartFormPost {
 
     public static void main(String[] args) throws Exception {
         String url="http://localhost:8888/mcform";
-        File file=new File("testdata/testcommands.json");
+        File file=new File("testdata/testcommands1.json");
         upload(url, file);
     }
     public static void upload(String url, File file) throws ClientProtocolException, IOException {
@@ -73,7 +73,7 @@ public class ClientMultipartFormPost {
             CloseableHttpResponse response = httpclient.execute(httppost);
             try {
                 //System.out.println("----------------------------------------");
-                //System.out.println(response.getStatusLine());
+                System.out.println(response.getStatusLine());
                 HttpEntity resEntity = response.getEntity();
                 if (resEntity != null) {
                     //System.out.println("Response content length: " + resEntity.getContentLength());

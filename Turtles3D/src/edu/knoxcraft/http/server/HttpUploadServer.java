@@ -15,9 +15,8 @@
  */
 package edu.knoxcraft.http.server;
 
-import net.canarymod.Canary;
+import edu.knox.minecraft.plugintest.TurtleAPI;
 import net.canarymod.logger.Logman;
-import net.canarymod.plugin.Plugin;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -35,8 +34,9 @@ import io.netty.handler.logging.LoggingHandler;
 /**
  * A HTTP server showing how to use the HTTP multipart package for file uploads and decoding post data.
  */
-public final class HttpUploadServer extends Plugin {
+public final class HttpUploadServer {
 
+    // TODO: Configuration file for port number to listen on for http connections
     static final int PORT = Integer.parseInt(System.getProperty("PORT", "8888"));
 
     EventLoopGroup bossGroup;
@@ -44,10 +44,9 @@ public final class HttpUploadServer extends Plugin {
     public static Logman logger;
     
     public HttpUploadServer() {
-        HttpUploadServer.logger=getLogman();
+        HttpUploadServer.logger=TurtleAPI.logger;
     }
     
-    @Override
     public boolean enable() {
         final Thread t=new Thread() {
             public void run() {
@@ -75,9 +74,6 @@ public final class HttpUploadServer extends Plugin {
 
                     Channel ch = b.bind(PORT).sync().channel();
 
-                    System.err.println("Open your web browser and navigate to " +
-                            "http://127.0.0.1:" + PORT + '/');
-
                     ch.closeFuture().sync();
                 } catch (InterruptedException e) {
                     // TODO: log this server-side using logman?
@@ -91,9 +87,8 @@ public final class HttpUploadServer extends Plugin {
         return true;
     }
 
-    @Override
     public void disable() {
-        // disable the plugin
+        // shutting down the groups should hopefully shutdown the server
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }
