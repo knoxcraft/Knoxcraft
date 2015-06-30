@@ -24,187 +24,51 @@ import edu.knoxcraft.http.server.HttpUploadServer;
 import edu.knoxcraft.turtle3d.KCTCommand;
 import edu.knoxcraft.turtle3d.KCTScript;
 
-// If tt is not true-> no other command works??
-//Or we could keep rel pos/dir because they get set up intially (or should be)
+/*TODO:  should most of these commands really happen in Turtle, 
+  and this class just call those versions?  Like in TurtleMove().  */
 
 //Things need to be overly simple during testing for ease of use
 
 //In time, need to build in string verification for correct input style (ie. All caps, etc)
 
-
 public class TurtleAPI extends Plugin implements CommandListener, PluginListener {
 
-    Turtle turtle;
-    BlockType bt = BlockType.Stone;
-    //World in which all actions occur
-    private World world;
-    //in world position of player -> (0,0,0) for Turtle. This should probably be called originPos.
-    private Position truePos;
-    private Direction trueDir;
-    //relative position
+    //POSITION VARIABLES
+
+    //in world position/direction of player at turtle on --> (0,0,0) for Turtle's relative coord system.
+    private Position originPos;
+    private Direction originDir;
+
+    //current relative position
     private Position relPos;
     private Direction relDir;
-    //current position (made by combining relative and real) -> this gets sent to the game.
-    //May want to call this truePos (instead of the other truePos) or gamePos.
-    private Position curPos;
-    private Direction curDir;
 
-    //Turtle on/off
-    private boolean tt = false;
-    //Block Place on/off
-    private boolean bp = false;
-    //flipped direction
-    private boolean fd = false;
+    //true current position in game coords(made by combining relative and real)
+    private Position gamePos;
+    private Direction gameDir;  //TODO:  I don't think this is ever updated...
+
+    //MODE TOGGLES
+    private boolean tt = false;  //Turtle on/off
+    private boolean bp = false;  //Block Place on/off
+
+    //OTHER VARIABLES
+    private Turtle turtle;
+    private BlockType bt = BlockType.Stone;  //default turtle block type 
+    private World world;  //World in which all actions occur
     private HttpUploadServer httpServer;
     public static Logman logger;
-    
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Constructor.
+     */
     public TurtleAPI() {
         TurtleAPI.logger = getLogman();
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //HELPER FUNCTIONS
-
-    private void updateCurPos(){
-        int xt = truePos.getBlockX();
-        int yt = truePos.getBlockY();
-        int zt = truePos.getBlockZ();		
-
-        int xr = relPos.getBlockX();
-        int yr = relPos.getBlockY();
-        int zr = relPos.getBlockZ();
-
-        //curPos = truePos + relPos;
-
-        curPos.setX(xt+xr);
-        curPos.setY(yt+yr);
-        curPos.setZ(zt+zr);
-    }
-
-    private void updateCurDir(){
-    }
-
-    //should this be called updateRelPos?  It doesn't return/print anything...
-    private void getRelPos(){
-        int xc = curPos.getBlockX();
-        int yc = curPos.getBlockY();
-        int zc = curPos.getBlockZ();
-
-        int xt = truePos.getBlockX();
-        int yt = truePos.getBlockY();
-        int zt = truePos.getBlockZ();	
-
-        relPos.setX(xc-xt);
-        relPos.setY(yc-yt);
-        relPos.setZ(zc-zt);
-
-    }
-
-    private void flipDir(){
-        int y = relDir.getIntValue();
-        switch(y){
-        case(0):
-
-            break;
-        case(1):
-
-            break;
-        case(2):
-
-            break;
-        case(3):
-
-            break;
-        case(4):
-
-            break;
-        case(5):
-
-            break;
-        case(6):
-
-            break;
-        case(7):
-
-            break;		
-        }				
-    }
-
-    private void getString(MessageReceiver sender, boolean b){
-        //Get the Boolean value 
-        String [] str = new String [2];
-        str[0] = "/c";
-        str[1] = b + "";
-
-        //return status of BP using TurtleConsole
-        TurtleConsole(sender, str);
-    }
-
-    private void getString(MessageReceiver sender, BlockType b){
-        //Get the Boolean value 
-        String []str = new String [2];
-        str[0] = "/c";
-        str[1] = b.toString() + "";
-
-        //return status of BP using TurtleConsole
-        TurtleConsole(sender, str);
-    }
-
-    private void getString(MessageReceiver sender, Direction b){
-        //Get the Boolean value 
-        String [] str = new String [2];
-        str[0] = "/c";
-        str[1] = b.toString() + "";
-
-        //return status of BP using TurtleConsole
-        TurtleConsole(sender, str);
-    }
-
-    private void getString(MessageReceiver sender, Position b){
-        //Get the Boolean value 
-        String [] str = new String [2];
-        str[0] = "/c";
-        str[1] = b.toString() + ""; //Need to overload / fix this output
-
-        //return status of BP using TurtleConsole
-        TurtleConsole(sender, str);
-    }
-
     /**
-     * Checks whether turtle mode is on.  If so, returns true.  If not, alerts user and returns false.
-     * @return Status of turtle mode
-     */
-    private boolean checkTT(MessageReceiver sender)  {
-        if (tt)  { //turtle mode is on-- no problems
-            return true;
-        }  else  {  //turtle mode is off-- need to alert user
-            String [] str = new String [2];
-            str[0] = "/c";
-            str[1] = "Turtle mode is not on.";
-            TurtleConsole(sender, str);
-            return false;
-        }
-    }
-    
-    /**
-     * Checks whether block placement mode is on.  If so, returns true.  If not, alerts user and returns false.
-     * @return Status of block placement mode
-     */
-    private boolean checkBP(MessageReceiver sender)  {
-        if (bp)  { //block placement mode is on-- no problems
-            return true;
-        }  else  {  //block placement mode is off-- need to alert user
-            String [] str = new String [2];
-            str[0] = "/c";
-            str[1] = "Block placement mode is not on.";
-            TurtleConsole(sender, str);
-            return false;
-        }
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Called when plugin is disabled.  Currently does nothing.
+     * Called when plugin is disabled.
      */
     @Override
     public void disable() {
@@ -252,28 +116,28 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
         //GET WORLD
         world = sender.asPlayer().getWorld();
-        
+
         //Relative pos stuff
 
         //Get True Position and Direction
-        truePos = sender.asPlayer().getPosition();
-        trueDir = sender.asPlayer().getCardinalDirection();
+        originPos = sender.asPlayer().getPosition();
+        originDir = sender.asPlayer().getCardinalDirection();
 
         //Make the Relative Position
         relPos = new Position(0,0,0);
         relDir = Direction.getFromIntValue(0);
-        //updateCurPos();
+        //updateCurPos();  //these two methods got renamed- change them if this gets uncommented
         //updateCurDir();
         //Faces player direction
         //Need to build in safety checks
         //Also, better way?
         //If doesn't work-> set to North ONLY, as way to start debugging
-        relDir = trueDir; //??
+        relDir = originDir; //??
 
         //Turning on Turtle
         tt = true;
-        getString(sender, truePos);
-        getString(sender, trueDir);
+        getString(sender, originPos);
+        getString(sender, originDir);
         getString(sender, tt);
     }
 
@@ -316,8 +180,6 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             TurtleOn(sender, args);
         }
     }
-
-    //Other Commands*******************************************************************************
 
     /**
      * Output a message to the player console.
@@ -442,7 +304,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         //   getRelPos();
         getString(sender, relPos);
     }
-    
+
     /**
      * Return current position of Turtle in game coords
      * @param sender
@@ -459,9 +321,9 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             return;
 
         //return position of turtle (game coord position)
-        getString(sender, curPos);
+        getString(sender, gamePos);
     }
-    
+
     /**
      * Return position of relative origin (Player's pos at Turtle on) in game coords
      * @param sender
@@ -478,7 +340,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             return;
 
         //return position of origin (game coord position)
-        getString(sender, truePos);
+        getString(sender, originPos);
     }
 
     /**
@@ -514,10 +376,10 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
-        
+
         if (!checkBP(sender))  //don't allow if block placement mode isn't on either
             return;
-        
+
         BlockType temp;
 
         //set current BT of turtle	
@@ -555,7 +417,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
         if (!checkBP(sender))  //don't allow if block placement mode isn't on either
             return;
-        
+
         //return current BT of turtle	
         getString(sender, bt);
     }
@@ -575,30 +437,71 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        //move turtle	
-        // Move should act in a loop to go 1 -> just happens. To go 10, loop 10 times
-        //Allows easier pos/ bp coding
-        int x = Integer.parseInt(args[1]);
-        //check if negative
-        if (x < 0){
+        int x = Integer.parseInt(args[1]);  //get desired move distance
+        boolean fd = false;  //flipped direction (for moving backward) 
+
+        //check if distance is negative (going backward)
+        if (x < 0){  
+            //if so, reverse turtle direction
             x = -x;
             flipDir();
             fd = true;
         }
-        for (int i = x; i > 0; i--){
-            //If block place True
-            if (bp) {
 
-                world.setBlockAt(relPos, bt);
-            }else {
-                //Place nothing
+        for (int i = x; i > 0; i--){
+
+            //Place block if block placement mode on
+            if (bp) {
+                world.setBlockAt(relPos, bt);                 
+                //TODO:  keep track of this block to undo
             }
 
+            //update turtle position
             relPos = turtle.move(relPos, relDir, false, false);
         }
-        if (fd = true){
+
+        //if reversed turtle direction, reset to original
+        if (fd == true){
             fd = false;
             flipDir();
+        }
+    }
+
+    /**
+     * Moves turtle up/down
+     * @param sender
+     * @param args
+     */
+    @Command(
+            aliases = { "u", "d", "up", "down" },
+            description = "Turtle up/down",
+            permissions = { "" },
+            toolTip = "/u or /d")
+    public void TurtleUpDown(MessageReceiver sender, String[] args)
+    {
+        if (!checkTT(sender))  //Don't allow if turtle mode is not on
+            return;
+
+        int x = Integer.parseInt(args[1]);  //get desired move distance
+        boolean up = true;  //default direction is up
+
+        //check if distance is negative (going down)
+        if (x < 0){  
+            //if so, reverse turtle direction
+            x = -x;
+            up = false;
+        }
+
+        for (int i = x; i > 0; i--){
+
+            //Place block if block placement mode on
+            if (bp) {
+                world.setBlockAt(relPos, bt);    
+                //TODO:  keep track of this block to undo
+            }
+
+            //update turtle position
+            relPos = turtle.move(relPos, relDir, up, !up);  //only moving vertically--> relDir doesn't matter
         }
     }
 
@@ -628,44 +531,6 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
     }
 
-    /**
-     * Moves turtle up/down
-     * @param sender
-     * @param args
-     */
-    @Command(
-            aliases = { "u", "d", "up", "down" },
-            description = "Turtle up/down",
-            permissions = { "" },
-            toolTip = "/u or /d")
-    public void TurtleUpDown(MessageReceiver sender, String[] args)
-    {
-        if (!checkTT(sender))  //Don't allow if turtle mode is not on
-            return;
-        
-        //move up or down turtle (left or right)
-        //move turtle	
-        // Move should act in a loop to go 1 -> just happens. To go 10, loop 10 times
-        //Allows easier pos/ bp coding
-        int x = Integer.parseInt(args[1]);
-        boolean dir = true;
-        //check if negative
-        if (x < 0){
-            x = -x;
-            dir = !dir;
-        }
-        for (int i = x; i > 0; i--){
-            //If block place True
-            if (bp) {
-
-                world.setBlockAt(relPos, bt);
-            }else {
-                //Place nothing
-            }
-
-            relPos = turtle.move(relPos, relDir, dir, !dir);//RelDir dont matter
-        }				
-    }
     @HookHandler
     public void uploadJSON(UploadJSONHook hook) {
         logger.info("Hook called");
@@ -673,13 +538,13 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         try {
             logger.info(hook.getJSON());
             JSONObject json=(JSONObject)parser.parse(hook.getJSON());
-            
+
             String scriptname=(String)json.get("scriptname");
 
             KCTScript script=new KCTScript(scriptname);
             
             logger.info(String.format("%s\n", scriptname));
-            
+
             JSONArray lang= (JSONArray) json.get("commands");
             for (int i=0; i<lang.size(); i++) {
                 JSONObject cmd=(JSONObject)lang.get(i);
@@ -690,6 +555,138 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         } catch (ParseException e) {
             // TODO: log better? handle better?
             throw new RuntimeException(e);
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //PRIVATE HELPER FUNCTIONS
+
+    /**
+     * Updates game position by combining origin position and current relative position.
+     */
+    private void updateGamePos(){
+        //get origin coords
+        int xo = originPos.getBlockX();
+        int yo = originPos.getBlockY();
+        int zo = originPos.getBlockZ();     
+
+        //get relative coords
+        int xr = relPos.getBlockX();
+        int yr = relPos.getBlockY();
+        int zr = relPos.getBlockZ();
+
+        //update game position
+        //gamePos = originPos + relPos;
+        gamePos.setX(xo+xr);
+        gamePos.setY(yo+yr);
+        gamePos.setZ(zo+zr);
+    }
+
+    private void updateGameDir(){
+        //TODO:  implement this
+    }
+
+    /*TODO:  should this be called updateRelPos?  It doesn't return/print anything...
+    Also when would we need to call this? */
+    private void getRelPos(){
+        int xg = gamePos.getBlockX();
+        int yg = gamePos.getBlockY();
+        int zg = gamePos.getBlockZ();
+
+        int xo = originPos.getBlockX();
+        int yo = originPos.getBlockY();
+        int zo = originPos.getBlockZ(); 
+
+        relPos.setX(xg-xo);
+        relPos.setY(yg-yo);
+        relPos.setZ(zg-zo);
+    }
+
+    /**
+     * Reverses relative direction (turn 180 degrees).  Used when moving backward.
+     */
+    private void flipDir(){
+        //get current direction (N, NE, ... , S --> 0, 1, ... , 7)
+        int dirInt = relDir.getIntValue();  
+
+        //calculate new direction
+        dirInt = (dirInt + 4) % 8;
+
+        //update relDir
+        relDir = Direction.getFromIntValue(dirInt);
+    }
+
+    /*TODO:  We need to add Javadoc comments for these methods and possibly rename them 
+     with more descriptive titles.  I'm a little confused by them at the moment.  */
+    private void getString(MessageReceiver sender, boolean b){
+        //Get the Boolean value 
+        String [] str = new String [2];
+        str[0] = "/c";
+        str[1] = b + "";
+
+        //return status of BP using TurtleConsole
+        TurtleConsole(sender, str);
+    }
+
+    private void getString(MessageReceiver sender, BlockType b){
+        //Get the Boolean value 
+        String []str = new String [2];
+        str[0] = "/c";
+        str[1] = b.toString() + "";
+
+        //return status of BP using TurtleConsole
+        TurtleConsole(sender, str);
+    }
+
+    private void getString(MessageReceiver sender, Direction b){
+        //Get the Boolean value 
+        String [] str = new String [2];
+        str[0] = "/c";
+        str[1] = b.toString() + "";
+
+        //return status of BP using TurtleConsole
+        TurtleConsole(sender, str);
+    }
+
+    private void getString(MessageReceiver sender, Position b){
+        //Get the Boolean value 
+        String [] str = new String [2];
+        str[0] = "/c";
+        str[1] = b.toString() + ""; //Need to overload / fix this output
+
+        //return status of BP using TurtleConsole
+        TurtleConsole(sender, str);
+    }
+
+    /**
+     * Checks whether turtle mode is on.  If so, returns true.  If not, alerts user and returns false.
+     * @return Status of turtle mode
+     */
+    private boolean checkTT(MessageReceiver sender)  {
+        if (tt)  { //turtle mode is on-- no problems
+            return true;
+        }  else  {  //turtle mode is off-- need to alert user
+            String [] str = new String [2];
+            str[0] = "/c";
+            str[1] = "Turtle mode is not on.";
+            TurtleConsole(sender, str);
+            return false;
+        }
+    }
+
+    /**
+     * Checks whether block placement mode is on.  If so, returns true.  If not, alerts user and returns false.
+     * @return Status of block placement mode
+     */
+    private boolean checkBP(MessageReceiver sender)  {
+        if (bp)  { //block placement mode is on-- no problems
+            return true;
+        }  else  {  //block placement mode is off-- need to alert user
+            String [] str = new String [2];
+            str[0] = "/c";
+            str[1] = "Block placement mode is not on.";
+            TurtleConsole(sender, str);
+            return false;
         }
     }
 }
