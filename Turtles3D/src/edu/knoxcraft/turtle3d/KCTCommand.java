@@ -24,7 +24,9 @@ public class KCTCommand
     // Constants for each command
     // Could probably be an enum?
     public static final String FORWARD="forward";
-    public static final String TURN="turn";
+    //public static final String TURN="turn";
+    public static final String TURNRIGHT = "turnRight";
+    public static final String TURNLEFT = "turnLeft";
     public static final String DIR = "dir";
     public static final String DEGREES = "degrees";
     public static final String CMD = "cmd";
@@ -67,8 +69,10 @@ public class KCTCommand
         if (commandName.equals(FORWARD)) {
             // check args; move turtle forward the appropriate distance
             // this will have to call back into 
-        } else if (commandName.equals(TURN)) {
-            // turn
+        } else if (commandName.equals(TURNRIGHT)) {
+            // turn right
+        } else if (commandName.equals(TURNLEFT)) {
+            // turn left
         } else {
             // TODO: Handle an unknown command. Is Runtime Exception the correct exception?
             // Are there better ways to handle this?
