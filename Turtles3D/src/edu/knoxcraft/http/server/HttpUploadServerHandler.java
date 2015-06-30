@@ -28,30 +28,28 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.LastHttpContent;
+import io.netty.handler.codec.http.multipart.Attribute;
 import io.netty.handler.codec.http.multipart.DiskAttribute;
 import io.netty.handler.codec.http.multipart.DiskFileUpload;
 import io.netty.handler.codec.http.multipart.FileUpload;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
-import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.EndOfDataDecoderException;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
 import io.netty.util.CharsetUtil;
 
 import java.io.IOException;
 
-import sun.security.action.GetLongAction;
 import net.canarymod.Canary;
 import net.canarymod.logger.Logman;
-import edu.knoxcraft.hooks.UploadJSONHook;
+import edu.knoxcraft.hooks.KCTUploadHook;
 
 /**
  * Based on: https://netty.io/4.0/xref/io/netty/example/http/upload/package-summary.html
@@ -64,110 +62,102 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
     // Relies on HttpUploadServer classloading first, which should happen
     // because HttpUploadServer references this class in its enable() method
     private static Logman logger=HttpUploadServer.logger;
-    private HttpRequest request;
-    private boolean readingChunks;
-    private final StringBuilder responseContent = new StringBuilder();
-    
-    // Disk if size exceed
-    //private static final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE); 
 
-    private HttpPostRequestDecoder decoder;
     static {
-        DiskFileUpload.deleteOnExitTemporaryFile = true; // should delete file
-        // on exit (in normal
-        // exit)
-        DiskFileUpload.baseDirectory = null; // system temp directory
-        DiskAttribute.deleteOnExitTemporaryFile = true; // should delete file on
-        // exit (in normal exit)
-        DiskAttribute.baseDirectory = null; // system temp directory
+        // should delete file on exit (in normal exit)
+        DiskFileUpload.deleteOnExitTemporaryFile = true;
+        // system temp directory
+        DiskFileUpload.baseDirectory = null;
+        // should delete file on exit (in normal exit)
+        DiskAttribute.deleteOnExitTemporaryFile = true;
+        // system temp directory
+        DiskAttribute.baseDirectory = null;
     }
 
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        if (decoder != null) {
-            decoder.cleanFiles();
-        }
+        // anything to do here?
     }
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
-        if (msg instanceof HttpRequest) {
-            //System.out.printf("%s\n", msg.getClass().toString());
-            this.request = (HttpRequest) msg;
-            if (!(request.getUri().startsWith("/mcform"))) {
-                // Not an HTTP request, or not the correct URL
-                ByteBuf buf = copiedBuffer("Not found!", CharsetUtil.UTF_8);
-                // Build the response object.
-                FullHttpResponse response = new DefaultFullHttpResponse(
-                        HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, buf);
+        if (msg instanceof FullHttpRequest) {
+            FullHttpRequest fullRequest=(FullHttpRequest) msg;
+            if (fullRequest.getUri().startsWith("/kctupload")) {
+                
+                if (fullRequest.getMethod().equals(HttpMethod.GET)) {
+                    // HTTP Get request!
+                    // Write the HTML page with the form
+                    // TODO: Update the HTML form
+                    writeMenu(ctx);
+                } else if (fullRequest.getMethod().equals(HttpMethod.POST)) {
+                    /* 
+                     * HTTP Post request! Handle the uploaded form
+                     * HTTP parameters:
+                    
+                    /kctupload
+                    username (should match player's Minecraft name)
+                    language (java, python, etc)
+                    jsonfile (a file upload, or empty)
+                    sourcefile (a file upload, or empty)
+                    jsontext (a JSON string, or empty)
+                    sourcetext (code as a String, or empty)
+                    */
 
-                response.headers().set(CONTENT_TYPE, "text/html; charset=UTF-8");
-                response.headers().set(CONTENT_LENGTH, buf.readableBytes());
-                // Write the response.
-                ctx.channel().writeAndFlush(response);
-            }
-            if (request.getMethod().equals(HttpMethod.GET)) {
-                //TODO: read menu html from a file
-                writeMenu(ctx);
-                return;
-            }
+                    HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(fullRequest);
+                    try {
+                        // read all of the post data into an KCTUploadHook, and trigger an event
+                        KCTUploadHook hook=new KCTUploadHook();
+                        while (decoder.hasNext()) {
+                            InterfaceHttpData data = decoder.next();
+                            if (data != null) {
+                                try {
+                                    if (data.getHttpDataType()==HttpDataType.FileUpload) {
+                                        // Handle file upload
+                                        // We may have json, source, or both
+                                        logger.info("data name for fileupload: "+data.getName());
+                                        if (data.getName().equals("jsonfile")) {
+                                            logger.info("jsonfile uploaded");
+                                            // uploaded a JSON file
+                                        } else if (data.getName().equals("sourcefile")) {
+                                            // uploaded a source file
+                                            logger.info("source file uploaded");
+                                        }
+                                    } else if (data.getHttpDataType() == HttpDataType.Attribute) {
+                                        Attribute attribute = (Attribute) data;
+                                        String name=attribute.getName();
+                                        String value=attribute.getValue();
+                                        if (name.equals("language")) {
+                                            hook.setLanguage(value);
+                                        } else if (name.equals("playerName")) {
+                                            hook.setPlayerName(value);
+                                        } else if (name.equals("jsontext")) {
+                                            hook.setJson(value);
+                                        } else if (name.equals("sourcetext")) {
+                                            hook.setSource(value);
+                                        }
+                                        logger.info(String.format("%s => %s", name, value));
+                                    }
+                                } finally {
+                                    // clean up resources
+                                    data.release();
+                                }
+                            }
+                        }
+                        Canary.hooks().callHook(hook);
+                    } finally {
+                        if (decoder != null) {
+                            // clean up resources
+                            decoder.cleanFiles();
+                            decoder.destroy();
+                        }
+                    }
 
-            responseContent.setLength(0);
-            decoder = new HttpPostRequestDecoder(request);
-
-            readingChunks = HttpHeaders.isTransferEncodingChunked(request);
-            if (readingChunks) {
-                // Chunk version
-                //responseContent.append("Chunks: ");
-                readingChunks = true;
-            }
-        }
-
-        // check if the decoder was constructed before
-        // if not it handles the form get
-        if (decoder != null) {
-            if (msg instanceof HttpContent) {
-                // New chunk is received
-                HttpContent chunk = (HttpContent) msg;
-                decoder.offer(chunk);
-                // example of reading chunk by chunk (minimize memory usage due to Factory)
-                readHttpDataChunkByChunk();
-                // example of reading only if at the end
-                if (chunk instanceof LastHttpContent) {
-                    responseContent.append("Thank you!\n");
-                    writeResponse(ctx.channel());
-                    readingChunks = false;
-                    reset();
+                    writeResponse(ctx.channel(), fullRequest, "Knoxcraft thanks you!\n");
                 }
             }
-        } else {
-            writeResponse(ctx.channel());
         }
     }    
-
-    private void reset() {
-        request = null;
-        // destroy the decoder to release all resources
-        decoder.destroy();
-        decoder = null;
-    }
-
-    private void readHttpDataChunkByChunk() throws IOException, EndOfDataDecoderException{
-        // No idea if we need to read by chunks
-        // I think this is somehow related to the Factory that we're no longer using
-        while (decoder.hasNext()) {
-            InterfaceHttpData data = decoder.next();
-            if (data != null) {
-                try {
-                    // new value
-                    writeHttpData(data);
-                } finally {
-                    data.release();
-                }
-            }
-        }
-    }
-
 
     private void writeHttpData(InterfaceHttpData data) throws IOException {
         // we only care about file uploads
@@ -180,8 +170,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                 System.out.printf("%s\n", s);
                 // Generate a callback to the Turtles3D plugin
                 // that is listening for hooks
-                logger.info("Trying to generate a hook for the json");
-                Canary.hooks().callHook(new UploadJSONHook(s));
+                
             } else {
                 throw new IOException("File to be continued but should not!");
             }
@@ -189,10 +178,9 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
     }
 
 
-    private void writeResponse(Channel channel) {
+    private void writeResponse(Channel channel, HttpRequest request, String message) {
         // Convert the response content to a ChannelBuffer.
-        ByteBuf buf = copiedBuffer(responseContent.toString(), CharsetUtil.UTF_8);
-        responseContent.setLength(0);
+        ByteBuf buf = copiedBuffer(message, CharsetUtil.UTF_8);
 
         // Decide whether to close the connection or not.
         boolean close = HttpHeaders.Values.CLOSE.equalsIgnoreCase(request.headers().get(CONNECTION))
@@ -217,9 +205,11 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
             future.addListener(ChannelFutureListener.CLOSE);
         }
     }
+    
     private void writeMenu(ChannelHandlerContext ctx) {
         // print several HTML forms
         // Convert the response content to a ChannelBuffer.
+        StringBuffer responseContent=new StringBuffer();
         responseContent.setLength(0);
 
         // create Pseudo Menu

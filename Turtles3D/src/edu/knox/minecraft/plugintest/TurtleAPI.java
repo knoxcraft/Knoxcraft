@@ -19,7 +19,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import edu.knoxcraft.hooks.UploadJSONHook;
+import edu.knoxcraft.hooks.KCTUploadHook;
 import edu.knoxcraft.http.server.HttpUploadServer;
 import edu.knoxcraft.turtle3d.KCTCommand;
 import edu.knoxcraft.turtle3d.KCTScript;
@@ -532,8 +532,8 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     }
 
     @HookHandler
-    public void uploadJSON(UploadJSONHook hook) {
-        logger.info("Hook called");
+    public void uploadJSON(KCTUploadHook hook) {
+        logger.info("Hook called, json is "+hook.getJSON());
         JSONParser parser=new JSONParser();
         try {
             logger.info(hook.getJSON());
