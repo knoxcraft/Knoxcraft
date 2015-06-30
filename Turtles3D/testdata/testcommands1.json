@@ -3,7 +3,7 @@
 	"commands" : [
 		{"cmd" : "forward",
 			"args" : {"dist" : 10}},
-		{"cmd" : "turn",
-			"args" : {"dir" : "right", "degrees" : 90}}
+		{"cmd" : "turnRight",
+			"args" : {"degrees" : 90}}
 	]
 }

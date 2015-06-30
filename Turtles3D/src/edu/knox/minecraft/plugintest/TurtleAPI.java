@@ -1,10 +1,5 @@
 package edu.knox.minecraft.plugintest;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
 import net.canarymod.Canary;
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
@@ -18,8 +13,16 @@ import net.canarymod.hook.HookHandler;
 import net.canarymod.logger.Logman;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import edu.knoxcraft.hooks.UploadJSONHook;
 import edu.knoxcraft.http.server.HttpUploadServer;
+import edu.knoxcraft.turtle3d.KCTCommand;
+import edu.knoxcraft.turtle3d.KCTScript;
 
 /*TODO:  should most of these commands really happen in Turtle, 
   and this class just call those versions?  Like in TurtleMove().  */
@@ -530,8 +533,6 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
     @HookHandler
     public void uploadJSON(UploadJSONHook hook) {
-        // TODO: Write classes to represent commands
-        // TODO: Convert JSON into a list of commands
         logger.info("Hook called");
         JSONParser parser=new JSONParser();
         try {
@@ -539,25 +540,18 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             JSONObject json=(JSONObject)parser.parse(hook.getJSON());
 
             String scriptname=(String)json.get("scriptname");
+
+            KCTScript script=new KCTScript(scriptname);
+            
             logger.info(String.format("%s\n", scriptname));
 
             JSONArray lang= (JSONArray) json.get("commands");
             for (int i=0; i<lang.size(); i++) {
                 JSONObject cmd=(JSONObject)lang.get(i);
-                String commandName=(String)cmd.get("cmd");
-                JSONObject args=(JSONObject)cmd.get("args");
-                if (commandName.equals("forward")) {
-                    //int distance=getInt(args, "dist");
-                    long distance=(long)args.get("dist");
-                    // Move forward by the appropriate distance
-                    logger.info(String.format("Move forward by %d\n", distance));
-                } else if (commandName.equals("turn")) {
-                    String dir=(String)args.get("dir");
-                    //int degrees=getInt(args, "degrees");
-                    long degrees=(long)args.get("degrees");
-                    logger.info(String.format("turn %s %d degrees\n", dir, degrees));
-                }
+                script.addCommand(cmd);
+                logger.info(String.format("script %s has command %s", script.getScriptName(), cmd.get(KCTCommand.CMD)));
             }
+            // TODO: Put script someplace now that we've created it
         } catch (ParseException e) {
             // TODO: log better? handle better?
             throw new RuntimeException(e);
