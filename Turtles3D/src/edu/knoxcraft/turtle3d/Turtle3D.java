@@ -1,11 +1,11 @@
 package edu.knoxcraft.turtle3d;
 
-import java.util.LinkedList;
-import java.util.List;
+import static edu.knoxcraft.turtle3d.KCTCommand.*;
 
-public abstract class Turtle3D
+public class Turtle3D
 {
-    /* Same JSON commands:
+    /* Sample JSON commands:
+
     {
    "scriptname" : "script-test",
    "commands" : [
@@ -17,34 +17,30 @@ public abstract class Turtle3D
    }
    */
     
-    // TODO: finish this class. It is the API, should create a list KCTCommand objects,
-    // and should have a method for creating JSON that includes itself as src (if that's somehow possible)
+    // TODO: finish this class. It is the API taht students will use in the Java code in BlueJ.
     private String scriptName;
-    private List<KCTCommand> commands=new LinkedList<KCTCommand>();
+    private KCTScript script;
     
-    public abstract void run();
-    private static String quoteString(String s) {
-        return "\""+s+"\"";
+    public String getScriptName() {
+        return this.scriptName;
     }
-    protected String toJSONString() {
-        return String.format("{%s : %s, %s : [\n%s\n]}", 
-                quoteString("scriptname"), 
-                quoteString(this.scriptName),
-                quoteString("commands"), 
-                commands.toString());
+    public KCTScript getScript() {
+        return this.script;
     }
-    
-    
     
     public Turtle3D(String scriptName) {
-        //commands.append(String.format("{%s : %s, "));
+        script=new KCTScript(scriptName);
     }
     
     public void forward(int distance) {
-        
+        KCTCommand cmd=new KCTCommand(FORWARD, JSONUtil.makeArgMap(DIST, distance));
+        script.addCommand(cmd);
     }
     
-    public void turn(int degrees) {
-        
+    public void turn(String dir, int degrees){
+        KCTCommand cmd=new KCTCommand(TURN, JSONUtil.makeArgMap(DIR, dir, DEGREES, degrees));
+        script.addCommand(cmd);
     }
+    
+    // TODO: other turtle commands
 }
