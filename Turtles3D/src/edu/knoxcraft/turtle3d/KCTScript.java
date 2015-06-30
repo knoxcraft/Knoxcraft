@@ -23,6 +23,7 @@ public class KCTScript
     private String scriptName;
     private List<KCTCommand> commands;
     // TODO: Add support for turtle scripts that store the source code that generated the list of commands
+    // instructors may want to see this
     private String sourceCode;
     
     public KCTScript(String scriptName) {

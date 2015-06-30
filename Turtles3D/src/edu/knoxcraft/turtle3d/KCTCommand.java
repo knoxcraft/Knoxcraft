@@ -59,7 +59,7 @@ public class KCTCommand
     
     /**
      * Execute this command
-     * TODO: May require parameters from the Minecraft server (reference to some kind of object that lets us lay blocks)
+     * TODO: May require parameters from the Minecraft server (reference to the thing that lets us lay blocks)
      */
     public void execute() {
         // TODO: Execute the command
@@ -80,7 +80,6 @@ public class KCTCommand
         // {"cmd" : "forward",
         //  "args" : {"dist" : 10}}
         StringBuffer buf=new StringBuffer();
-        // Converting to an array so that I can elegantly get 
         for (Map.Entry<String,Object> entry : arguments.entrySet()) {
             buf.append(String.format("%s : %s,\n", 
                     quoteString(entry.getKey()), 
