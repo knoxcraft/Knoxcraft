@@ -24,9 +24,6 @@ import edu.knoxcraft.http.server.HttpUploadServer;
 import edu.knoxcraft.turtle3d.KCTCommand;
 import edu.knoxcraft.turtle3d.KCTScript;
 
-/*TODO:  should most of these commands really happen in Turtle, 
-  and this class just call those versions?  Like in TurtleMove().  */
-
 //Things need to be overly simple during testing for ease of use
 
 //In time, need to build in string verification for correct input style (ie. All caps, etc)
@@ -123,6 +120,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         originPos = sender.asPlayer().getPosition();
         originDir = sender.asPlayer().getCardinalDirection();
 
+       //TODO:  Is this done?  There's a lot of commented out things/confused comments...
         //Make the Relative Position
         relPos = new Position(0,0,0);
         relDir = Direction.getFromIntValue(0);
@@ -157,6 +155,8 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         tt = false;
         turtle = null;
         getString(sender, tt);
+        
+        //TODO:  Do we need to reset position/direction here?  Or maybe not, since ton does...
     }
 
     /**
@@ -184,6 +184,10 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     /**
      * Output a message to the player console.
      * Expects args[0] = "c"   
+     * 
+     * TODO:  Should we make a helper method that takes a string and makes the args array for this?
+     * It would make it easier to call this from the code.
+     * 
      * @param sender
      * @param args
      */
@@ -220,7 +224,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             return;
 
         bp = !bp;
-        TurtleBlockPlaceStatus(sender, args);
+        TurtleBlockPlaceStatus(sender, args);  //alert user about change
     }
 
     /**
@@ -263,6 +267,9 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     /**
      * Set turtle direction.  Textbased (North, South, East, West)
      * Number based for simplicity in early tests?
+     * 
+     * TODO:  I think this can support the diagonals now.
+     * 
      * @param sender
      * @param args
      */
@@ -523,9 +530,20 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
-
+        
+        //Get desired direction from args
+        String dir = args[1];
+        boolean left = true;  //default dir is left  
+        
+        if (dir.equals("right") || dir.equals("RIGHT") || dir.equals("Right"))  {  //going right
+            left = false;
+        }  else if (!dir.equals("left") && !dir.equals("LEFT") && !dir.equals("Left"))  { //bad input
+            consoleHelper(sender, "That is not a valid direction.");
+            return;
+        }
+        
         //turn turtle (left or right)
-
+        relDir = turtle.turn(relDir,  left, 0);
     }
 
     @HookHandler
@@ -664,10 +682,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         if (tt)  { //turtle mode is on-- no problems
             return true;
         }  else  {  //turtle mode is off-- need to alert user
-            String [] str = new String [2];
-            str[0] = "/c";
-            str[1] = "Turtle mode is not on.";
-            TurtleConsole(sender, str);
+            consoleHelper(sender, "Turtle mode is not on.");
             return false;
         }
     }
@@ -680,11 +695,20 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         if (bp)  { //block placement mode is on-- no problems
             return true;
         }  else  {  //block placement mode is off-- need to alert user
-            String [] str = new String [2];
-            str[0] = "/c";
-            str[1] = "Block placement mode is not on.";
-            TurtleConsole(sender, str);
+            consoleHelper(sender, "Block placement mode is not on.");
             return false;
         }
+    }
+    
+    /**
+     * Helper for calling TurtleConsole as a method (rather than in game).  
+     * Creates args array and submits to console. 
+     * @param msg Message to output
+     */
+    private void consoleHelper(MessageReceiver sender, String msg) {
+        String [] str = new String [2];
+        str[0] = "/c";
+        str[1] = msg;
+        TurtleConsole(sender, str);
     }
 }
