@@ -10,6 +10,9 @@ public class Turtle {
     //Make a Turtle
 
     //Constructor
+    public Turtle(){
+        //Nothing to a turtle
+    }
 
     /**
      * Move.  Returns new relative position of Turtle.
