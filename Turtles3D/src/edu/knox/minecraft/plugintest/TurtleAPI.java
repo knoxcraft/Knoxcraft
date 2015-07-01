@@ -167,21 +167,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         TurtleConsole(sender, str);
     }
 
-    /**
-     * Checks whether turtle mode is on.  If so, returns true.  If not, alerts user and returns false.
-     * @return Status of turtle mode
-     */
-    private boolean checkTT(MessageReceiver sender)  {
-        if (tt)  { //turtle mode is on-- no problems
-            return true;
-        }  else  {  //turtle mode is off-- need to alert user
-            String [] str = new String [2];
-            str[0] = "/c";
-            str[1] = "Turtle mode is not on.";
-            TurtleConsole(sender, str);
-            return false;
-        }
-    }
+    
     
     /**
      * Checks whether block placement mode is on.  If so, returns true.  If not, alerts user and returns false.
@@ -311,6 +297,27 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         else
         { //if Off, Turning on Turtle
             TurtleOn(sender, args);
+        }
+    }
+    
+    /**
+     * Checks whether turtle mode is on.  If so, returns true.  If not, alerts user and returns false.
+     * @return Status of turtle mode
+     */
+    @Command(
+            aliases = { "tt?", "TurtleToggle" },
+            description = "Turtle ",
+            permissions = { "" },
+            toolTip = "/tt?")
+    private boolean checkTT(MessageReceiver sender)  {
+        if (tt)  { //turtle mode is on-- no problems
+            return true;
+        }  else  {  //turtle mode is off-- need to alert user
+            String [] str = new String [2];
+            str[0] = "/c";
+            str[1] = "Turtle mode is not on.";
+            TurtleConsole(sender, str);
+            return false;
         }
     }
 
