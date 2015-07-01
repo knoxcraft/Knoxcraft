@@ -27,6 +27,7 @@
 package edu.knoxcraft.http.client;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Scanner;
@@ -48,22 +49,42 @@ import org.apache.http.util.EntityUtils;
  */
 public class ClientMultipartFormPost {
 
-    public static void main(String[] args) throws Exception {
-        String url="http://localhost:8888/mcform";
-        File file=new File("testdata/testcommands1.json");
-        upload(url, file);
+    private static String readFromFile(File file) throws IOException {
+        StringBuilder buf=new StringBuilder();
+        Scanner scan=new Scanner(new FileInputStream(file));
+        while (scan.hasNextLine()) {
+            String line=scan.nextLine();
+            buf.append(line);
+            buf.append("\n");
+        }
+        scan.close();
+        return buf.toString();
     }
-    public static void upload(String url, File file) throws ClientProtocolException, IOException {
+    
+    public static void main(String[] args) throws Exception {
+        //String url="http://localhost:8888/mcform";
+        String url="http://localhost:8888/kctupload";
+        String playerName="ppypp-emhastings-masters-of-minecraft-hackery";
+        File jsonfile=new File("testdata/testcommands1.json");
+        File sourcefile=new File("test/edu/knoxcraft/turtle3d/SampleProgram.java");
+        upload(url, playerName, jsonfile, sourcefile);
+    }
+    public static void upload(String url, String playerName, File jsonfile, File sourcefile) throws ClientProtocolException, IOException {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             HttpPost httppost = new HttpPost(url);
 
-            FileBody bin = new FileBody(file);
-            StringBody comment = new StringBody("JSON file", ContentType.TEXT_PLAIN);
+            FileBody json= new FileBody(jsonfile);
+            FileBody source= new FileBody(sourcefile);
+            String jsontext=readFromFile(jsonfile);
 
             HttpEntity reqEntity = MultipartEntityBuilder.create()
-                    .addPart("json", bin)
-                    .addPart("comment", comment)
+                    .addPart("playerName", new StringBody(playerName, ContentType.TEXT_PLAIN))
+                    .addPart("jsonfile", json)
+                    .addPart("sourcefile", source)
+                    .addPart("language", new StringBody("java", ContentType.TEXT_PLAIN))
+                    .addPart("jsontext", new StringBody(jsontext, ContentType.TEXT_PLAIN))
+                    .addPart("sourcetext", new StringBody("public class Foo {\n  int x=5\n}", ContentType.TEXT_PLAIN))
                     .build();
 
 
