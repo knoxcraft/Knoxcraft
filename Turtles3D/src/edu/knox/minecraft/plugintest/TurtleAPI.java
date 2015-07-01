@@ -52,7 +52,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     private boolean bp = false;  //Block Place on/off
 
     //OTHER VARIABLES
-    private Turtle turtle;
+    private Turtle turtle = new Turtle();
     private BlockType bt = BlockType.Stone;  //default turtle block type 
     private World world;  //World in which all actions occur
     private HttpUploadServer httpServer;
@@ -247,11 +247,11 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
      * @param args
      */
     @Command(
-            aliases = { "sp", "SetPosition" },
+            aliases = { "srp", "SetPosition" },
             description = "Set Turtle position",
             permissions = { "" },
-            toolTip = "/sp")
-    public void TurtleSetPosition(MessageReceiver sender, String[] args)
+            toolTip = "/srp")
+    public void TurtleSetRelPosition(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
@@ -496,24 +496,19 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
             //Place block if block placement mode on
             if (bp) {
-                world.setBlockAt(relPos, bt);    
+                world.setBlockAt(gamePos, bt);    
                 //TODO:  keep track of this block to undo
             }
 
             //update turtle position
-            relPos = turtle.move(relPos, relDir, up, !up);  //only moving vertically--> relDir doesn't matter
+            gamePos = turtle.move(gamePos, relDir, up, !up);  //only moving vertically--> relDir doesn't matter
+            updateRelPos();
         }
     }
 
-    /**
-     * turn (number based) (degrees)
-     * @param sender
-     * @param args
-     */
-    //TODO implementation -> will allow diagonals
 
     /**
-     * Turn (Right/Left) (text based)
+     * Turn (Right/Left) (text based)(degrees)
      * @param sender
      * @param args
      */	
@@ -524,6 +519,8 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             toolTip = "/t")
     public void TurtleTurn(MessageReceiver sender, String[] args)
     {
+        //TODO implementation -> will allow diagonals
+        
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
@@ -588,7 +585,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
     /*TODO:  should this be called updateRelPos?  It doesn't return/print anything...
     Also when would we need to call this? */
-    private void getRelPos(){
+    private void updateRelPos(){
         int xg = gamePos.getBlockX();
         int yg = gamePos.getBlockY();
         int zg = gamePos.getBlockZ();
@@ -602,6 +599,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         relPos.setZ(zg-zo);
     }
 
+    
     /**
      * Reverses relative direction (turn 180 degrees).  Used when moving backward.
      */
