@@ -120,7 +120,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         originPos = sender.asPlayer().getPosition();
         originDir = sender.asPlayer().getCardinalDirection();
 
-       //TODO:  Is this done?  There's a lot of commented out things/confused comments...
+        //TODO:  Is this done?  There's a lot of commented out things/confused comments...
         //Make the Relative Position
         relPos = new Position(0,0,0);
         relDir = Direction.getFromIntValue(0);
@@ -134,9 +134,9 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
         //Turning on Turtle
         tt = true;
-        getString(sender, originPos);
-        getString(sender, originDir);
-        getString(sender, tt);
+        consoleHelper(sender, originPos);
+        consoleHelper(sender, originDir);
+        consoleHelper(sender, tt);
     }
 
     /**
@@ -154,8 +154,8 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         //Turning off Turtle
         tt = false;
         turtle = null;
-        getString(sender, tt);
-        
+        consoleHelper(sender, tt);
+
         //TODO:  Do we need to reset position/direction here?  Or maybe not, since ton does...
     }
 
@@ -183,10 +183,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
     /**
      * Output a message to the player console.
-     * Expects args[0] = "c"   
-     * 
-     * TODO:  Should we make a helper method that takes a string and makes the args array for this?
-     * It would make it easier to call this from the code.
+     * Expects args[0] = "c"
      * 
      * @param sender
      * @param args
@@ -242,7 +239,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        getString(sender, bp);
+        consoleHelper(sender, bp);
     }
 
     /**
@@ -252,7 +249,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
      */
     @Command(
             aliases = { "srp", "SetPosition" },
-            description = "Set Turtle position",
+            description = "Set Turtle position in relative coords",
             permissions = { "" },
             toolTip = "/srp")
     public void TurtleSetRelPosition(MessageReceiver sender, String[] args)
@@ -298,7 +295,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
      */
     @Command(
             aliases = { "gp", "GetPosition" },
-            description = "Get Turtle position",
+            description = "Get Turtle position in relative coords",
             permissions = { "" },
             toolTip = "/gp")
     public void TurtleGetPosition(MessageReceiver sender, String[] args)
@@ -309,7 +306,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         //report position of turtle (relative position)
 
         //   getRelPos();
-        getString(sender, relPos);
+        consoleHelper(sender, relPos);
     }
 
     /**
@@ -328,7 +325,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             return;
 
         //report position of turtle (game coord position)
-        getString(sender, gamePos);
+        consoleHelper(sender, gamePos);
     }
 
     /**
@@ -347,7 +344,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             return;
 
         //report position of origin (game coord position)
-        getString(sender, originPos);
+        consoleHelper(sender, originPos);
     }
 
     /**
@@ -366,7 +363,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             return;
 
         //report position of turtle	
-        getString(sender, relDir);
+        consoleHelper(sender, relDir);
     }
 
     /**
@@ -426,7 +423,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             return;
 
         //report current BT of turtle	
-        getString(sender, bt);
+        consoleHelper(sender, bt);
     }
 
     /**
@@ -527,21 +524,21 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     public void TurtleTurn(MessageReceiver sender, String[] args)
     {
         //TODO implementation -> will allow diagonals
-        
+
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
-        
+
         //Get desired direction from args
         String dir = args[1];
         boolean left = true;  //default dir is left  
-        
+
         if (dir.equals("right") || dir.equals("RIGHT") || dir.equals("Right"))  {  //going right
             left = false;
         }  else if (!dir.equals("left") && !dir.equals("LEFT") && !dir.equals("Left"))  { //bad input
             consoleHelper(sender, "That is not a valid direction.");
             return;
         }
-        
+
         //turn turtle (left or right)
         relDir = turtle.turn(relDir,  left, 0);
     }
@@ -557,7 +554,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             String scriptname=(String)json.get("scriptname");
 
             KCTScript script=new KCTScript(scriptname);
-            
+
             logger.info(String.format("%s\n", scriptname));
 
             JSONArray lang= (JSONArray) json.get("commands");
@@ -617,7 +614,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         relPos.setZ(zg-zo);
     }
 
-    
+
     /**
      * Reverses relative direction (turn 180 degrees).  Used when moving backward.
      */
@@ -632,45 +629,80 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         relDir = Direction.getFromIntValue(dirInt);
     }
 
-    /*TODO:  We need to add Javadoc comments for these methods and possibly rename them 
-     with more descriptive titles.  I'm a little confused by them at the moment.  */
-    private void getString(MessageReceiver sender, boolean b){
-        //Get the Boolean value 
+    /**
+     * Helper methods for for calling TurtleConsole as a method (rather than in game).  
+     * Creates args array and submits desired content to console. 
+     *
+     * @param sender
+     */
+
+    /**
+     * Boolean version
+     * @param b
+     */
+    private void consoleHelper(MessageReceiver sender, boolean b){
+        //set up array 
         String [] str = new String [2];
         str[0] = "/c";
         str[1] = b + "";
 
-        //return status of BP using TurtleConsole
+        //output message using TurtleConsole
         TurtleConsole(sender, str);
     }
 
-    private void getString(MessageReceiver sender, BlockType b){
-        //Get the Boolean value 
+    /**
+     * BlockType version
+     * @param bt
+     */
+    private void consoleHelper(MessageReceiver sender, BlockType bt){
+        //set up array 
         String []str = new String [2];
         str[0] = "/c";
-        str[1] = b.toString() + "";
+        str[1] = bt.toString() + "";
 
-        //return status of BP using TurtleConsole
+        //output message using TurtleConsole
         TurtleConsole(sender, str);
     }
 
-    private void getString(MessageReceiver sender, Direction b){
-        //Get the Boolean value 
+    /**
+     * Direction version
+     * @param d
+     */
+    private void consoleHelper(MessageReceiver sender, Direction d){
+        //set up array
         String [] str = new String [2];
         str[0] = "/c";
-        str[1] = b.toString() + "";
+        str[1] = d.toString() + "";
 
-        //return status of BP using TurtleConsole
+        //output message using TurtleConsole
         TurtleConsole(sender, str);
     }
 
-    private void getString(MessageReceiver sender, Position b){
-        //Get the Boolean value 
+    /**
+     * Position version
+     * @param p
+     */
+    private void consoleHelper(MessageReceiver sender, Position p){
+        //set up array
         String [] str = new String [2];
         str[0] = "/c";
-        str[1] = b.toString() + ""; //Need to overload / fix this output
+        str[1] = p.toString() + ""; //TODO:  Need to overload / fix this output
 
-        //return status of BP using TurtleConsole
+        //output message using TurtleConsole
+        TurtleConsole(sender, str);
+    }
+
+    /**
+     * String version
+     * @param msg
+     */
+    private void consoleHelper(MessageReceiver sender, String msg) {
+        //set up array
+        String [] str = new String [2];
+        str[0] = "/c";
+        str[1] = msg;
+
+        //output message using TurtleConsole
         TurtleConsole(sender, str);
     }
 
@@ -698,17 +730,5 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             consoleHelper(sender, "Block placement mode is not on.");
             return false;
         }
-    }
-    
-    /**
-     * Helper for calling TurtleConsole as a method (rather than in game).  
-     * Creates args array and submits to console. 
-     * @param msg Message to output
-     */
-    private void consoleHelper(MessageReceiver sender, String msg) {
-        String [] str = new String [2];
-        str[0] = "/c";
-        str[1] = msg;
-        TurtleConsole(sender, str);
     }
 }
