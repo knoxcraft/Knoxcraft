@@ -5,6 +5,12 @@ import net.canarymod.api.world.position.Position;
 
 public class Turtle {
 
+    /**
+     * Constructor
+     */
+    public Turtle(){
+        //Nothing to a turtle
+    }
 
     /**
      * Move.  Returns new relative position of Turtle.

@@ -45,7 +45,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
     //true current position in game coords(made by combining relative and real)
     private Position gamePos;
-    private Direction gameDir;  //TODO:  I don't think this is ever updated...
+    private Direction gameDir;  //TODO:  I don't think this is ever updated... //true Facts
 
     //MODE TOGGLES
     private boolean tt = false;  //Turtle on/off
