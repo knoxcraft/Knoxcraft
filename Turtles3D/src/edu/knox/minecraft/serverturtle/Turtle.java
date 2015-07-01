@@ -1,4 +1,4 @@
-package edu.knox.minecraft.plugintest;
+package edu.knox.minecraft.serverturtle;
 
 import net.canarymod.api.world.position.Direction;
 import net.canarymod.api.world.position.Position;
