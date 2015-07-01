@@ -45,7 +45,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
     //true current position in game coords(made by combining relative and real)
     private Position gamePos;
-    private Direction gameDir;  //TODO:  I don't think this is ever updated...
+    private Direction gameDir;  //TODO:  I don't think this is ever updated... //true Facts
 
     //MODE TOGGLES
     private boolean tt = false;  //Turtle on/off
@@ -406,10 +406,10 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
      * @param args
      */
     @Command(
-            aliases = { "rb", "ReturnBlockType" },
+            aliases = { "rbt", "ReturnBlockType" },
             description = "Return Turtle block type",
             permissions = { "" },
-            toolTip = "/rb")
+            toolTip = "/rbt")
     public void TurtleReturnBlockType(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
