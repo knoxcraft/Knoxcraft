@@ -285,80 +285,80 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     }
 
     /**
-     * Return current position (relative)
+     * Get current position (relative)
      * @param sender
      * @param args
      */
     @Command(
-            aliases = { "rp", "ReturnPosition" },
-            description = "Return Turtle position",
+            aliases = { "gp", "GetPosition" },
+            description = "Get Turtle position",
             permissions = { "" },
-            toolTip = "/rp")
-    public void TurtleReturnPosition(MessageReceiver sender, String[] args)
+            toolTip = "/gp")
+    public void TurtleGetPosition(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        //return position of turtle (relative position)
+        //report position of turtle (relative position)
 
         //   getRelPos();
         getString(sender, relPos);
     }
 
     /**
-     * Return current position of Turtle in game coords
+     * Get current position of Turtle in game coords
      * @param sender
      * @param args
      */
     @Command(
-            aliases = { "rgp", "ReturnGamePosition" },
-            description = "Return Turtle position in game coords",
+            aliases = { "ggp", "GetGamePosition" },
+            description = "Get Turtle position in game coords",
             permissions = { "" },
-            toolTip = "/rgp")
-    public void TurtleReturnGamePosition(MessageReceiver sender, String[] args)
+            toolTip = "/ggp")
+    public void TurtleGetGamePosition(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        //return position of turtle (game coord position)
+        //report position of turtle (game coord position)
         getString(sender, gamePos);
     }
 
     /**
-     * Return position of relative origin (Player's pos at Turtle on) in game coords
+     * Get position of relative origin (Player's pos at Turtle on) in game coords
      * @param sender
      * @param args
      */
     @Command(
-            aliases = { "rop", "ReturnOriginPosition" },
-            description = "Return origin position in game coords",
+            aliases = { "gop", "GetOriginPosition" },
+            description = "Get origin position in game coords",
             permissions = { "" },
-            toolTip = "/rop")
-    public void TurtleReturnOriginPosition(MessageReceiver sender, String[] args)
+            toolTip = "/gop")
+    public void TurtleGetOriginPosition(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        //return position of origin (game coord position)
+        //report position of origin (game coord position)
         getString(sender, originPos);
     }
 
     /**
-     * Return current direction (relative)
+     * Get current direction (relative)
      * @param sender
      * @param args
      */
     @Command(
-            aliases = { "rd", "ReturnDirection" },
-            description = "Return Turtle direction",
+            aliases = { "gd", "GetDirection" },
+            description = "Get Turtle direction",
             permissions = { "" },
-            toolTip = "/rd")
-    public void TurtleReturnDirection(MessageReceiver sender, String[] args)
+            toolTip = "/gd")
+    public void TurtleGetDirection(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        //return position of turtle	
+        //report position of turtle	
         getString(sender, relDir);
     }
 
@@ -401,16 +401,16 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     //TODO implementation
 
     /**
-     * Return current block type
+     * Get current block type
      * @param sender
      * @param args
      */
     @Command(
-            aliases = { "rb", "ReturnBlockType" },
-            description = "Return Turtle block type",
+            aliases = { "gbt", "GetBlockType" },
+            description = "Get Turtle block type",
             permissions = { "" },
-            toolTip = "/rb")
-    public void TurtleReturnBlockType(MessageReceiver sender, String[] args)
+            toolTip = "/gbt")
+    public void TurtleGetBlockType(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
@@ -418,7 +418,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         if (!checkBP(sender))  //don't allow if block placement mode isn't on either
             return;
 
-        //return current BT of turtle	
+        //report current BT of turtle	
         getString(sender, bt);
     }
 

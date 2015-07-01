@@ -4,12 +4,7 @@ import net.canarymod.api.world.position.Direction;
 import net.canarymod.api.world.position.Position;
 
 public class Turtle {
-    
-    //TODO:  Will we ever actually make a Turtle, or could this class be static?
 
-    //Make a Turtle
-
-    //Constructor
 
     /**
      * Move.  Returns new relative position of Turtle.
