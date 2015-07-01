@@ -598,9 +598,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         //TODO:  implement this
     }
 
-    /*TODO:  should this be called updateRelPos?  It doesn't return/print anything...
-    Also when would we need to call this? */
-    private void updateRelPos(){
+   private void updateRelPos(){
         int xg = gamePos.getBlockX();
         int yg = gamePos.getBlockY();
         int zg = gamePos.getBlockZ();
