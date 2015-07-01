@@ -54,7 +54,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     private boolean fd = false;
     private HttpUploadServer httpServer;
     public static Logman logger;
-    
+
     public TurtleAPI() {
         TurtleAPI.logger = getLogman();
     }
@@ -167,8 +167,8 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         TurtleConsole(sender, str);
     }
 
-    
-    
+
+
     /**
      * Checks whether block placement mode is on.  If so, returns true.  If not, alerts user and returns false.
      * @return Status of block placement mode
@@ -235,7 +235,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
         //GET WORLD
         world = sender.asPlayer().getWorld();
-        
+
         //Relative pos stuff
 
         //Get True Position and Direction
@@ -298,8 +298,8 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         { //if Off, Turning on Turtle
             TurtleOn(sender, args);
         }
-    }
-    
+    }   
+
     /**
      * Checks whether turtle mode is on.  If so, returns true.  If not, alerts user and returns false.
      * @return Status of turtle mode
@@ -446,7 +446,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         //   getRelPos();
         getString(sender, relPos);
     }
-    
+
     /**
      * Return current position of Turtle in game coords
      * @param sender
@@ -465,7 +465,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         //return position of turtle (game coord position)
         getString(sender, curPos);
     }
-    
+
     /**
      * Return position of relative origin (Player's pos at Turtle on) in game coords
      * @param sender
@@ -518,10 +518,10 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
-        
+
         if (!checkBP(sender))  //don't allow if block placement mode isn't on either
             return;
-        
+
         BlockType temp;
 
         //set current BT of turtle	
@@ -559,7 +559,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
         if (!checkBP(sender))  //don't allow if block placement mode isn't on either
             return;
-        
+
         //return current BT of turtle	
         getString(sender, bt);
     }
@@ -646,7 +646,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
-        
+
         //move up or down turtle (left or right)
         //move turtle	
         // Move should act in a loop to go 1 -> just happens. To go 10, loop 10 times
@@ -679,10 +679,10 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         try {
             logger.info(hook.getJSON());
             JSONObject json=(JSONObject)parser.parse(hook.getJSON());
-            
+
             String scriptname=(String)json.get("scriptname");
             logger.info(String.format("%s\n", scriptname));
-            
+
             JSONArray lang= (JSONArray) json.get("commands");
             for (int i=0; i<lang.size(); i++) {
                 JSONObject cmd=(JSONObject)lang.get(i);
