@@ -453,7 +453,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         }     
         
         //check if distance is negative (going backward)
-        if (x < 0){  
+        if (x < 0 || args[0].equals("/b") || args[0].equals("/back")){  
             //if so, reverse turtle direction
             x = -x;
             flipDir();
@@ -495,11 +495,14 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        int x = Integer.parseInt(args[1]);  //get desired move distance
         boolean up = true;  //default direction is up
+        int x = 1;  //default move distance
+        if(args.length>1)  {  //alternate move distance specified
+            x = Integer.parseInt(args[1]);  
+        } 
 
         //check if distance is negative (going down)
-        if (x < 0){  
+        if (x < 0 || args[0].equals("/d") || args[0].equals("/down")){  
             //if so, reverse turtle direction
             x = -x;
             up = false;
