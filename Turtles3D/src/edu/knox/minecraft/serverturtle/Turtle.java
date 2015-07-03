@@ -103,11 +103,13 @@ public class Turtle {
         int dirInt = d.getIntValue();  
 
         //calculate new direction    
-        if (deg != 0)  {  //using basic string-based version w/o degrees
+        if (deg == 0)  {  //using basic string-based version w/o degrees
             if (left)  {  //turning left
                 dirInt -= 2;
+                //dirInt--;
             }  else  {  //turning right
                 dirInt += 2;
+                //dirInt++;
             }
             
         }  else {  //turning by degrees
@@ -121,7 +123,7 @@ public class Turtle {
                 dirInt += turns;
             }
         }
-        dirInt = (dirInt + 4) % 8;
+        dirInt = dirInt % 8;
         
         //update direction and return
         d = Direction.getFromIntValue(dirInt);
