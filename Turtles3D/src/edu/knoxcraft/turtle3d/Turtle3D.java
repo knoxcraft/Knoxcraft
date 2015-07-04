@@ -79,7 +79,7 @@ public class Turtle3D
     
     /**
      * Turn the turtle to the right the given number of degrees.
-     * TODO: Can we handle values that aren't multiples of 45?
+     * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
      * @param degrees
      */
     public void turnRight(int degrees){
@@ -89,7 +89,7 @@ public class Turtle3D
     
     /**
      * Turn the turtle to the left the given number of degrees.
-     * TODO: Can we handle values that aren't multiples of 45?
+     * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
      * @param degrees
      */public void turnLeft(int degrees){
         KCTCommand cmd=new KCTCommand(TURNLEFT, JSONUtil.makeArgMap(DEGREES, degrees));
