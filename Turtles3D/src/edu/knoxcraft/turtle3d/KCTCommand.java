@@ -50,6 +50,7 @@ public class KCTCommand
     }
     
     public KCTCommand(JSONObject cmd) {
+        // TODO: Error checking: make sure these are real commands
         this.commandName=(String)cmd.get(CMD);
         this.arguments=new HashMap<String, Object>();
         JSONObject args=(JSONObject)cmd.get(ARGS);

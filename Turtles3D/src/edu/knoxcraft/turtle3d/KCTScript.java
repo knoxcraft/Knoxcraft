@@ -58,4 +58,10 @@ public class KCTScript
                 cmdstr.toString());
     }
     
+    public void execute() {
+        // TODO: execute this method (or not)
+        // XXX: or make this a parameter to a method in TurtleAPI
+        // actually, that sounds very reasonable
+    }
+    
 }

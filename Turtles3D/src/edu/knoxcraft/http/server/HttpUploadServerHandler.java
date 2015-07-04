@@ -159,23 +159,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
         }
     }    
 
-    private void writeHttpData(InterfaceHttpData data) throws IOException {
-        // we only care about file uploads
-        if (data.getHttpDataType() == HttpDataType.FileUpload) {
-            FileUpload fileUpload = (FileUpload) data;
-            if (fileUpload.isCompleted()) {
-                String filename=fileUpload.getFilename();
-                System.out.printf("filename: %s\n",filename);
-                String s=fileUpload.getString();
-                System.out.printf("%s\n", s);
-                // Generate a callback to the Turtles3D plugin
-                // that is listening for hooks
-                
-            } else {
-                throw new IOException("File to be continued but should not!");
-            }
-        }
-    }
+    
 
 
     private void writeResponse(Channel channel, HttpRequest request, String message) {
