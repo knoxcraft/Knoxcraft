@@ -11,3 +11,4 @@ config/motd.txt
 config/ops.cfg
 config/server.cfg
 db
+logs
