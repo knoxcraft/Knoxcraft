@@ -583,6 +583,21 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         }
     }
 
+    
+    /**
+     * This is just a sample method to test if changes are getting picked up.
+     * @param sender
+     * @param args
+     */ 
+    @Command(
+            aliases = { "buildtest"},
+            description = "Build test command",
+            permissions = { "" },
+            toolTip = "/buildtest")
+    public void buildtest(MessageReceiver sender, String[] args)
+    {
+        consoleHelper(sender, "This new command works.");
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //PRIVATE HELPER FUNCTIONS
 

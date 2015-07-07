@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?> 
 <!-- ====================================================================== 
      Mar 29, 2015 12:02:35 PM                                                        
 
@@ -7,6 +7,7 @@
                    
      jspacco                                                                
      ====================================================================== -->
+<!--
 <project name="project" default="build">
     <description>
 		description
@@ -30,5 +31,36 @@
 	<target name="install" depends="build">
 		<copy file="${dest}/Turtles3D.jar" todir="${install.location}"/>
 	</target>
+
+</project> -->
+
+<!-- ====================================================================== 
+     Mar 29, 2015 12:02:35 PM                                                        
+     project    
+     description
+                   
+     jspacco                                                                
+     ====================================================================== -->
+<project name="project" default="build">
+    <description>
+            description
+    </description>
+    
+    <property file="build.properties"/>
+
+    <target name="build" depends="depends" description="description">
+        <jar destfile="${dest}/Turtle.jar">
+            <fileset file="${bin}/**"/>
+            <fileset file="config/Canary.inf"/>
+        </jar>
+    </target>
+
+    <target name="depends">
+        <mkdir dir="${dest}"/>
+    </target>
+    
+    <target name="install" depends="build">
+        <copy file="${dest}/Turtle.jar" todir="${install.location}"/>
+    </target>
 
 </project>
