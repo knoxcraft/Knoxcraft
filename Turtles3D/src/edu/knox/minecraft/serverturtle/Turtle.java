@@ -89,9 +89,6 @@ public class Turtle {
     /**
      *  Turn.  Returns new relative direction of Turtle.
      *  
-     *  TODO:  for the degree version of this, it may be worth just taking the 
-     *  number of "notches"/eighth turns instead of real degrees.  Might be easier for users. 
-     *  
      * @param d  Initial relative direction of turtle.
      * @param left Is this turn going left?  (False -> turning right)
      * @param deg  number of degrees to turn in specified direction
@@ -102,29 +99,19 @@ public class Turtle {
         //get current direction (N, NE, ... , S --> 0, 1, ... , 7)
         int dirInt = d.getIntValue();  
 
-        //calculate new direction    
-        if (deg == 0)  {  //using basic string-based version w/o degrees
-            if (left)  {  //turning left
-                dirInt -= 2;
-                //dirInt--;
-            }  else  {  //turning right
-                dirInt += 2;
-                //dirInt++;
-            }
-            
-        }  else {  //turning by degrees
-            //This currently only works for 45 deg intervals.  It may be okay to leave it that way.
-            
-            int turns = deg/45;  //desired number of eighth turns
-            
-            if (left)  {  //turning left
-                dirInt -= turns;
-            }  else  {  //turning right
-                dirInt += turns;
-            }
+        //calculate new direction            
+        //This currently only works correctly for 45 deg intervals.  It may be okay to leave it that way.
+
+        int turns = deg/45;  //desired number of eighth turns
+
+        if (left)  {  //turning left
+            dirInt -= turns;
+        }  else  {  //turning right
+            dirInt += turns;
         }
+
         dirInt = dirInt % 8;
-        
+
         //update direction and return
         d = Direction.getFromIntValue(dirInt);
         return d;

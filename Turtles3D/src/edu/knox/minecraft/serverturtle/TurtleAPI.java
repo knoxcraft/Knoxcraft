@@ -156,7 +156,6 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         //Turning off Turtle
         tt = false;
         turtle = null;
-        //consoleHelper(sender, tt);
         consoleHelper(sender, "Turtle mode off.");
 
         //TODO:  Do we need to reset position/direction here?  
@@ -187,7 +186,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
     /**
      * Output a message to the player console.
-     * Expects args[0] = "c"
+     * Expects args[0] = "/c"
      * 
      * @param sender
      * @param args
@@ -243,7 +242,6 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        //consoleHelper(sender, bp);
         if(bp)  {
             consoleHelper(sender, "Block placement mode on.");
         }  else {
@@ -260,18 +258,21 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             aliases = { "sp", "SetPosition" },
             description = "Set Turtle position in relative coords",
             permissions = { "" },
-            toolTip = "/sp x y z")
+            toolTip = "/sp <x> <y> <z>")
     public void TurtleSetRelPosition(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
         //Change location to new location based on relative coordinates
-        if (args.length == 4)  {
-            //TODO:  Make sure these are really numbers?
-            relPos = new Position (Integer.parseInt(args[1]), Integer.parseInt(args[2]),Integer.parseInt(args[3]));
+        if (args.length == 4)  { //are there enough arguments?
+            try  {
+                relPos = new Position (Integer.parseInt(args[1]), Integer.parseInt(args[2]),Integer.parseInt(args[3]));
+            }  catch (Exception e)  {  //args weren't really numbers
+                consoleHelper(sender, "Not a valid position.");
+            }
         }  else  {
-            consoleHelper(sender, "Not a valid position.");
+            consoleHelper(sender, "Not enough arguments.");
         }
     }
 
@@ -285,13 +286,18 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             aliases = { "sd", "SetDirection" },
             description = "Set turtle direction",
             permissions = { "" },
-            toolTip = "/sd")
+            toolTip = "/sd <dir>")
     public void TurtleSetDirection(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        relDir = Direction.getFromIntValue(Integer.parseInt(args[1]));
+        if (args.length<2)  {  //not enough arguments
+            consoleHelper(sender, "Not enough arguments.");
+            return;
+        }
+
+        //update direction
         // 0 = NORTH
         // 1 = NORTHEAST
         // 2 = EAST
@@ -300,7 +306,13 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         // 5 = SOUTHWEST
         // 6 = WEST
         // 7 = NORTHWEST
-        // Else = ERROR -- TODO: should add error checking for this
+        // Else = ERROR 
+        try  {
+            relDir = Direction.getFromIntValue(Integer.parseInt(args[1]));
+            updateGameDir();
+        }  catch (Exception e)  {  //arg wasn't a number or was invalid
+            consoleHelper(sender, "Not a valid direction.");
+        }        
     }
 
     /**
@@ -388,7 +400,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             aliases = { "sbt", "SetBlockType" },
             description = "Set Turtle block type",
             permissions = { "" },
-            toolTip = "/sbt type")
+            toolTip = "/sbt <type>")
     public void TurtleSetBlockType(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
@@ -397,17 +409,26 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         if (!checkBP(sender))  //don't allow if block placement mode isn't on either
             return;
 
+        if (args.length<2)  {  //not enough arguments
+            consoleHelper(sender, "Not enough arguments.");
+            return;
+        }
+
         BlockType temp;
 
         //set current BT of turtle	
-        if (!(args.length == 3))
-        {
-            temp = BlockType.fromId(Integer.parseInt(args[1]));
-        }else{
-            temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-        }
+        try  {
+            if (!(args.length == 3))
+            {
+                temp = BlockType.fromId(Integer.parseInt(args[1]));
+            }else{
+                temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+            }
 
-        bt = temp;
+            bt = temp;
+        }  catch (Exception e)  {  //bad arguments
+            consoleHelper(sender, "Not a valid block type.");
+        }
     }
 
     /**
@@ -415,7 +436,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
      * @param sender
      * @param args
      */
-    //TODO implementation
+    //TODO implementation-- maybe we don't need this version?
 
     /**
      * Get current block type
@@ -442,8 +463,6 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     /**
      * Move (forward/back)
      * 
-     * TODO:  Fix moving backward-- doesn't work now
-     * 
      * @param sender
      * @param args
      */
@@ -451,7 +470,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             aliases = { "m" , "f", "b", "move", "forward", "back"},
             description = "Turtle move forward/back",
             permissions = { "" },
-            toolTip = "/m or /f or /b")
+            toolTip = "/m [dist] or /f [dist] or /b [dist]")
     public void TurtleMove(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
@@ -460,19 +479,19 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         boolean fd = false;  //flipped direction (for moving backward) 
         int x = 1;  //default move distance
         if(args.length>1)  {  //alternate move distance specified
-            x = Integer.parseInt(args[1]);  
+            try  {
+                x = Integer.parseInt(args[1]);  
+            }  catch (Exception e)  {  //arg not a number
+                consoleHelper(sender, "Not a valid distance.");
+            }
         }   
-
-        //debugging-- what does the program think this is?
-        //consoleHelper(sender, "Input: " + args[0]);
 
         //check if distance is negative (going backward)
         if (x < 0 || args[0].equals("/b") || args[0].equals("/back")){  
             //if so, reverse turtle direction
-            x = -x;
+            x = Math.abs(x);
             flipDir();
             fd = true;
-            consoleHelper(sender, "Going backwards");
         }
 
         for (int i = x; i > 0; i--){
@@ -504,7 +523,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             aliases = { "u", "d", "up", "down" },
             description = "Turtle up/down",
             permissions = { "" },
-            toolTip = "/u or /d")
+            toolTip = "/u [dist] or /d [dist]")
     public void TurtleUpDown(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
@@ -513,13 +532,17 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         boolean up = true;  //default direction is up
         int x = 1;  //default move distance
         if(args.length>1)  {  //alternate move distance specified
-            x = Integer.parseInt(args[1]);  
+            try  {
+                x = Integer.parseInt(args[1]);  
+            }  catch (Exception e)  {  //arg not a number
+                consoleHelper(sender, "Not a valid distance.");
+            }
         } 
 
         //check if distance is negative (going down)
         if (x < 0 || args[0].equals("/d") || args[0].equals("/down")){  
             //if so, reverse turtle direction
-            x = -x;
+            x = Math.abs(x);
             up = false;
         }
 
@@ -538,7 +561,8 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     }
 
     /**
-     * Turn (Right/Left) (text based)(degrees)
+     * Turn right/left.  Can also take arg for desired degrees-- default is 90.
+     * 
      * @param sender
      * @param args
      */	
@@ -546,13 +570,17 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             aliases = { "t", "turn" },
             description = "Turtle turn",
             permissions = { "" },
-            toolTip = "/t")
+            toolTip = "/t <right/left> [degrees]")
     public void TurtleTurn(MessageReceiver sender, String[] args)
     {
-        //TODO implementation -> will allow diagonals/degrees
 
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
+
+        if (args.length<2)  {  //not enough arguments
+            consoleHelper(sender, "Bad input.  Try again.");
+            return;
+        }
 
         //Get desired direction from args
         String dir = args[1];
@@ -565,8 +593,18 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             return;
         }
 
-        //turn turtle (left or right)
-        relDir = turtle.turn(relDir,  left, 0);
+        //Get desired turn amount
+        int deg = 90;  //default turn amount
+        if (args.length == 3)  {  //different amount specified
+            try  {
+                deg = Integer.parseInt(args[2]);
+            }  catch (Exception e)  {  //arg not a number
+                consoleHelper(sender, "Not a valid turn amount.");
+            }
+        }        
+
+        //turn turtle
+        relDir = turtle.turn(relDir, left, deg);
         updateGameDir();
     }
 
@@ -600,6 +638,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
     /**
      * This is just a sample method to test if changes are getting picked up.
+     * This can be deleted eventually.
      * @param sender
      * @param args
      */ 
@@ -610,8 +649,9 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             toolTip = "/buildtest")
     public void buildtest(MessageReceiver sender, String[] args)
     {
-        consoleHelper(sender, "New command!");
+        consoleHelper(sender, "Newer command!");
     }
+    
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //PRIVATE HELPER FUNCTIONS
 
@@ -637,12 +677,12 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     }
 
     private void updateGameDir(){
-        //TODO:  implement this
+        //TODO:  implement this for real
         //maybe it just needs to be the same as relDir?  Still need to think about this.
         gameDir = relDir;
     }
 
-    //TODO:  Do we need this method?
+    //TODO:  Do we need this method? I can't think of a reason why we would have to call it.
     private void updateRelPos(){
         int xg = gamePos.getBlockX();
         int yg = gamePos.getBlockY();
@@ -656,7 +696,6 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         relPos.setY(yg-yo);
         relPos.setZ(zg-zo);
     }
-
 
     /**
      * Reverses relative direction (turn 180 degrees).  Used when moving backward.
