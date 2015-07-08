@@ -123,24 +123,22 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         //Make the Relative Position
         relPos = new Position(0,0,0);
         relDir = originDir;  //Faces player direction
-        
+
         //Update game position
         gamePos = new Position();
         //gameDir = new Direction();
         gameDir = relDir;
         updateGamePos();
         updateGameDir();  //Maybe we don't need this...
-        
+
         //Need to build in safety checks
         //Also, better way?
-        //If doesn't work-> set to North ONLY, as way to start debugging
 
         //Turning on Turtle
         tt = true;
         consoleHelper(sender, "Turtle mode on.  Origin position: ");
         consoleHelper(sender, originPos);
         consoleHelper(sender, originDir);
-        //consoleHelper(sender, tt);
     }
 
     /**
@@ -245,7 +243,12 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        consoleHelper(sender, bp);
+        //consoleHelper(sender, bp);
+        if(bp)  {
+            consoleHelper(sender, "Block placement mode on.");
+        }  else {
+            consoleHelper(sender, "Block placement mode off.");
+        }
     }
 
     /**
@@ -254,24 +257,26 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
      * @param args
      */
     @Command(
-            aliases = { "srp", "SetPosition" },
+            aliases = { "sp", "SetPosition" },
             description = "Set Turtle position in relative coords",
             permissions = { "" },
-            toolTip = "/srp")
+            toolTip = "/sp x y z")
     public void TurtleSetRelPosition(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
         //Change location to new location based on relative coordinates
-        relPos = new Position (Integer.parseInt(args[1]), Integer.parseInt(args[2]),Integer.parseInt(args[3]));
+        if (args.length == 4)  {
+            //TODO:  Make sure these are really numbers?
+            relPos = new Position (Integer.parseInt(args[1]), Integer.parseInt(args[2]),Integer.parseInt(args[3]));
+        }  else  {
+            consoleHelper(sender, "Not a valid position.");
+        }
     }
 
     /**
-     * Set turtle direction.  Textbased (North, South, East, West)
-     * Number based for simplicity in early tests?
-     * 
-     * TODO:  I think this can support the diagonals now.
+     * Set turtle direction.  Number based.
      * 
      * @param sender
      * @param args
@@ -288,10 +293,14 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
         relDir = Direction.getFromIntValue(Integer.parseInt(args[1]));
         // 0 = NORTH
+        // 1 = NORTHEAST
         // 2 = EAST
+        // 3 = SOUTHEAST
         // 4 = SOUTH
+        // 5 = SOUTHWEST
         // 6 = WEST
-        // Else = ERROR
+        // 7 = NORTHWEST
+        // Else = ERROR -- TODO: should add error checking for this
     }
 
     /**
@@ -330,7 +339,6 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
         //report position of turtle (game coord position)
         consoleHelper(sender, gamePos);
-        //TODO:  or maybe this is where the exception is?  Update:  yes.
     }
 
     /**
@@ -380,7 +388,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             aliases = { "sbt", "SetBlockType" },
             description = "Set Turtle block type",
             permissions = { "" },
-            toolTip = "/sbt")
+            toolTip = "/sbt type")
     public void TurtleSetBlockType(MessageReceiver sender, String[] args)
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
@@ -433,6 +441,9 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
     /**
      * Move (forward/back)
+     * 
+     * TODO:  Fix moving backward-- doesn't work now
+     * 
      * @param sender
      * @param args
      */
@@ -445,32 +456,36 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
     {
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
-        
+
         boolean fd = false;  //flipped direction (for moving backward) 
         int x = 1;  //default move distance
         if(args.length>1)  {  //alternate move distance specified
             x = Integer.parseInt(args[1]);  
-        }     
-        
+        }   
+
+        //debugging-- what does the program think this is?
+        //consoleHelper(sender, "Input: " + args[0]);
+
         //check if distance is negative (going backward)
         if (x < 0 || args[0].equals("/b") || args[0].equals("/back")){  
             //if so, reverse turtle direction
             x = -x;
             flipDir();
             fd = true;
+            consoleHelper(sender, "Going backwards");
         }
 
         for (int i = x; i > 0; i--){
+
+            //update turtle position
+            relPos = turtle.move(relPos, relDir, false, false);
+            updateGamePos();
 
             //Place block if block placement mode on
             if (bp) {
                 world.setBlockAt(gamePos, bt);                 
                 //TODO:  keep track of this block to undo
             }
-
-            //update turtle position
-            relPos = turtle.move(relPos, relDir, false, false);
-            updateGamePos();
         }
 
         //if reversed turtle direction, reset to original
@@ -510,18 +525,17 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
 
         for (int i = x; i > 0; i--){
 
+            //update turtle position
+            relPos = turtle.move(relPos, relDir, up, !up);  //only moving vertically--> relDir doesn't matter
+            updateGamePos();
+
             //Place block if block placement mode on
             if (bp) {
                 world.setBlockAt(gamePos, bt);    
                 //TODO:  keep track of this block to undo
             }
-
-            //update turtle position
-            relPos = turtle.move(relPos, relDir, up, !up);  //only moving vertically--> relDir doesn't matter
-            updateGamePos();
         }
     }
-
 
     /**
      * Turn (Right/Left) (text based)(degrees)
@@ -535,7 +549,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             toolTip = "/t")
     public void TurtleTurn(MessageReceiver sender, String[] args)
     {
-        //TODO implementation -> will allow diagonals
+        //TODO implementation -> will allow diagonals/degrees
 
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
@@ -583,7 +597,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         }
     }
 
-    
+
     /**
      * This is just a sample method to test if changes are getting picked up.
      * @param sender
@@ -596,7 +610,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
             toolTip = "/buildtest")
     public void buildtest(MessageReceiver sender, String[] args)
     {
-        consoleHelper(sender, "This new command works.");
+        consoleHelper(sender, "New command!");
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //PRIVATE HELPER FUNCTIONS
@@ -628,7 +642,8 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         gameDir = relDir;
     }
 
-   private void updateRelPos(){
+    //TODO:  Do we need this method?
+    private void updateRelPos(){
         int xg = gamePos.getBlockX();
         int yg = gamePos.getBlockY();
         int zg = gamePos.getBlockZ();
@@ -703,7 +718,7 @@ public class TurtleAPI extends Plugin implements CommandListener, PluginListener
         str[1] = d.toString() + "";
 
         //output message using TurtleConsole
-        TurtleConsole(sender, str);  //getting exception here?
+        TurtleConsole(sender, str);
     }
 
     /**
