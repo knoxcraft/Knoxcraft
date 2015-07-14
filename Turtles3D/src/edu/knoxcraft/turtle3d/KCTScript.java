@@ -5,7 +5,17 @@ import static edu.knoxcraft.turtle3d.JSONUtil.quoteString;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.canarymod.api.world.World;
+import net.canarymod.api.world.blocks.BlockType;
+import net.canarymod.api.world.position.Direction;
+import net.canarymod.api.world.position.Position;
+import net.canarymod.chat.MessageReceiver;
+import net.canarymod.logger.Logman;
+
 import org.json.simple.JSONObject;
+
+import edu.knox.minecraft.serverturtle.TurtleState;
+import edu.knoxcraft.http.server.HttpUploadServer;
 
 public class KCTScript
 {
@@ -26,9 +36,15 @@ public class KCTScript
     // instructors may want to see this
     private String sourceCode;
     
+    private TurtleState state;   
+    
+    
+    /////////////////////////////////////////////////////////////////////////////////////
+    
     public KCTScript(String scriptName) {
         this.scriptName=scriptName;
         this.commands=new LinkedList<KCTCommand>();
+        this.state = new TurtleState();
     }
     
     public String getScriptName() {
@@ -58,14 +74,20 @@ public class KCTScript
                 cmdstr.toString());
     }
     
-    public void execute() {
+    public void execute(MessageReceiver sender) {
         // TODO: execute this method (or not)
         // XXX: or make this a parameter to a method in TurtleAPI
         // actually, that sounds very reasonable
+        
+        //initialize turtle
+        state.turtleInit(sender);        
+        
+        //execute each command of the script
+        for (KCTCommand c : this.commands)  {
+            c.execute(state);
+        }
     }
-
     public List<KCTCommand> getCommands() {
         return commands;
     }
-    
 }

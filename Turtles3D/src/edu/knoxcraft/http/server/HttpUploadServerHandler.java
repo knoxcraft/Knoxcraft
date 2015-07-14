@@ -61,7 +61,11 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
 
     // Relies on HttpUploadServer classloading first, which should happen
     // because HttpUploadServer references this class in its enable() method
-    private static Logman logger=HttpUploadServer.logger;
+    private static Logman logger;
+    
+    public HttpUploadServerHandler(Logman logger){
+        HttpUploadServerHandler.logger=logger;
+    }
 
     static {
         // should delete file on exit (in normal exit)

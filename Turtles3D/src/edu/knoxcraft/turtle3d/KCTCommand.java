@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.json.simple.JSONObject;
 
+import edu.knox.minecraft.serverturtle.TurtleState;
+
 public class KCTCommand
 {
     /* Sample JSON commands:
@@ -72,12 +74,12 @@ public class KCTCommand
      * Execute this command
      * TODO: May require parameters from the Minecraft server (reference to the thing that lets us lay blocks)
      */
-    public void execute() {
+    public void execute(TurtleState state) {
         // TODO: Execute the command
         // TODO: Handle all of the other commands
         if (commandName.equals(FORWARD)) {
             // check args; move turtle forward the appropriate distance
-            // this will have to call back into 
+            // this will have to call back into TurtleAPI.
         } else if (commandName.equals(TURNRIGHT)) {
             // turn right
         } else if (commandName.equals(TURNLEFT)) {

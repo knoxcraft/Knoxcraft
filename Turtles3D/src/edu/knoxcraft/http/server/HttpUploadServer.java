@@ -15,8 +15,6 @@
  */
 package edu.knoxcraft.http.server;
 
-import edu.knox.minecraft.serverturtle.TurtleAPI;
-import net.canarymod.logger.Logman;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -31,6 +29,7 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import net.canarymod.logger.Logman;
 
 /**
  * A HTTP server showing how to use the HTTP multipart package for file uploads and decoding post data.
@@ -42,13 +41,11 @@ public final class HttpUploadServer {
 
     EventLoopGroup bossGroup;
     EventLoopGroup workerGroup;
-    public static Logman logger;
     
     public HttpUploadServer() {
-        HttpUploadServer.logger=TurtleAPI.logger;
     }
     
-    public boolean enable() {
+    public boolean enable(Logman logger) {
         final Thread t=new Thread() {
             public void run() {
                 bossGroup = new NioEventLoopGroup(1);
@@ -71,7 +68,7 @@ public final class HttpUploadServer {
                             // Remove the following line if you don't want automatic content compression.
                             pipeline.addLast(new HttpContentCompressor());
 
-                            pipeline.addLast(new HttpUploadServerHandler());
+                            pipeline.addLast(new HttpUploadServerHandler(logger));
                         }
                     });
 
