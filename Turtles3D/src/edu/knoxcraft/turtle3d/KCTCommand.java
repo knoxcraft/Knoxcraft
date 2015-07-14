@@ -1,9 +1,10 @@
 package edu.knoxcraft.turtle3d;
 
+import static edu.knoxcraft.turtle3d.JSONUtil.quoteString;
+import static edu.knoxcraft.turtle3d.JSONUtil.toJSONStringOrInt;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import static edu.knoxcraft.turtle3d.JSONUtil.*;
 
 import org.json.simple.JSONObject;
 
@@ -39,6 +40,13 @@ public class KCTCommand
     
     protected String commandName;
     protected Map<String, Object> arguments;
+    
+    public String getCommandName() {
+        return this.commandName;
+    }
+    public Map<String,Object> getArguments() {
+        return this.arguments;
+    }
     
     public KCTCommand(String commandName) {
         this.commandName=commandName;

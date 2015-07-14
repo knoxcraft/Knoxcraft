@@ -2,7 +2,7 @@ package edu.knoxcraft.turtle3d;
 
 import static edu.knoxcraft.turtle3d.KCTCommand.*;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -27,7 +27,8 @@ public class Turtle3D
     private KCTScript script;
     
     // Map for the static factory pattern.
-    static Map<String,Turtle3D> turtleMap=new HashMap<String,Turtle3D>();
+    // TODO: How to handle race conditions for the turtleMap in multithreading?
+    static Map<String,Turtle3D> turtleMap=new LinkedHashMap<String,Turtle3D>();
     /**
      * Static factory instead of constructor
      * This lets us get the Turtle instances after running main, and then get their KCTScripts and generate 

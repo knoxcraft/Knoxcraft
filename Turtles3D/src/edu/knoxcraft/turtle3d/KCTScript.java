@@ -63,5 +63,9 @@ public class KCTScript
         // XXX: or make this a parameter to a method in TurtleAPI
         // actually, that sounds very reasonable
     }
+
+    public List<KCTCommand> getCommands() {
+        return commands;
+    }
     
 }
