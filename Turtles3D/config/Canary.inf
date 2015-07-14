@@ -1,4 +1,4 @@
-main-class=edu.knox.minecraft.serverturtle.TurtleAPI
+main-class=edu.knox.minecraft.serverturtle.TurtleTester
 author = ppypp and emhastings
 version = 0.0.0.1
 language = java
