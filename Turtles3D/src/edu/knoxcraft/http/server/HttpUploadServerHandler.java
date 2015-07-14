@@ -17,6 +17,7 @@
  */
 package edu.knoxcraft.http.server;
 
+import static edu.knoxcraft.turtle3d.JSONUtil.quoteString;
 import static io.netty.buffer.Unpooled.copiedBuffer;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
@@ -39,14 +40,10 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.multipart.Attribute;
 import io.netty.handler.codec.http.multipart.DiskAttribute;
 import io.netty.handler.codec.http.multipart.DiskFileUpload;
-import io.netty.handler.codec.http.multipart.FileUpload;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
 import io.netty.util.CharsetUtil;
-
-import java.io.IOException;
-
 import net.canarymod.Canary;
 import net.canarymod.logger.Logman;
 import edu.knoxcraft.hooks.KCTUploadHook;
@@ -93,6 +90,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                     // HTTP Get request!
                     // Write the HTML page with the form
                     // TODO: Update the HTML form
+                    
                     writeMenu(ctx);
                 } else if (fullRequest.getMethod().equals(HttpMethod.POST)) {
                     /* 
@@ -108,6 +106,8 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                     sourcetext (code as a String, or empty)
                     */
 
+                    // TODO: process attributes first, check the client for uploading
+                    // then process any file uploads
                     HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(fullRequest);
                     try {
                         // read all of the post data into an KCTUploadHook, and trigger an event
@@ -126,6 +126,8 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                         } else if (data.getName().equals("sourcefile")) {
                                             // uploaded a source file
                                             logger.info("source file uploaded");
+                                        } else {
+                                            logger.info(String.format("Unknow source file uploaded: %s", data.getName()));
                                         }
                                     } else if (data.getHttpDataType() == HttpDataType.Attribute) {
                                         Attribute attribute = (Attribute) data;
@@ -148,6 +150,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                 }
                             }
                         }
+                        // TODO: check that hook is valid
                         Canary.hooks().callHook(hook);
                     } finally {
                         if (decoder != null) {
@@ -199,15 +202,39 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
         // Convert the response content to a ChannelBuffer.
         StringBuffer responseContent=new StringBuffer();
         responseContent.setLength(0);
-
-        // create Pseudo Menu
-        responseContent.append("<html>");
-        responseContent.append("<head>");
-        responseContent.append("<title>Netty Test Form</title>\r\n");
-        responseContent.append("</head>\r\n");
-        responseContent.append("<h1>Netty Test Form</h1>");
-        responseContent.append("</body>");
-        responseContent.append("</html>");
+        String page=String.format(
+                "<html><head><title> KnoxCraft Turtles 3D: Code Upload Form</title></title>\n"
+                        + "<body>\n"
+                        + "<h1>KnoxCraft Turtles 3D: Code Upload Form</h1>\n"
+                        + "<form method=%s action=%s>\n"
+                        + "Player Name: <input type=text name=%s><br>\n"
+                        + "<input type=hidden name=client value=web>\n"
+                        // TODO: Make language drop-down
+                        + "Language: <select name=%s>\n"
+                        + "<option value=%s selected> Java </option>\n"
+                        + "<option value=%s> Python </option>\n"
+                        + "</select>\n"
+                        + "Source Code (paste here): <br><textarea rows=15 cols=60 name=%s></textarea><br>\n"
+                        + "JSON Turtle Commands (paste here): <br><textarea rows=15 cols=60 name=%s></textarea><br>\n"
+                        + "Source Code (file upload): <input type=%s name=%s><br>\n"
+                        + "JSON Turtle Commands (file upload): <input type=%s name=%s><br>\n"
+                        + "<input type=submit value=%s><br>\n"
+                        + "</form>\n"
+                        + "</body></html>\n", quoteString("POST"), quoteString("/kctupload"),  
+                            quoteString("playerName"),
+                            quoteString("language"), 
+                            quoteString("Java"),
+                            quoteString("Python"),
+                            quoteString("sourcetext"),
+                            quoteString("jsontext"),
+                            quoteString("file"),
+                            quoteString("sourcefile"),
+                            quoteString("file"),
+                            quoteString("jsonfile"),
+                            
+                            quoteString("Upload KnoxCraft 3D Turtle Code!")
+                            );
+        responseContent.append(page);
 
         ByteBuf buf = copiedBuffer(responseContent.toString(), CharsetUtil.UTF_8);
         // Build the response object.
