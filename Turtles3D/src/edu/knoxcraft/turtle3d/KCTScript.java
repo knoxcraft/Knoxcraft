@@ -1,21 +1,18 @@
 package edu.knoxcraft.turtle3d;
 
 import static edu.knoxcraft.turtle3d.JSONUtil.quoteString;
+import static edu.knoxcraft.turtle3d.KCTCommand.*;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import net.canarymod.api.world.World;
-import net.canarymod.api.world.blocks.BlockType;
-import net.canarymod.api.world.position.Direction;
-import net.canarymod.api.world.position.Position;
 import net.canarymod.chat.MessageReceiver;
 import net.canarymod.logger.Logman;
 
 import org.json.simple.JSONObject;
 
 import edu.knox.minecraft.serverturtle.Turtle;
-import edu.knoxcraft.http.server.HttpUploadServer;
+
 
 public class KCTScript
 {
@@ -25,26 +22,30 @@ public class KCTScript
    "commands" : [
        {"cmd" : "forward",
            "args" : {"dist" : 10}},
-       {"cmd" : "turn",
-           "args" : {"dir" : "right", "degrees" : 90}}
-   ]
+       {"cmd" : "turnRight", 
+           "args" : {"degrees" : 45}}
+       ]
    }
    */
+    static Logman logger;
     private String scriptName;
     private List<KCTCommand> commands;
     // TODO: Add support for turtle scripts that store the source code that generated the list of commands
     // instructors may want to see this
     private String sourceCode;
+    private String language;
     
     private Turtle turtle;   
     
-    
     /////////////////////////////////////////////////////////////////////////////////////
+    public KCTScript() {
+        this.commands=new LinkedList<KCTCommand>();
+        this.turtle=new Turtle();
+    }
     
     public KCTScript(String scriptName) {
+        this();
         this.scriptName=scriptName;
-        this.commands=new LinkedList<KCTCommand>();
-        this.turtle = new Turtle();
     }
     
     public String getScriptName() {
@@ -66,11 +67,12 @@ public class KCTScript
             cmdstr.append(c.toJSONString());
             cmdstr.append(", ");
         }
+        // Remove trailing ", " end of cmdstr
         cmdstr.delete(cmdstr.length()-2, cmdstr.length());
         return String.format("{%s : %s, %s : [\n%s\n]}", 
-                KCTCommand.SCRIPTNAMEKEY, 
+                SCRIPTNAMEKEY, 
                 quoteString(this.scriptName),
-                KCTCommand.COMMANDSKEY, 
+                COMMANDSKEY, 
                 cmdstr.toString());
     }
     
@@ -89,5 +91,20 @@ public class KCTScript
     }
     public List<KCTCommand> getCommands() {
         return commands;
+    }
+    public String getLanguage() {
+        return language;
+    }
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+    public String getSourceCode() {
+        return sourceCode;
+    }
+    public void setSourceCode(String sourceCode) {
+        this.sourceCode = sourceCode;
+    }
+    public void setScriptName(String scriptName) {
+        this.scriptName = scriptName;
     }
 }

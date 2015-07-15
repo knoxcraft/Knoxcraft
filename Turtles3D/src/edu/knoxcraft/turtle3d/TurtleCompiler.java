@@ -3,6 +3,10 @@ package edu.knoxcraft.turtle3d;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeoutException;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.knoxcraft.javacompiler.ByteArrayClassLoader;
 import org.knoxcraft.javacompiler.CompilationResult;
 import org.knoxcraft.javacompiler.CompilerDiagnostic;
@@ -10,7 +14,66 @@ import org.knoxcraft.javacompiler.InMemoryJavaCompiler;
 
 public class TurtleCompiler
 {
+    public static final String JAVA="java";
+    public static final String PYTHON="python";
+    public static final String BLOCKLY="blockly";
     
+    /**
+     * Convert Java source code into a KCTScript, by way of JSON.
+     * 
+     * TODO: Support both Turtle3D as well as Turtle3DBase
+     * 
+     * @param filename
+     * @param javaSource
+     * @return
+     * @throws InvalidTurtleCodeException
+     */
+    public KCTScript compileJavaTurtleCode(String filename, String javaSource)
+    throws InvalidTurtleCodeException
+    {
+        String className=filename.replace(".java", "");
+        String json=getJSONTurtle3DBase(className, javaSource);
+        KCTScript script=parseFromJson(json);
+        script.setLanguage(JAVA);
+        script.setSourceCode(javaSource);
+        return script;
+    }
+    
+    /**
+     * Static factory method to parse Json and produce a KCTScript.
+     * 
+     * @param jsonText
+     * @return
+     * @throws InvalidTurtleCodeException If there are any errors in the json
+     */
+    public static KCTScript parseFromJson(String jsonText)
+    throws InvalidTurtleCodeException
+    {
+        JSONParser parser=new JSONParser();
+        try {
+            KCTScript.logger.info(jsonText);
+            JSONObject json=(JSONObject)parser.parse(jsonText);
+    
+            String scriptname=(String)json.get("scriptname");
+    
+            KCTScript script=new KCTScript(scriptname);
+    
+            KCTScript.logger.info(String.format("%s\n", scriptname));
+    
+            JSONArray lang= (JSONArray) json.get("commands");
+            for (int i=0; i<lang.size(); i++) {
+                JSONObject cmd=(JSONObject)lang.get(i);
+                script.addCommand(cmd);
+                KCTScript.logger.info(String.format("script %s has command %s", script.getScriptName(), cmd.get(KCTCommand.CMD)));
+            }
+            return script;
+        } catch (ParseException e) {
+            // TODO: log better? handle better?
+            KCTScript.logger.error(e);
+            throw new InvalidTurtleCodeException(e);
+        }
+    }
+
     /**
      * Run uploaded Turtle code, and convert it into its corresponding JSON String.
      * 

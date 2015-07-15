@@ -39,14 +39,15 @@ public final class HttpUploadServer {
     // TODO: Configuration file for port number to listen on for http connections
     static final int PORT = Integer.parseInt(System.getProperty("PORT", "8888"));
 
-    EventLoopGroup bossGroup;
-    EventLoopGroup workerGroup;
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
+    private Thread thread;
     
     public HttpUploadServer() {
     }
     
     public boolean enable(Logman logger) {
-        final Thread t=new Thread() {
+        thread=new Thread() {
             public void run() {
                 bossGroup = new NioEventLoopGroup(1);
                 workerGroup = new NioEventLoopGroup();
@@ -77,18 +78,20 @@ public final class HttpUploadServer {
                     ch.closeFuture().sync();
                 } catch (InterruptedException e) {
                     // TODO: log this server-side using logman?
+                    logger.error("Interrupted server thread!");
                 } finally {
                     bossGroup.shutdownGracefully();
                     workerGroup.shutdownGracefully();
                 }
             }
         };
-        t.start();
+        thread.start();
         return true;
     }
 
     public void disable() {
         // shutting down the groups should hopefully shutdown the server
+        thread.interrupt();
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }
