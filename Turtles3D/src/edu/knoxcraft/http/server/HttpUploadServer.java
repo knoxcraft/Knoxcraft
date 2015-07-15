@@ -15,7 +15,7 @@
  */
 package edu.knoxcraft.http.server;
 
-import edu.knox.minecraft.serverturtle.TurtleAPI;
+import edu.knox.minecraft.serverturtle.TurtlePlugin;
 import net.canarymod.logger.Logman;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -45,7 +45,7 @@ public final class HttpUploadServer {
     public static Logman logger;
     
     public HttpUploadServer() {
-        HttpUploadServer.logger=TurtleAPI.logger;
+        HttpUploadServer.logger=TurtlePlugin.logger;
     }
     
     public boolean enable() {

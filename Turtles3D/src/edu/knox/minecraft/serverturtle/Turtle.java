@@ -1,23 +1,60 @@
 package edu.knox.minecraft.serverturtle;
 
+import java.util.ArrayList;
+
+import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
 import net.canarymod.api.world.position.Position;
 import net.canarymod.chat.MessageReceiver;
 
-//TODO:  maybe don't need these anymore. See below.
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+public class Turtle {
 
-import edu.knoxcraft.hooks.KCTUploadHook;
-import edu.knoxcraft.http.server.HttpUploadServer;
-import edu.knoxcraft.turtle3d.KCTCommand;
-import edu.knoxcraft.turtle3d.KCTScript;
+    //POSITION VARIABLES
 
-public class TurtleAPI {
-    //TODO:  should just make state field and eliminate args?  Or else make class static.
+    //in world position of player at turtle on --> (0,0,0) for Turtle's relative coord system.
+    private Position originPos;
+
+    //current relative position
+    private Position relPos;
+
+    //true current position/direction in game coords(made by combining relative and real)
+    private Position gamePos;
+    private Direction dir;
+
+    //OTHER VARIABLES
+    private boolean bp = false;  //Block Place on/off
+    private BlockType bt = BlockType.Stone;  //default turtle block type 
+    private World world;  //World in which all actions occur
+    private MessageReceiver sender;  //player to send messages to
+    private ArrayList<BlockRecord> oldBlocks;  //original pos/type of all bricks laid by this turtle for undoing
+
+    ///////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Initialize the turtle.  Called when executing a script (or turning command line turtle on) 
+     * @param sender
+     */
+    public void turtleInit(MessageReceiver sender)  {
+        //save sender for later
+        this.sender = sender;
+
+        //GET WORLD
+        world = sender.asPlayer().getWorld();
+
+        //Set up positions
+
+        //Get origin Position and Direction
+        originPos = sender.asPlayer().getPosition();
+        dir = sender.asPlayer().getCardinalDirection();
+
+        //Make the Relative Position
+        relPos = new Position(0,0,0);
+
+        //Update game position
+        gamePos = new Position(); 
+        updateGamePos();
+    }       
 
     /**
      * Output a message to the player console.
@@ -25,36 +62,35 @@ public class TurtleAPI {
      * @param sender
      * @param args
      */
-    public void TurtleConsole(MessageReceiver sender, String msg)
+    public void turtleConsole(String msg)
     {
-        //Display string in console
         sender.message(msg); 
     }  
 
     /**
      * Toggle block placement mode on/off.
      * 
-     * TODO:  IF placement off -> dont change vs AIr placement
+     * TODO:  IF placement off -> dont change vs AIr placement?
      * @param sender
      * @param args
      */
-    public void TurtleBlockPlace(TurtleState state, MessageReceiver sender)
+    public void turtleToggleBlockPlace()
     {
-        state.toggleBp();
-        TurtleBlockPlaceStatus(state, sender);  //alert user about change
+        bp = !bp;
+        turtleBlockPlaceStatus();  //alert user about change
     }
 
     /**
-     * Checks whether block placement mode is on.
+     * Reports whether block placement mode is on.
      * @param sender
      * @param args
      */
-    public void TurtleBlockPlaceStatus(TurtleState state, MessageReceiver sender)
+    public void turtleBlockPlaceStatus()
     {
-        if(state.getBp())  {
-            TurtleConsole(sender, "Block placement mode on.");
+        if(bp)  {
+            turtleConsole("Block placement mode on.");
         }  else {
-            TurtleConsole(sender, "Block placement mode off.");
+            turtleConsole("Block placement mode off.");
         }
     }
 
@@ -63,9 +99,9 @@ public class TurtleAPI {
      * @param sender
      * @param args
      */
-    public void TurtleSetRelPosition(TurtleState state, int x, int y, int z)
+    public void turtleSetRelPosition(int x, int y, int z)
     {     
-        state.setRelPos(new Position(x, y, z));
+        relPos = new Position(x, y, z);
     }
 
     /**
@@ -74,7 +110,7 @@ public class TurtleAPI {
      * @param sender
      * @param args
      */
-    public void TurtleSetDirection(TurtleState state, int dir)
+    public void turtleSetDirection(int dir)
     {
         //update direction
         // 0 = NORTH
@@ -86,47 +122,47 @@ public class TurtleAPI {
         // 6 = WEST
         // 7 = NORTHWEST
         // Else = ERROR 
-        state.setDir(Direction.getFromIntValue(dir));
+        this.dir = (Direction.getFromIntValue(dir));
     }
 
     /**
-     * Get current position (relative)
+     * Report current position (relative)
      * @param sender
      * @param args
      */
-    public void TurtleGetPosition(TurtleState state, MessageReceiver sender)
+    public void turtleReportPosition()
     {
-        TurtleConsole(sender, "" + state.getRelPos());
+        turtleConsole("" + relPos);
     }
 
     /**
-     * Get current position of Turtle in game coords
+     * Report current position of Turtle in game coords
      * @param sender
      * @param args
      */
-    public void TurtleGetGamePosition(TurtleState state, MessageReceiver sender)
+    public void turtleReportGamePosition()
     {
-        TurtleConsole(sender, "" + state.getGamePos());
+        turtleConsole("" + gamePos);
     }
 
     /**
-     * Get position of relative origin (Player's pos at Turtle on) in game coords
+     * Report position of relative origin (Player's pos at Turtle on) in game coords
      * @param sender
      * @param args
      */
-    public void TurtleGetOriginPosition(TurtleState state, MessageReceiver sender)
+    public void turtleReportOriginPosition()
     {
-        TurtleConsole(sender, "" + state.getOriginPos());
+        turtleConsole("" + originPos);
     }
 
     /**
-     * Get current direction (relative)
+     * Report current direction (relative)
      * @param sender
      * @param args
      */
-    public void TurtleGetDirection(TurtleState state, MessageReceiver sender)
+    public void turtleReportDirection()
     {
-        TurtleConsole(sender, "" + state.getDir());
+        turtleConsole("" + dir);
     }
 
     /**
@@ -134,12 +170,12 @@ public class TurtleAPI {
      * @param sender
      * @param args
      */
-    public void TurtleSetBlockType(TurtleState state, int blockType)
+    public void turtleSetBlockType(int blockType)
     {
-        if (!state.getBp())  //don't allow if block placement mode isn't on
+        if (!bp)  //don't allow if block placement mode isn't on
             return;
 
-        state.setBt(BlockType.fromId(blockType));      
+        bt = BlockType.fromId(blockType);      
     }
 
     /**
@@ -150,17 +186,17 @@ public class TurtleAPI {
     //TODO implementation-- maybe we don't need this version?
 
     /**
-     * Get current block type
+     * Report current block type
      * @param sender
      * @param args
      */
-    public void TurtleGetBlockType(TurtleState state, MessageReceiver sender)
+    public void turtleReportBlockType()
     {
-        if (!state.getBp())  //don't allow if block placement mode isn't on
+        if (!bp)  //don't allow if block placement mode isn't on
             return;
 
-        //report current BT of turtle	
-        TurtleConsole(sender, "" + state.getBt());
+        //report current BT of turtle   
+        turtleConsole("" + bt);
     }
 
     /**
@@ -169,7 +205,7 @@ public class TurtleAPI {
      * @param sender
      * @param args
      */
-    public void TurtleMove(TurtleState state, int dist)
+    public void turtleMove(int dist)
     {
         boolean fd = false;  //flipped direction (for moving backward) 
 
@@ -177,26 +213,30 @@ public class TurtleAPI {
         if (dist < 0){  
             //if so, reverse turtle direction
             dist = Math.abs(dist);
-            flipDir(state);
+            flipDir();
             fd = true;
         }
 
         for (int i = dist; i > 0; i--){
 
             //update turtle position
-            state.setRelPos(calculateMove(state.getRelPos(), state.getDir(), false, false));
-            state.updateGamePos();
+            relPos = calculateMove(relPos, dir, false, false);
+            updateGamePos();
 
             //Place block if block placement mode on
-            if (state.getBp()) {
-                state.getWorld().setBlockAt(state.getGamePos(), state.getBt());                 
-                //TODO:  keep track of this block to undo
+            if (bp) {
+              //TODO:  keep track of this block to undo
+                //oldBlocks.add(getBlockAt)
+                //oops... need to look up and see if this is a real method.
+                
+                world.setBlockAt(gamePos, bt);                 
+                
             }
         }
 
         //if reversed turtle direction, reset to original
         if (fd == true){
-            flipDir(state);
+            flipDir();
         }
     }
 
@@ -205,7 +245,7 @@ public class TurtleAPI {
      * @param sender
      * @param args
      */
-    public void TurtleUpDown(TurtleState state, int dist)
+    public void turtleUpDown(int dist)
     {
         boolean up = true;  //default direction is up
 
@@ -219,72 +259,72 @@ public class TurtleAPI {
         for (int i = dist; i > 0; i--){
 
             //update turtle position
-            state.setRelPos(calculateMove(state.getRelPos(), state.getDir(), up, !up)); 
-            state.updateGamePos();
+            relPos = calculateMove(relPos, dir, up, !up); 
+            updateGamePos();
 
             //Place block if block placement mode on
-            if (state.getBp()) {
-                state.getWorld().setBlockAt(state.getGamePos(), state.getBt());    
+            if (bp) {
+                world.setBlockAt(gamePos, bt);    
                 //TODO:  keep track of this block to undo
             }
         }
     }
 
     /**
-     * Turn right/left..
+     * Turn right/left.
      * 
      * @param sender
      * @param args
-     */	
-    public void TurtleTurn(TurtleState state, boolean left, int deg)
+     */ 
+    public void turtleTurn(boolean left, int deg)
     {
         //turn turtle
-        state.setDir(calculateTurn(state.getDir(), left, deg));
+        dir = calculateTurn(dir, left, deg);
     }
 
-    //TODO:  Not sure if this still belongs in this class, or in the new plugin we'll need/TurtleTester
-    /* @HookHandler
-    public void uploadJSON(KCTUploadHook hook) {
-        logger.info("Hook called, json is "+hook.getJSON());
-        JSONParser parser=new JSONParser();
-        try {
-            logger.info(hook.getJSON());
-            JSONObject json=(JSONObject)parser.parse(hook.getJSON());
-
-            String scriptname=(String)json.get("scriptname");
-
-            KCTScript script=new KCTScript(scriptname);
-
-            logger.info(String.format("%s\n", scriptname));
-
-            JSONArray lang= (JSONArray) json.get("commands");
-            for (int i=0; i<lang.size(); i++) {
-                JSONObject cmd=(JSONObject)lang.get(i);
-                script.addCommand(cmd);
-                logger.info(String.format("script %s has command %s", script.getScriptName(), cmd.get(KCTCommand.CMD)));
-            }
-            // TODO: Put script someplace now that we've created it
-        } catch (ParseException e) {
-            // TODO: log better? handle better?
-            throw new RuntimeException(e);
-        }
-    }  */
+    /**
+     * Return whether block placement mode is on.  Called by TurtleTester.
+     */
+    public boolean getBP()  {
+        return bp;
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //PRIVATE HELPER FUNCTIONS
 
     /**
+     * Update game pos
+     */
+    private void updateGamePos() {
+        //get origin coords
+        int xo = originPos.getBlockX();
+        int yo = originPos.getBlockY();
+        int zo = originPos.getBlockZ();     
+
+        //get relative coords
+        int xr = relPos.getBlockX();
+        int yr = relPos.getBlockY();
+        int zr = relPos.getBlockZ();
+
+        //update game position
+        //gamePos = originPos + relPos;
+        gamePos.setX(xo+xr);
+        gamePos.setY(yo+yr);
+        gamePos.setZ(zo+zr);
+    }
+
+    /**
      * Reverses relative direction (turn 180 degrees).  Used when moving backward.
      */
-    private void flipDir(TurtleState state){
+    private void flipDir(){
         //get current direction (N, NE, ... , S --> 0, 1, ... , 7)
-        int dirInt = state.getDir().getIntValue();  
+        int dirInt = dir.getIntValue();  
 
         //calculate new direction
         dirInt = (dirInt + 4) % 8;
 
         //update relDir
-        state.setDir(Direction.getFromIntValue(dirInt));
+        dir = Direction.getFromIntValue(dirInt);
     }
 
     /**

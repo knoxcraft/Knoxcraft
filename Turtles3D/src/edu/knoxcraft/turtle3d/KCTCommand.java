@@ -9,7 +9,7 @@ import net.canarymod.chat.MessageReceiver;
 
 import org.json.simple.JSONObject;
 
-import edu.knox.minecraft.serverturtle.TurtleState;
+import edu.knox.minecraft.serverturtle.Turtle;
 
 public class KCTCommand
 {
@@ -68,7 +68,7 @@ public class KCTCommand
      * Execute this command
      * TODO: May require parameters from the Minecraft server (reference to the thing that lets us lay blocks)
      */
-    public void execute(TurtleState state) {
+    public void execute(Turtle state) {
         // TODO: Execute the command
         // TODO: Handle all of the other commands
         if (commandName.equals(FORWARD)) {

@@ -1,10 +1,6 @@
 package edu.knox.minecraft.serverturtle;
 
 import net.canarymod.Canary;
-import net.canarymod.api.world.World;
-import net.canarymod.api.world.blocks.BlockType;
-import net.canarymod.api.world.position.Direction;
-import net.canarymod.api.world.position.Position;
 import net.canarymod.chat.MessageReceiver;
 import net.canarymod.commandsys.Command;
 import net.canarymod.commandsys.CommandDependencyException;
@@ -31,9 +27,8 @@ import edu.knoxcraft.turtle3d.KCTScript;
 public class TurtleTester extends Plugin implements CommandListener, PluginListener {
 
     private boolean tt = false;  //Turtle on/off
-    private TurtleState state;
-    private TurtleAPI api;
-    
+    private Turtle turtle;  //this should probably be a map of sender->turtle.  Maybe okay for now.
+
     private HttpUploadServer httpServer;
     public static Logman logger;
 
@@ -91,15 +86,14 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
     public void TurtleOn(MessageReceiver sender, String[] args)
     {
         //Make Turtle
-        state = new TurtleState();
-        state.turtleInit(sender);
-        api = new TurtleAPI();
+        turtle = new Turtle();
+        turtle.turtleInit(sender);
 
         //Turning on Turtle
         tt = true;
-        api.TurtleConsole(sender, "Turtle mode on.  Origin position: ");
-        api.TurtleGetOriginPosition(state, sender);
-        api.TurtleGetDirection(state,  sender);
+        turtle.turtleConsole("Turtle mode on.  Origin position: ");
+        turtle.turtleReportOriginPosition();
+        turtle.turtleReportDirection();
     }
 
     /**
@@ -116,8 +110,8 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
     {
         //Turning off Turtle
         tt = false;
-        state = null;
-        api.TurtleConsole(sender, "Turtle mode off.");
+        turtle.turtleConsole("Turtle mode off.");
+        turtle = null;
     }
 
     /**
@@ -161,7 +155,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
         for (int i=1; i<args.length; i++) {  //skip the command, just send the message
             message = message + args[i]+ " ";
         }
-        api.TurtleConsole(sender,  message);
+        turtle.turtleConsole(message);
     }
 
     /**
@@ -180,8 +174,8 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        api.TurtleBlockPlace(state, sender);
-        api.TurtleBlockPlaceStatus(state, sender);  //alert user about change
+        turtle.turtleToggleBlockPlace();
+        turtle.turtleBlockPlaceStatus();  //alert user about change
     }
 
     /**
@@ -199,7 +193,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        api.TurtleBlockPlaceStatus(state, sender);
+        turtle.turtleBlockPlaceStatus();
     }
 
     /**
@@ -220,12 +214,12 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
         //Change location to new location based on relative coordinates
         if (args.length == 4)  { //are there enough arguments?
             try  {
-                api.TurtleSetRelPosition(state, Integer.parseInt(args[1]), Integer.parseInt(args[2]),Integer.parseInt(args[3]));
+                turtle.turtleSetRelPosition(Integer.parseInt(args[1]), Integer.parseInt(args[2]),Integer.parseInt(args[3]));
             }  catch (Exception e)  {  //args weren't really numbers
-                api.TurtleConsole(sender, "Not a valid position.");
+                turtle.turtleConsole("Not a valid position.");
             }
         }  else  {
-            api.TurtleConsole(sender, "Not enough arguments.");
+            turtle.turtleConsole("Not enough arguments.");
         }
     }
 
@@ -246,7 +240,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             return;
 
         if (args.length<2)  {  //not enough arguments
-            api.TurtleConsole(sender, "Not enough arguments.");
+            turtle.turtleConsole("Not enough arguments.");
             return;
         }
 
@@ -261,9 +255,9 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
         // 7 = NORTHWEST
         // Else = ERROR 
         try  {
-            api.TurtleSetDirection(state, Integer.parseInt(args[1]));
+            turtle.turtleSetDirection(Integer.parseInt(args[1]));
         }  catch (Exception e)  {  //arg wasn't a number or was invalid
-            api.TurtleConsole(sender, "Not a valid direction.");
+            turtle.turtleConsole("Not a valid direction.");
         }        
     }
 
@@ -283,7 +277,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             return;
 
         //report position of turtle (relative position)
-        api.TurtleGetPosition(state, sender);
+        turtle.turtleReportPosition();
     }
 
     /**
@@ -302,7 +296,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             return;
 
         //report position of turtle (game coord position)
-        api.TurtleGetGamePosition(state, sender);
+        turtle.turtleReportGamePosition();
     }
 
     /**
@@ -321,7 +315,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             return;
 
         //report position of origin (game coord position)
-        api.TurtleGetOriginPosition(state, sender);
+        turtle.turtleReportOriginPosition();
     }
 
     /**
@@ -340,7 +334,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             return;
 
         //report position of turtle	
-        api.TurtleGetDirection(state, sender);
+        turtle.turtleReportDirection();
     }
 
     /**
@@ -362,7 +356,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             return;
 
         if (args.length<2)  {  //not enough arguments
-            api.TurtleConsole(sender, "Not enough arguments.");
+            turtle.turtleConsole("Not enough arguments.");
             return;
         }
 
@@ -370,14 +364,14 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
         try  {
             if (!(args.length == 3))
             {
-                api.TurtleSetBlockType(state, Integer.parseInt(args[1]));
+                turtle.turtleSetBlockType(Integer.parseInt(args[1]));
             }  /*else{
                 temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
             }*/
             //TODO:  finish fixing else case.  It probably won't work since I changed things.
 
         }  catch (Exception e)  {  //bad arguments
-            api.TurtleConsole(sender, "Not a valid block type.");
+            turtle.turtleConsole("Not a valid block type.");
         }
     }
 
@@ -407,7 +401,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             return;
 
         //report current BT of turtle	
-        api.TurtleGetBlockType(state, sender);
+        turtle.turtleReportBlockType();
     }
 
     /**
@@ -431,7 +425,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             try  {
                 x = Integer.parseInt(args[1]);  
             }  catch (Exception e)  {  //arg not a number
-                api.TurtleConsole(sender, "Not a valid distance.");
+                turtle.turtleConsole("Not a valid distance.");
             }
         }   
 
@@ -441,7 +435,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             x = -x;
         }
 
-        api.TurtleMove(state, x);
+        turtle.turtleMove(x);
     }
 
     /**
@@ -464,7 +458,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             try  {
                 x = Integer.parseInt(args[1]);  
             }  catch (Exception e)  {  //arg not a number
-                api.TurtleConsole(sender, "Not a valid distance.");
+                turtle.turtleConsole("Not a valid distance.");
             }
         } 
 
@@ -474,7 +468,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             x = -x;
         }
 
-        api.TurtleUpDown(state, x);
+        turtle.turtleUpDown(x);
     }
 
     /**
@@ -495,7 +489,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             return;
 
         if (args.length<2)  {  //not enough arguments
-            api.TurtleConsole(sender, "Not enough arguments.");
+            turtle.turtleConsole("Not enough arguments.");
             return;
         }
 
@@ -506,7 +500,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
         if (dir.equals("right") || dir.equals("RIGHT") || dir.equals("Right"))  {  //going right
             left = false;
         }  else if (!dir.equals("left") && !dir.equals("LEFT") && !dir.equals("Left"))  { //bad input
-            api.TurtleConsole(sender, "That is not a valid direction.");
+            turtle.turtleConsole("That is not a valid direction.");
             return;
         }
 
@@ -516,12 +510,12 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             try  {
                 deg = Integer.parseInt(args[2]);
             }  catch (Exception e)  {  //arg not a number
-                api.TurtleConsole(sender, "Not a valid turn amount.");
+                turtle.turtleConsole("Not a valid turn amount.");
             }
         }        
 
         //turn turtle
-        api.TurtleTurn(state, left, deg);
+        turtle.turtleTurn(left, deg);
     }
 
     @HookHandler
@@ -550,7 +544,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             throw new RuntimeException(e);
         }
     }
-    
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //PRIVATE HELPER FUNCTIONS
 
@@ -562,7 +556,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
         if (tt)  { //turtle mode is on-- no problems
             return true;
         }  else  {  //turtle mode is off-- need to alert user
-            api.TurtleConsole(sender, "Turtle mode is not on.");
+            turtle.turtleConsole("Turtle mode is not on.");
             return false;
         }
     }
@@ -572,10 +566,10 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
      * @return Status of block placement mode
      */
     private boolean checkBP(MessageReceiver sender)  {
-        if (state.getBp())  { //block placement mode is on-- no problems
+        if (turtle.getBP())  { //block placement mode is on-- no problems
             return true;
         }  else  {  //block placement mode is off-- need to alert user
-            api.TurtleConsole(sender, "Block placement mode is not on.");
+            turtle.turtleConsole("Block placement mode is not on.");
             return false;
         }
     }
