@@ -31,9 +31,6 @@ import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
-import edu.knox.minecraft.serverturtle.TurtleAPI;
-import net.canarymod.logger.Logman;
-
 /**
  * Compile Java source code into class files (bytecode) in memory.
  * 
