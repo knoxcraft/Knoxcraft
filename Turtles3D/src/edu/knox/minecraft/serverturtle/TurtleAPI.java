@@ -4,17 +4,7 @@ import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
 import net.canarymod.api.world.position.Position;
 import net.canarymod.chat.MessageReceiver;
-
 //TODO:  maybe don't need these anymore. See below.
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import edu.knoxcraft.hooks.KCTUploadHook;
-import edu.knoxcraft.http.server.HttpUploadServer;
-import edu.knoxcraft.turtle3d.KCTCommand;
-import edu.knoxcraft.turtle3d.KCTScript;
 
 public class TurtleAPI {
     //TODO:  should just make state field and eliminate args?  Or else make class static.

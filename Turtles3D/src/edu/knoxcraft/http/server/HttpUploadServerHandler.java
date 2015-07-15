@@ -202,6 +202,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
         // Convert the response content to a ChannelBuffer.
         StringBuffer responseContent=new StringBuffer();
         responseContent.setLength(0);
+        // TODO: Need to name the classfile for Java, or we need to parse it out server-side
         String page=String.format(
                 "<html><head><title> KnoxCraft Turtles 3D: Code Upload Form</title></title>\n"
                         + "<body>\n"
@@ -209,9 +210,8 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                         + "<form method=%s action=%s>\n"
                         + "Player Name: <input type=text name=%s><br>\n"
                         + "<input type=hidden name=client value=web>\n"
-                        // TODO: Make language drop-down
                         + "Language: <select name=%s>\n"
-                        + "<option value=%s selected> Java </option>\n"
+                        + "<option value=%s selected> Java </option><br>\n"
                         + "<option value=%s> Python </option>\n"
                         + "</select>\n"
                         + "Source Code (paste here): <br><textarea rows=15 cols=60 name=%s></textarea><br>\n"
