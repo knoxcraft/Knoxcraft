@@ -59,7 +59,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             getLogman().info("Registering plugin");
             Canary.hooks().registerListener(this, this);
             httpServer=new HttpUploadServer();
-            httpServer.enable();
+            httpServer.enable(logger);
             //getName() returns the class name, in this case TurtleAPI
             getLogman().info("Enabling "+getName() + " Version " + getVersion()); 
             getLogman().info("Authored by "+getAuthor());
@@ -520,29 +520,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
     @HookHandler
     public void uploadJSON(KCTUploadHook hook) {
-        logger.info("Hook called, json is "+hook.getJSON());
-        JSONParser parser=new JSONParser();
-        try {
-            logger.info(hook.getJSON());
-            JSONObject json=(JSONObject)parser.parse(hook.getJSON());
-
-            String scriptname=(String)json.get("scriptname");
-
-            KCTScript script=new KCTScript(scriptname);
-
-            logger.info(String.format("%s\n", scriptname));
-
-            JSONArray lang= (JSONArray) json.get("commands");
-            for (int i=0; i<lang.size(); i++) {
-                JSONObject cmd=(JSONObject)lang.get(i);
-                script.addCommand(cmd);
-                logger.info(String.format("script %s has command %s", script.getScriptName(), cmd.get(KCTCommand.CMD)));
-            }
-            // TODO: Put script someplace now that we've created it
-        } catch (ParseException e) {
-            // TODO: log better? handle better?
-            throw new RuntimeException(e);
-        }
+        logger.info("Hook called (TurtleTester, is this still being launched?)");
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

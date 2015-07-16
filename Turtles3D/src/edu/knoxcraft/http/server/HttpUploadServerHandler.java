@@ -17,6 +17,7 @@
  */
 package edu.knoxcraft.http.server;
 
+import static edu.knoxcraft.turtle3d.JSONUtil.quoteString;
 import static io.netty.buffer.Unpooled.copiedBuffer;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
@@ -45,11 +46,16 @@ import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
 import io.netty.util.CharsetUtil;
 
-import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.canarymod.Canary;
 import net.canarymod.logger.Logman;
 import edu.knoxcraft.hooks.KCTUploadHook;
+import edu.knoxcraft.turtle3d.InvalidTurtleCodeException;
+import edu.knoxcraft.turtle3d.KCTScript;
+import edu.knoxcraft.turtle3d.TurtleCompiler;
 
 /**
  * Based on: https://netty.io/4.0/xref/io/netty/example/http/upload/package-summary.html
@@ -61,7 +67,11 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
 
     // Relies on HttpUploadServer classloading first, which should happen
     // because HttpUploadServer references this class in its enable() method
-    private static Logman logger=HttpUploadServer.logger;
+    private static Logman logger;
+    
+    public HttpUploadServerHandler(Logman logger){
+        HttpUploadServerHandler.logger=logger;
+    }
 
     static {
         // should delete file on exit (in normal exit)
@@ -78,6 +88,16 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
         // anything to do here?
     }
+    
+    private static class UploadedFile {
+        // really simple container class
+        public final String filename;
+        public final String body;
+        public UploadedFile(String filename, String body) {
+            this.filename=filename;
+            this.body=body;
+        }
+    }
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
@@ -88,7 +108,6 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                 if (fullRequest.getMethod().equals(HttpMethod.GET)) {
                     // HTTP Get request!
                     // Write the HTML page with the form
-                    // TODO: Update the HTML form
                     writeMenu(ctx);
                 } else if (fullRequest.getMethod().equals(HttpMethod.POST)) {
                     /* 
@@ -104,59 +123,146 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                     sourcetext (code as a String, or empty)
                     */
 
+                    String language=null;
+                    String playerName=null;
+                    String scriptName=null;
+                    String client=null;
+                    String jsonText=null;
+                    String sourceText=null;
+                    Map<String,UploadedFile> files=new LinkedHashMap<String,UploadedFile>();
+
                     HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(fullRequest);
                     try {
-                        // read all of the post data into an KCTUploadHook, and trigger an event
-                        KCTUploadHook hook=new KCTUploadHook();
                         while (decoder.hasNext()) {
-                            InterfaceHttpData data = decoder.next();
-                            if (data != null) {
-                                try {
-                                    if (data.getHttpDataType()==HttpDataType.FileUpload) {
-                                        // Handle file upload
-                                        // We may have json, source, or both
-                                        logger.info("data name for fileupload: "+data.getName());
-                                        if (data.getName().equals("jsonfile")) {
-                                            logger.info("jsonfile uploaded");
-                                            // uploaded a JSON file
-                                        } else if (data.getName().equals("sourcefile")) {
-                                            // uploaded a source file
-                                            logger.info("source file uploaded");
-                                        }
-                                    } else if (data.getHttpDataType() == HttpDataType.Attribute) {
-                                        Attribute attribute = (Attribute) data;
-                                        String name=attribute.getName();
-                                        String value=attribute.getValue();
-                                        if (name.equals("language")) {
-                                            hook.setLanguage(value);
-                                        } else if (name.equals("playerName")) {
-                                            hook.setPlayerName(value);
-                                        } else if (name.equals("jsontext")) {
-                                            hook.setJson(value);
-                                        } else if (name.equals("sourcetext")) {
-                                            hook.setSource(value);
-                                        }
-                                        logger.info(String.format("%s => %s", name, value));
+                            InterfaceHttpData data=decoder.next();
+                            if (data == null) continue;
+                            
+                            try {
+                                if (data.getHttpDataType() == HttpDataType.Attribute) {
+                                    Attribute attribute = (Attribute) data;
+                                    String name=attribute.getName();
+                                    String value=attribute.getValue();
+                                    if (name.equals("language")) {
+                                        language=value;
+                                    } else if (name.equals("playerName")) {
+                                        playerName=value;
+                                    } else if (name.equals("client")) {
+                                        client=value;
+                                    } else if (name.equals("jsontext")) {
+                                        jsonText=value;
+                                    } else if (name.equals("sourcetext")) {
+                                        sourceText=value;
+                                    } else if (name.equals("scriptName")) {
+                                        scriptName=value;
+                                    } else {
+                                        logger.warn(String.format("Unknown kctupload attribute: %s => %s", name, value));
                                     }
-                                } finally {
-                                    // clean up resources
-                                    data.release();
+                                } else if (data.getHttpDataType()==HttpDataType.FileUpload) {
+                                    // Handle file upload
+                                    // We may have json, source, or both
+                                    logger.info("data name for fileupload: "+data.getName());
+                                    FileUpload fileUpload=(FileUpload)data;
+                                    String filename=fileUpload.getFilename();
+                                    ByteBuf buf=fileUpload.getByteBuf();
+                                    String fileBody=new String(buf.array(), "UTF-8");
+                                    files.put(data.getName(), new UploadedFile(filename, fileBody));
                                 }
+                            } finally {
+                                data.release();
                             }
                         }
-                        Canary.hooks().callHook(hook);
                     } finally {
-                        if (decoder != null) {
+                        if (decoder!= null) {
                             // clean up resources
                             decoder.cleanFiles();
                             decoder.destroy();
                         }
                     }
 
-                    writeResponse(ctx.channel(), fullRequest, "Knoxcraft thanks you!\n");
+                    /*
+                     * Error checking here makes the most sense, since we can send back a reasonable error message
+                     * to the uploading client at this point. Makes less sense to wait to compile.
+                     * 
+                     * Upload possibilities:
+                     * 
+                     * bluej: file1, file2, etc. All source code. Language should be set to Java.
+                     * Convert to JSON, then to KCTScript. Signal an error if one happens.
+                     * 
+                     * web: jsontext and/or sourcetext. json-only is OK; source-only is OK if it's Java. 
+                     * Cannot send source-only for non-Java languages, since we can't build them (yet).
+                     * 
+                     * anything else: convert to Json and hope for the best
+                     */
+                    try {
+                        KCTUploadHook hook = extractHook(language, playerName, client, jsonText, sourceText, files);
+                        Canary.hooks().callHook(hook);
+                        writeResponse(ctx.channel(), fullRequest, "KnoxCraft thanks you!\n");
+                    } catch (InvalidTurtleCodeException e) {
+                        // TODO: Convert exception into message to send back to client
+                        writeResponse(ctx.channel(), fullRequest, e.getMessage()+"!\n");
+                    }
                 }
             }
         }
+    }
+
+
+
+
+    /**
+     * @param language
+     * @param playerName
+     * @param client
+     * @param jsonText
+     * @param sourceText
+     * @param files
+     * @return
+     * @throws InvalidTurtleCodeException
+     */
+    private KCTUploadHook extractHook(String language, String playerName,
+        String client, String jsonText, String sourceText,
+        Map<String, UploadedFile> files) throws InvalidTurtleCodeException
+    {
+        if (playerName==null) {
+            throw new InvalidTurtleCodeException("You must specify your MineCraft player name!");
+        }
+        KCTUploadHook hook=new KCTUploadHook();
+        // XXX How do we know that the playerName is valid?
+        hook.setPlayerName(playerName);
+
+        TurtleCompiler turtleCompiler=new TurtleCompiler();
+
+        if ("web".equalsIgnoreCase(client) || "testclient".equalsIgnoreCase(client)) {
+            // must have both Json and source, either in text area or as uploaded files
+            if (sourceText!=null && jsonText!=null) {
+                KCTScript script=TurtleCompiler.parseFromJson(jsonText);
+                script.setLanguage(language);
+                script.setSourceCode(sourceText);
+                hook.addScript(script);
+            } else if (files.containsKey("jsonfile") && files.containsKey("sourcefile")) {
+                UploadedFile sourceUpload=files.get("sourcefile");
+                UploadedFile jsonUpload=files.get("jsonfile");
+
+                KCTScript script=TurtleCompiler.parseFromJson(jsonUpload.body);
+                script.setLanguage(language);
+                script.setSourceCode(sourceUpload.body);
+                hook.addScript(script);
+            } else {
+                throw new InvalidTurtleCodeException("You must upload BOTH json and the corresponding source code "
+                        + " (either as files or pasted into the text areas)");
+            }
+        } else if ("bluej".equalsIgnoreCase(client)) {
+            for (Entry<String,UploadedFile> entry : files.entrySet()) {
+                //logger.info(entry.getKey() +" => "+entry.getValue().filename+" : "+entry.getValue().body);
+                UploadedFile uploadedFile=entry.getValue();
+                KCTScript script=turtleCompiler.compileJavaTurtleCode(uploadedFile.filename, uploadedFile.body);
+                hook.addScript(script);
+            }
+        } else {
+            // Unknown client: could be a new language being uploaded!
+            throw new InvalidTurtleCodeException("TODO: Handle things not from BlueJ or the web interface");
+        }
+        return hook;
     }    
 
     
@@ -195,15 +301,39 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
         // Convert the response content to a ChannelBuffer.
         StringBuffer responseContent=new StringBuffer();
         responseContent.setLength(0);
-
-        // create Pseudo Menu
-        responseContent.append("<html>");
-        responseContent.append("<head>");
-        responseContent.append("<title>Netty Test Form</title>\r\n");
-        responseContent.append("</head>\r\n");
-        responseContent.append("<h1>Netty Test Form</h1>");
-        responseContent.append("</body>");
-        responseContent.append("</html>");
+        // TODO: Need to name the classfile for Java, or we need to parse it out server-side
+        String page=String.format(
+                "<html><head><title> KnoxCraft Turtles 3D: Code Upload Form</title></title>\n"
+                        + "<body>\n"
+                        + "<h1>KnoxCraft Turtles 3D: Code Upload Form</h1>\n"
+                        + "<form method=%s action=%s>\n"
+                        + "Player Name: <input type=text name=%s><br>\n"
+                        + "<input type=hidden name=client value=web>\n"
+                        + "Language: <select name=%s>\n"
+                        + "<option value=%s selected> Java </option><br>\n"
+                        + "<option value=%s> Python </option>\n"
+                        + "</select>\n"
+                        + "Source Code (paste here): <br><textarea rows=15 cols=60 name=%s></textarea><br>\n"
+                        + "JSON Turtle Commands (paste here): <br><textarea rows=15 cols=60 name=%s></textarea><br>\n"
+                        + "Source Code (file upload): <input type=%s name=%s><br>\n"
+                        + "JSON Turtle Commands (file upload): <input type=%s name=%s><br>\n"
+                        + "<input type=submit value=%s><br>\n"
+                        + "</form>\n"
+                        + "</body></html>\n", quoteString("POST"), quoteString("/kctupload"),  
+                            quoteString("playerName"),
+                            quoteString("language"), 
+                            quoteString("Java"),
+                            quoteString("Python"),
+                            quoteString("sourcetext"),
+                            quoteString("jsontext"),
+                            quoteString("file"),
+                            quoteString("sourcefile"),
+                            quoteString("file"),
+                            quoteString("jsonfile"),
+                            
+                            quoteString("Upload KnoxCraft 3D Turtle Code!")
+                            );
+        responseContent.append(page);
 
         ByteBuf buf = copiedBuffer(responseContent.toString(), CharsetUtil.UTF_8);
         // Build the response object.

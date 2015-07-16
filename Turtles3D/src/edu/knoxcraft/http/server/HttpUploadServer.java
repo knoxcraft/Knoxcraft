@@ -15,8 +15,6 @@
  */
 package edu.knoxcraft.http.server;
 
-import edu.knox.minecraft.serverturtle.TurtlePlugin;
-import net.canarymod.logger.Logman;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -31,6 +29,7 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import net.canarymod.logger.Logman;
 
 /**
  * A HTTP server showing how to use the HTTP multipart package for file uploads and decoding post data.
@@ -40,16 +39,15 @@ public final class HttpUploadServer {
     // TODO: Configuration file for port number to listen on for http connections
     static final int PORT = Integer.parseInt(System.getProperty("PORT", "8888"));
 
-    EventLoopGroup bossGroup;
-    EventLoopGroup workerGroup;
-    public static Logman logger;
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
+    private Thread thread;
     
     public HttpUploadServer() {
-        HttpUploadServer.logger=TurtlePlugin.logger;
     }
     
-    public boolean enable() {
-        final Thread t=new Thread() {
+    public boolean enable(Logman logger) {
+        thread=new Thread() {
             public void run() {
                 bossGroup = new NioEventLoopGroup(1);
                 workerGroup = new NioEventLoopGroup();
@@ -71,7 +69,7 @@ public final class HttpUploadServer {
                             // Remove the following line if you don't want automatic content compression.
                             pipeline.addLast(new HttpContentCompressor());
 
-                            pipeline.addLast(new HttpUploadServerHandler());
+                            pipeline.addLast(new HttpUploadServerHandler(logger));
                         }
                     });
 
@@ -80,18 +78,20 @@ public final class HttpUploadServer {
                     ch.closeFuture().sync();
                 } catch (InterruptedException e) {
                     // TODO: log this server-side using logman?
+                    logger.error("Interrupted server thread!");
                 } finally {
                     bossGroup.shutdownGracefully();
                     workerGroup.shutdownGracefully();
                 }
             }
         };
-        t.start();
+        thread.start();
         return true;
     }
 
     public void disable() {
         // shutting down the groups should hopefully shutdown the server
+        thread.interrupt();
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }
