@@ -1,7 +1,9 @@
 package edu.knox.minecraft.serverturtle;
 
-import java.util.ArrayList;
+import java.util.Stack;
 
+import edu.knoxcraft.turtle3d.KCTCommand;
+import edu.knoxcraft.turtle3d.KCTScript;
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
@@ -27,7 +29,8 @@ public class Turtle {
     private BlockType bt = BlockType.Stone;  //default turtle block type 
     private World world;  //World in which all actions occur
     private MessageReceiver sender;  //player to send messages to
-    private ArrayList<BlockRecord> oldBlocks;  //original pos/type of all bricks laid by this turtle for undoing
+    private Stack<BlockRecord> oldBlocks;  //original pos/type of all bricks laid by this turtle for undoing
+    private KCTScript script;  //script this turtle will execute
 
     ///////////////////////////////////////////////////////////////////////////////
 
@@ -36,7 +39,10 @@ public class Turtle {
      * @param sender
      */
     public void turtleInit(MessageReceiver sender)  {
-        //save sender for later
+        //initialize undo buffer
+        oldBlocks = new Stack<BlockRecord>();
+
+        //record sender
         this.sender = sender;
 
         //GET WORLD
@@ -225,12 +231,12 @@ public class Turtle {
 
             //Place block if block placement mode on
             if (bp) {
-              //TODO:  keep track of this block to undo
-                //oldBlocks.add(getBlockAt)
-                //oops... need to look up and see if this is a real method.
-                
-                world.setBlockAt(gamePos, bt);                 
-                
+
+                //keep track of original block to undo
+                oldBlocks.push(new BlockRecord(world.getBlockAt(gamePos), gamePos, world));
+
+                //place new block
+                world.setBlockAt(gamePos, bt);
             }
         }
 
@@ -264,8 +270,12 @@ public class Turtle {
 
             //Place block if block placement mode on
             if (bp) {
-                world.setBlockAt(gamePos, bt);    
-                //TODO:  keep track of this block to undo
+
+                //keep track of original block to undo
+                oldBlocks.push(new BlockRecord(world.getBlockAt(gamePos), gamePos, world));
+
+                //place new block
+                world.setBlockAt(gamePos, bt);
             }
         }
     }
@@ -284,9 +294,35 @@ public class Turtle {
 
     /**
      * Return whether block placement mode is on.  Called by TurtleTester.
+     * 
+     * @return the value of bp
      */
     public boolean getBP()  {
         return bp;
+    }
+
+    /**
+     * Return the stack of blocks replaced by this turtle (for undoing)
+     * @return
+     */
+    public Stack<BlockRecord> getOldBlocks()  {
+        return oldBlocks;
+    }    
+
+    /**
+     * Execute a KCTScript.
+     */
+    public void executeScript(KCTScript script) {
+        
+        //empty the undo buffer of previous scripts' blocks
+        while (!oldBlocks.empty())  {
+            oldBlocks.pop();
+        }
+
+        //execute each command of the new script
+        for (KCTCommand c : script.getCommands())  {
+            executeCommand(c);
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -430,5 +466,28 @@ public class Turtle {
         //update direction and return
         d = Direction.getFromIntValue(dirInt);
         return d;
+    }
+    
+    /*
+     * Execute a KCTCommand.
+     */
+    private void executeCommand(KCTCommand c)  {
+        // TODO: Execute the command
+        // TODO: Handle all of the other commands
+        
+        String commandName = c.getCommandName();
+        
+        if (commandName.equals(KCTCommand.FORWARD)) {
+            // check args; move turtle forward the appropriate distance
+            // this will have to call back into TurtleAPI.
+        } else if (commandName.equals(KCTCommand.TURNRIGHT)) {
+            // turn right
+        } else if (commandName.equals(KCTCommand.TURNLEFT)) {
+            // turn left
+        } else {
+            // TODO: Handle an unknown command. Is Runtime Exception the correct exception?
+            // Are there better ways to handle this?
+            throw new RuntimeException("Unknown command: "+commandName);
+        }
     }
 }

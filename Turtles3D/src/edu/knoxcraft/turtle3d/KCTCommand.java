@@ -70,27 +70,6 @@ public class KCTCommand
         }
     }
     
-    /**
-     * Execute this command
-     * TODO: May require parameters from the Minecraft server (reference to the thing that lets us lay blocks)
-     */
-    public void execute(Turtle state) {
-        // TODO: Execute the command
-        // TODO: Handle all of the other commands
-        if (commandName.equals(FORWARD)) {
-            // check args; move turtle forward the appropriate distance
-            // this will have to call back into TurtleAPI.
-        } else if (commandName.equals(TURNRIGHT)) {
-            // turn right
-        } else if (commandName.equals(TURNLEFT)) {
-            // turn left
-        } else {
-            // TODO: Handle an unknown command. Is Runtime Exception the correct exception?
-            // Are there better ways to handle this?
-            throw new RuntimeException("Unknown command: "+commandName);
-        }
-    }
-
     public String toJSONString() {
         // {"cmd" : "forward",
         //  "args" : {"dist" : 10}}

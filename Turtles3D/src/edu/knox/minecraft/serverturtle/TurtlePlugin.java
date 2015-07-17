@@ -1,5 +1,7 @@
 package edu.knox.minecraft.serverturtle;
 
+import java.util.Stack;
+
 import net.canarymod.Canary;
 import net.canarymod.chat.MessageReceiver;
 import net.canarymod.commandsys.Command;
@@ -16,8 +18,8 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
     
     private HttpUploadServer httpServer;
     public static Logman logger;
-    //TODO:  need a map for scripts
-    //TODO:  undo buffer
+    private ScriptManager scripts;
+    private Stack<Stack<BlockRecord>> undoBuffer;
     
     //////////////////////////////////////////////////////////////////////////////////
     
@@ -26,6 +28,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
      */
     public TurtlePlugin() {
         TurtlePlugin.logger = getLogman();
+        scripts = new ScriptManager(); 
     }
 
     /**
@@ -78,7 +81,16 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             permissions = { "" },
             toolTip = "/ex <scriptName>")
     public void execute(MessageReceiver sender, String[] args)  {
-        //TODO:  implement this
+        
+        if (args.length<2)  {  //not enough arguments
+            sender.message("Not enough arguments.");
+            return;
+        }
+        String scriptName = args[1];
+        
+        //TODO:  finish this
+        //execute script
+        //add script's blocks to undo buffer
     }
     
     /**
@@ -92,6 +104,15 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             permissions = { "" },
             toolTip = "/undo")
     public void undo(MessageReceiver sender, String[] args)  {
-        //TODO:  implement this
+        
+        //if buffer is not empty, undo last script executed 
+        if (!undoBuffer.empty())  {
+            
+            Stack<BlockRecord> blocks = undoBuffer.pop();
+            
+            while(!blocks.empty())  {
+                blocks.pop().revert();
+            }
+        }
     }
 }

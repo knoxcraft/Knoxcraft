@@ -33,14 +33,12 @@ public class KCTScript
     // TODO: Add support for turtle scripts that store the source code that generated the list of commands
     // instructors may want to see this
     private String sourceCode;
-    private String language;
-    
-    private Turtle turtle;   
+    private String language; 
     
     /////////////////////////////////////////////////////////////////////////////////////
+    
     public KCTScript() {
         this.commands=new LinkedList<KCTCommand>();
-        this.turtle=new Turtle();
     }
     
     public KCTScript(String scriptName) {
@@ -76,34 +74,26 @@ public class KCTScript
                 cmdstr.toString());
     }
     
-    public void execute(MessageReceiver sender) {
-        // TODO: execute this method (or not)
-        // XXX: or make this a parameter to a method in TurtleAPI
-        // actually, that sounds very reasonable
-        
-        //initialize turtle
-        turtle.turtleInit(sender);        
-        
-        //execute each command of the script
-        for (KCTCommand c : this.commands)  {
-            c.execute(turtle);
-        }
-    }
     public List<KCTCommand> getCommands() {
         return commands;
     }
+    
     public String getLanguage() {
         return language;
     }
+    
     public void setLanguage(String language) {
         this.language = language;
     }
+    
     public String getSourceCode() {
         return sourceCode;
     }
+    
     public void setSourceCode(String sourceCode) {
         this.sourceCode = sourceCode;
     }
+    
     public void setScriptName(String scriptName) {
         this.scriptName = scriptName;
     }
