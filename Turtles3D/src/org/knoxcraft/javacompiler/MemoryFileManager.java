@@ -96,7 +96,7 @@ public final class MemoryFileManager extends ForwardingJavaFileManager<JavaFileM
 	 */
 	@Override
 	public ClassLoader getClassLoader(Location location) {
-		return new ByteArrayClassLoader(classes);
+		return new ByteArrayClassLoader(this.getClass().getClassLoader(), classes);
 	}
 
 	@Override
