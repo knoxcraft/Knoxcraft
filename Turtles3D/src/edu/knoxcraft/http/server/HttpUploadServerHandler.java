@@ -134,6 +134,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
 
                         HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(fullRequest);
                         try {
+                            logger.trace("is multipart? "+decoder.isMultipart());
                             while (decoder.hasNext()) {
                                 InterfaceHttpData data=decoder.next();
                                 if (data == null) continue;
@@ -143,6 +144,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                         Attribute attribute = (Attribute) data;
                                         String name=attribute.getName();
                                         String value=attribute.getValue();
+                                        logger.trace(String.format("http attribute: %s => %s", name, value));
                                         if (name.equals("language")) {
                                             language=value;
                                         } else if (name.equals("playerName")) {
@@ -161,7 +163,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                     } else if (data.getHttpDataType()==HttpDataType.FileUpload) {
                                         // Handle file upload
                                         // We may have json, source, or both
-                                        logger.trace("data name for fileupload: "+data.getName());
+                                        logger.debug("data name for fileupload: "+data.getName());
                                         FileUpload fileUpload=(FileUpload)data;
                                         String filename=fileUpload.getFilename();
                                         ByteBuf buf=fileUpload.getByteBuf();
@@ -203,21 +205,29 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                 // TODO: authenticate against Mojang's server?
                                 throw new InvalidTurtleCodeException("You must specify your MineCraft player name!");
                             }
+                            
+                            if (client==null) {
+                                throw new InvalidTurtleCodeException("Your uploading and submission system must specify "
+                                        + "the type of client used for the upload (i.e. bluej, web, pykc, etc)");
+                            }
 
                             hook.setPlayerName(playerName);
-                            res.append(String.format("Hello %s! Thanks for using KnoxCraft Turtles\n<br>", playerName));
+                            res.append(String.format("Hello %s! Thanks for using KnoxCraft Turtles\n", playerName));
 
                             TurtleCompiler turtleCompiler=new TurtleCompiler(logger);
                             int success=0;
                             int failure=0;
-                            if ("web".equalsIgnoreCase(client) || "testclient".equalsIgnoreCase(client)) {
+                            if ("web".equalsIgnoreCase(client) || 
+                                    "testclient".equalsIgnoreCase(client) ||
+                                    client.startsWith("pykc"))
+                            {
                                 // must have both Json and source, either in text area or as uploaded files
                                 if (sourceText!=null && jsonText!=null) {
                                     KCTScript script=TurtleCompiler.parseFromJson(jsonText);
                                     script.setLanguage(language);
                                     script.setSourceCode(sourceText);
                                     res.append(String.format("Successfully uploaded KnoxCraft Turtle program "
-                                            + "named %s, in programming language\n<br>", 
+                                            + "named %s, in programming language %s\n", 
                                             script.getScriptName(), script.getLanguage()));
                                     success++;
                                     hook.addScript(script);
@@ -228,7 +238,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                     script.setLanguage(language);
                                     script.setSourceCode(sourceUpload.body);
                                     res.append(String.format("Successfully uploaded KnoxCraft Turtle program "
-                                            + "named %s, in programming language<br>\n", 
+                                            + "named %s, in programming language %s\n", 
                                             script.getScriptName(), script.getLanguage()));
                                     success++;
                                     hook.addScript(script);
@@ -245,28 +255,32 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                         logger.debug("Returned KCTScript (it's JSON is): "+script.toJSONString());
                                         hook.addScript(script);
                                         res.append(String.format("Successfully uploaded KnoxCraft Turtle program "
-                                                + "named %s, in programming language\n<br>", 
+                                                + "named %s, in programming language %s\n", 
                                                 script.getScriptName(), script.getLanguage()));
                                         success++;
                                     } catch (Exception e) {
                                         logger.error("Unable to upload and compile KCT script", e);
                                         failure++;
-                                        res.append(String.format("Failed to load script %s\n<br>", entry.getKey()));
+                                        res.append(String.format("Failed to load script %s\n", entry.getKey()));
                                     }
                                 }
                             } else {
-                                // TODO: Unknown client: could be a new language being uploaded!
-                                // Python will go here
-                                throw new InvalidTurtleCodeException("TODO: Handle things not from BlueJ or the web interface");
+                                // TODO Unknown client; make a best effort to handle upload
+                                res.append(String.format("Unknown upload client: %s; making our best effort to handle the upload"));
                             }
-                            res.append(String.format("<h2>Successfully uploaded %d KnoxCraft Turtles programs</h2><br>", success));
-                            res.append(String.format("<h2>Failed to upload %d KnoxCraft Turtles programs</h2><br>", failure));
+                            
+                            res.append(String.format("\nSuccessfully uploaded %d KnoxCraft Turtles programs\n", success));
+                            if (failure>0) {
+                                res.append(String.format("\nFailed to upload %d KnoxCraft Turtles programs\n", failure));
+                            }
                             Canary.hooks().callHook(hook);
                             // TODO: Upload a message about how many scripts were uploaded, and their names
-                            writeResponse(ctx.channel(), fullRequest, res.toString());
+                            writeResponse(ctx.channel(), fullRequest, res.toString(), client);
+
+                            
                         } catch (InvalidTurtleCodeException e) {
                             // TODO: Convert exception into clearer error message to send back to client
-                            writeResponse(ctx.channel(), fullRequest, e.getMessage().replaceAll("\n", "<br>\n")+"!\n");
+                            writeResponse(ctx.channel(), fullRequest, e.getMessage(), "error");
                         }
                     }
                 }
@@ -279,7 +293,13 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
 
 
 
-    private void writeResponse(Channel channel, HttpRequest request, String message) {
+    private void writeResponse(Channel channel, HttpRequest request, String message, String client) {
+        String contentType="text/plain";
+        if (client !=null && (client.equals("web") || client.equals("bluej"))) {
+            // convert to HTML
+            message=message.replaceAll("\n", "<br>\n");
+            contentType="text/html";
+        }
         // Convert the response content to a ChannelBuffer.
         ByteBuf buf = copiedBuffer(message, CharsetUtil.UTF_8);
 
@@ -291,7 +311,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
         // Build the response object.
         FullHttpResponse response = new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buf);
-        response.headers().set(CONTENT_TYPE, "text/plain; charset=UTF-8");
+        response.headers().set(CONTENT_TYPE, contentType+"; charset=UTF-8");
 
         if (!close) {
             // There's no need to add 'Content-Length' header
@@ -314,10 +334,10 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
         responseContent.setLength(0);
         // TODO: Need to name the classfile for Java, or we need to parse it out server-side
         String page=String.format(
-                "<html><head><title> KnoxCraft Turtles 3D: Code Upload Form</title></title>\n"
+                "<html><head><title> KnoxCraft Turtles 3D: Code Upload Form</title></head>\n"
                         + "<body>\n"
                         + "<h1>KnoxCraft Turtles 3D: Code Upload Form</h1>\n"
-                        + "<form method=%s action=%s>\n"
+                        + "<form method=%s action=%s enctype=\"multipart/form-data\">\n"
                         + "Player Name: <input type=text name=%s><br>\n"
                         + "<input type=hidden name=client value=web>\n"
                         + "Language: <select name=%s>\n"
