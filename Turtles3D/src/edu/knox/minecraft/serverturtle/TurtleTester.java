@@ -9,16 +9,8 @@ import net.canarymod.hook.HookHandler;
 import net.canarymod.logger.Logman;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
 import edu.knoxcraft.hooks.KCTUploadHook;
 import edu.knoxcraft.http.server.HttpUploadServer;
-import edu.knoxcraft.turtle3d.KCTCommand;
-import edu.knoxcraft.turtle3d.KCTScript;
 
 //Things need to be overly simple during testing for ease of use
 
@@ -46,6 +38,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
      */
     @Override
     public void disable() {
+        logger.warn("TurtleTester.disable() invoked");
         httpServer.disable();
     }
 

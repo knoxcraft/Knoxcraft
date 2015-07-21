@@ -25,6 +25,8 @@ package org.knoxcraft.javacompiler;
 
 import java.util.Map;
 
+import net.canarymod.logger.Logman;
+
 /**
  * A class loader which loads classes from byte arrays.
  *
@@ -39,21 +41,33 @@ public class ByteArrayClassLoader extends ClassLoader {
      * Maps binary class names to class files stored as byte arrays.
      */
     private Map<String, byte[]> classes;
+    private ClassLoader defaultClassLoader;
+    public static Logman logger;
 
     /**
      * Creates a new instance of ByteArrayClassLoader
      * @param classes a map from binary class names to class files stored as byte arrays
      */
-    public ByteArrayClassLoader(Map<String, byte[]> classes) {
+    public ByteArrayClassLoader(ClassLoader defaultLoader, Map<String, byte[]> classes) {
+        this.defaultClassLoader=defaultLoader;
         this.classes = classes;
     }
 
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
+
         try {
-            return super.loadClass(name);
+            if (defaultClassLoader==null) {
+                logger.error("classloader isnull");
+            }
+            return defaultClassLoader.loadClass(name);
         } catch (ClassNotFoundException e) {
             byte[] classData = classes.get(name);
+
+            if (classData==null) {
+                throw new ClassNotFoundException("Cannot find bytes for "+name, e);
+            }
+
             return defineClass(name, classData, 0, classData.length);
         }
     }

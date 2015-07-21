@@ -6,6 +6,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
+ * @deprecated This class is not finished!
+ * 
+ * TODO: Finish this class, and add httpserver support for it
+ * 
  * @author jspacco
  *
  */
