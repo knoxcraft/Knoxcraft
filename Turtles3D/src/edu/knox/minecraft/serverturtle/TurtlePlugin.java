@@ -1,7 +1,9 @@
 package edu.knox.minecraft.serverturtle;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Stack;
 
 import net.canarymod.Canary;
@@ -81,6 +83,21 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
 
     //COMMANDS
 
+    @Command(aliases = { "scripts", "sc" },
+            description = "List KCTScripts",
+            permissions = { "" },
+            toolTip = "/sc")
+    public void listScripts(MessageReceiver sender, String[] args) {
+        logger.info(String.format("name of sender is: %s", sender.getName()));
+        for (String name : scripts.getAllScripts().keySet()) {
+            logger.info(name);
+        }
+        HashMap<String,KCTScript> map=scripts.getAllScriptsForPlayer(sender.getName());
+        for (Entry<String,KCTScript> entry : map.entrySet()) {
+            logger.info(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
+        }
+    }
+    
     /**
      * Invoke a script.
      * @param sender
@@ -126,18 +143,32 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         turtle.turtleInit(sender);
 
         //Get script from map
-        KCTScript script = new KCTScript();
+        KCTScript script = null;
         try  {     
+            logger.trace(String.format("%s is looking for %s", playerName, scriptName));
+            for (String p : scripts.getAllScripts().keySet()) {
+                logger.trace("Player name: "+p);
+                for (String s : scripts.getAllScriptsForPlayer(p).keySet()) {
+                    logger.trace(String.format("Player name %s has script named %s", p, s));
+                }
+            }
             script = scripts.getScript(playerName, scriptName);
+            if (script==null) {
+                throw new RuntimeException("dammit Jim I'm a doctor");
+            }
         }  catch (Exception e)  {
+            // TODO message to player?
             turtle.turtleConsole("Script failed to load!");
+            logger.error("Script failed to load", e);
         }
 
         //Execute script    
         try  {
             turtle.executeScript(script);
         }  catch (Exception e)  {
+            // TODO message to player?
             turtle.turtleConsole("Script failed to execute!");
+            logger.error("Script failed to execute", e);
         }
 
         //add script's blocks to undo buffer

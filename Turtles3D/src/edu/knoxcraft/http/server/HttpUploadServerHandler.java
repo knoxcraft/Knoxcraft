@@ -126,7 +126,6 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
 
                         String language=null;
                         String playerName=null;
-                        String scriptName=null;
                         String client=null;
                         String jsonText=null;
                         String sourceText=null;
@@ -155,16 +154,14 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                             jsonText=value;
                                         } else if (name.equals("sourcetext")) {
                                             sourceText=value;
-                                        } else if (name.equals("scriptName")) {
-                                            scriptName=value;
                                         } else {
                                             logger.warn(String.format("Unknown kctupload attribute: %s => %s", name, value));
                                         }
                                     } else if (data.getHttpDataType()==HttpDataType.FileUpload) {
                                         // Handle file upload
                                         // We may have json, source, or both
-                                        logger.debug("data name for fileupload: "+data.getName());
                                         FileUpload fileUpload=(FileUpload)data;
+                                        logger.debug(String.format("http file upload name %s, filename: ",data.getName(), fileUpload.getFilename()));
                                         String filename=fileUpload.getFilename();
                                         ByteBuf buf=fileUpload.getByteBuf();
                                         String fileBody=new String(buf.array(), "UTF-8");
@@ -217,10 +214,11 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                             TurtleCompiler turtleCompiler=new TurtleCompiler(logger);
                             int success=0;
                             int failure=0;
-                            if ("web".equalsIgnoreCase(client) || 
-                                    "testclient".equalsIgnoreCase(client) ||
+                            if (client.equalsIgnoreCase("web") || 
+                                    client.equalsIgnoreCase("testclient") ||
                                     client.startsWith("pykc"))
                             {
+                                logger.trace("Upload from web");
                                 // must have both Json and source, either in text area or as uploaded files
                                 if (sourceText!=null && jsonText!=null) {
                                     KCTScript script=TurtleCompiler.parseFromJson(jsonText);
@@ -247,12 +245,14 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                             + " (either as files or pasted into the text areas)");
                                 }
                             } else if ("bluej".equalsIgnoreCase(client)) {
+                                logger.trace("Upload from bluej");
                                 for (Entry<String,UploadedFile> entry : files.entrySet()) {
                                     // TODO: compile one file at a time
                                     try {
                                         UploadedFile uploadedFile=entry.getValue();
+                                        logger.trace(String.format("Processing uploaded file named %s", uploadedFile.filename));
                                         KCTScript script=turtleCompiler.compileJavaTurtleCode(uploadedFile.filename, uploadedFile.body);
-                                        logger.debug("Returned KCTScript (it's JSON is): "+script.toJSONString());
+                                        logger.trace("Returned KCTScript (it's JSON is): "+script.toJSONString());
                                         hook.addScript(script);
                                         res.append(String.format("Successfully uploaded KnoxCraft Turtle program "
                                                 + "named %s, in programming language %s\n", 

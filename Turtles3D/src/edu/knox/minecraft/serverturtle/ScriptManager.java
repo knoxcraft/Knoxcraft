@@ -18,6 +18,18 @@ public class ScriptManager {
         map = new HashMap<String, HashMap<String, KCTScript>>();
     }
     
+    /**
+     * TODO error checking and documentation
+     * @param playerName
+     * @return
+     */
+    public HashMap<String, KCTScript> getAllScriptsForPlayer(String playerName) {
+        return map.get(playerName);
+    }
+    public HashMap<String, HashMap<String,KCTScript>> getAllScripts() {
+        return map;
+    }
+    
     //This is Where we want to store to database -> When put in Map, put in SQLite
     //How to configure SQLIte first time??
     //Or does Canry just make it for us? That would be nice
@@ -32,9 +44,11 @@ public class ScriptManager {
      * @param script
      */
     public void putScript(String playerName, KCTScript script)  {
-        HashMap<String, KCTScript> scriptMap = new HashMap<String, KCTScript>();
+        if (!map.containsKey(playerName)) {
+            map.put(playerName, new HashMap<String, KCTScript>());
+        }
+        HashMap<String,KCTScript> scriptMap=map.get(playerName);
         scriptMap.put(script.getScriptName(), script);
-        map.put(playerName, scriptMap);
         
 //        try {
 //            //Insert Script into DB

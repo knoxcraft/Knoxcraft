@@ -142,7 +142,6 @@ public final class MemoryFileManager extends ForwardingJavaFileManager<JavaFileM
 					out.close();
 					ByteArrayOutputStream bos = (ByteArrayOutputStream)out;
 					classes.put(name, bos.toByteArray());
-					System.out.println("compiled " + name);
 				}
 			};
 		}
