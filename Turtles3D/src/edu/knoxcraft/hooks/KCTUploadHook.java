@@ -3,6 +3,8 @@ package edu.knoxcraft.hooks;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 
 import edu.knoxcraft.turtle3d.KCTScript;
 import net.canarymod.hook.Hook;
@@ -37,5 +39,17 @@ public class KCTUploadHook extends Hook implements Iterable<KCTScript>
     }
     public Iterator<KCTScript> iterator() {
         return turtleScripts.iterator();
+    }
+
+    @Override
+    public void forEach(Consumer<? super KCTScript> arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public Spliterator<KCTScript> spliterator() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

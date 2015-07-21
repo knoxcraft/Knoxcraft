@@ -1,5 +1,7 @@
 package edu.knox.minecraft.serverturtle;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Stack;
 
 import net.canarymod.Canary;
@@ -69,6 +71,12 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
     @HookHandler
     public void uploadJSON(KCTUploadHook hook) {
         logger.info("Hook called!");
+        
+        //add scripts to manager
+        Collection<KCTScript> list = hook.getScripts();
+        for (KCTScript script : list)  {
+            scripts.putScript(hook.getPlayerName(), script);
+        }
     }  
 
     //COMMANDS
