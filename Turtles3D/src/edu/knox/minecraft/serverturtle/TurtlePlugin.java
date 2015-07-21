@@ -2,7 +2,6 @@ package edu.knox.minecraft.serverturtle;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Stack;
 
@@ -25,7 +24,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
     private HttpUploadServer httpServer;
     public static Logman logger;
     private ScriptManager scripts;
-    private Stack<Stack<BlockRecord>> undoBuffer;
+    private HashMap<String, Stack<Stack<BlockRecord>>> undoBuffers;  //PlayerName->buffer
 
     //////////////////////////////////////////////////////////////////////////////////
 
@@ -35,7 +34,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
     public TurtlePlugin() {
         TurtlePlugin.logger = getLogman();
         scripts = new ScriptManager();
-        undoBuffer = new Stack<Stack<BlockRecord>>();
+        undoBuffers = new HashMap<String, Stack<Stack<BlockRecord>>>();
     }
 
     /**
@@ -73,7 +72,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
     @HookHandler
     public void uploadJSON(KCTUploadHook hook) {
         logger.info("Hook called!");
-        
+
         //add scripts to manager
         Collection<KCTScript> list = hook.getScripts();
         for (KCTScript script : list)  {
@@ -97,7 +96,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             logger.info(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
         }
     }
-    
+
     /**
      * Invoke a script.
      * @param sender
@@ -109,9 +108,9 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             permissions = { "" },
             toolTip = "/in <scriptName> [playerName]")
     public void invoke(MessageReceiver sender, String[] args)  {
-        
+
         /////////////////////////////////////////////////////////
-        //Create sample script for testing-- will remove this later
+        //Create sample script for testing-- can remove this later
         KCTScript test = new KCTScript("test");
         KCTCommand forward = new KCTCommand(KCTCommand.FORWARD);
 
@@ -132,8 +131,9 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         }
 
         String scriptName = args[1]; //get desired script name
+        String senderName = sender.getName();
 
-        String playerName = sender.getName(); //executing own script (default)        
+        String playerName = senderName; //executing own script (default)        
         if (args.length==3)  {  //executing someone else's script
             playerName = args[2];
         }
@@ -172,10 +172,16 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         }
 
         //add script's blocks to undo buffer
-        try  {
-            undoBuffer.push(turtle.getOldBlocks());
+        try  {            
+            //create buffer if doesn't exist
+            if (!undoBuffers.containsKey(senderName)) {  
+                undoBuffers.put(senderName, new Stack<Stack<BlockRecord>>());
+            }    
+            //add to buffer
+            undoBuffers.get(senderName).push(turtle.getOldBlocks());            
         }  catch (Exception e)  {
             turtle.turtleConsole("Failed to add to undo buffer!");
+            logger.error("Faile to add to undo buffer", e);
         }
     }
 
@@ -191,13 +197,30 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             toolTip = "/undo")
     public void undo(MessageReceiver sender, String[] args)  {
 
-        //if buffer is not empty, undo last script executed 
-        if (!undoBuffer.empty())  {
 
-            Stack<BlockRecord> blocks = undoBuffer.pop();
+        String senderName = sender.getName();
 
-            while(!blocks.empty())  {                
-                blocks.pop().revert();                
+        //sender has not executed any scripts
+        if (!undoBuffers.containsKey(senderName))  {  
+            sender.message("You have not executed any scripts to undo!");
+            
+        }  else {  //buffer exists
+
+            //get buffer
+            Stack<Stack<BlockRecord>> buffer = undoBuffers.get(senderName);
+
+            if (buffer.empty()){  //buffer empty
+                sender.message("There are no more scripts to undo!");
+                
+            }  else  {  //okay to undo last script executed
+
+                //get buffer
+                Stack<BlockRecord> blocks = buffer.pop();
+
+                //replace original blocks
+                while(!blocks.empty())  {                
+                    blocks.pop().revert();                
+                }
             }
         }
     }
