@@ -1,6 +1,6 @@
 from pykc import Turtle
 
-t = Turtle('Marie')
+t = Turtle('Francois')
 t.forward(10)
 t.turnRight(2)
 #print(t.toJson())

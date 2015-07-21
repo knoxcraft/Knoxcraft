@@ -98,7 +98,7 @@ public class TurtleCompiler
     {
         // TODO Change these (if necessary) once we standardize the package names
         String turtleClassName="edu.knoxcraft.turtle3d.Turtle3DBase";
-        String pluginName="edu.knox.minecraft.serverturtle.TurtleTester";
+        String pluginName="edu.knox.minecraft.serverturtle.TurtlePlugin";
         
         InMemoryJavaCompiler compiler=new InMemoryJavaCompiler();
         // Apparently we need to add extra classpath containing the Turtle code
@@ -135,7 +135,7 @@ public class TurtleCompiler
         
         // XXX Not sure why, but it is necessary to set the default classloader
         // for the bytearrayclassloader as the classloader that loaded TurtleCompiler
-        // Probably anything in the package with TurtleTester would work, actually
+        // Probably anything in the package with TurtlePlugin would work, actually
         ByteArrayClassLoader classLoader=new ByteArrayClassLoader(this.getClass().getClassLoader(), compiler.getFileManager().getClasses());
         ByteArrayClassLoader.logger=logger;
         try {
