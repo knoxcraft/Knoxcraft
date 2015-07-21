@@ -1,3 +1,4 @@
 bin=bin
 dest=target
 install.location=/path/to/Canarymod/plugins
+kct.java.install.location=/path/to/bluej/+libs
