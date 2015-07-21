@@ -13,22 +13,25 @@ import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
 import edu.knoxcraft.hooks.KCTUploadHook;
 import edu.knoxcraft.http.server.HttpUploadServer;
+import edu.knoxcraft.turtle3d.KCTCommand;
+import edu.knoxcraft.turtle3d.KCTScript;
 
 public class TurtlePlugin extends Plugin implements CommandListener, PluginListener {
-    
+
     private HttpUploadServer httpServer;
     public static Logman logger;
     private ScriptManager scripts;
     private Stack<Stack<BlockRecord>> undoBuffer;
-    
+
     //////////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * Constructor.
      */
     public TurtlePlugin() {
         TurtlePlugin.logger = getLogman();
-        scripts = new ScriptManager(); 
+        scripts = new ScriptManager();
+        undoBuffer = new Stack<Stack<BlockRecord>>();
     }
 
     /**
@@ -60,39 +63,83 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             throw new RuntimeException(e);
         }
     }
-    
+
     //HOOK HANDLERS
-    
+
     @HookHandler
     public void uploadJSON(KCTUploadHook hook) {
         logger.info("Hook called!");
     }  
-    
+
     //COMMANDS
 
     /**
-     * Execute a script.
+     * Invoke a script.
      * @param sender
      * @param args
      */
     @Command(
-            aliases = { "execute", "ex" },
-            description = "Execute a script.",
+            aliases = { "invoke", "in" },
+            description = "Invoke a script.",
             permissions = { "" },
-            toolTip = "/ex <scriptName>")
-    public void execute(MessageReceiver sender, String[] args)  {
+            toolTip = "/in <scriptName> [playerName]")
+    public void invoke(MessageReceiver sender, String[] args)  {
         
+        /////////////////////////////////////////////////////////
+        //Create sample script for testing-- will remove this later
+        KCTScript test = new KCTScript("test");
+        KCTCommand forward = new KCTCommand(KCTCommand.FORWARD);
+
+        for (int i=0; i<3; i++)  {
+            test.addCommand(forward);
+        }
+        test.addCommand(new KCTCommand(KCTCommand.TURNRIGHT));
+        for (int i=0; i<3; i++)  {
+            test.addCommand(forward);
+        }
+
+        scripts.putScript(sender.getName(), test);
+        ////////////////////////////////////////////////////////        
+
         if (args.length<2)  {  //not enough arguments
             sender.message("Not enough arguments.");
             return;
         }
-        String scriptName = args[1];
-        
-        //TODO:  finish this
-        //execute script
+
+        String scriptName = args[1]; //get desired script name
+
+        String playerName = sender.getName(); //executing own script (default)        
+        if (args.length==3)  {  //executing someone else's script
+            playerName = args[2];
+        }
+
+        //Create turtle
+        Turtle turtle = new Turtle();
+        turtle.turtleInit(sender);
+
+        //Get script from map
+        KCTScript script = new KCTScript();
+        try  {     
+            script = scripts.getScript(playerName, scriptName);
+        }  catch (Exception e)  {
+            turtle.turtleConsole("Script failed to load!");
+        }
+
+        //Execute script    
+        try  {
+            turtle.executeScript(script);
+        }  catch (Exception e)  {
+            turtle.turtleConsole("Script failed to execute!");
+        }
+
         //add script's blocks to undo buffer
+        try  {
+            undoBuffer.push(turtle.getOldBlocks());
+        }  catch (Exception e)  {
+            turtle.turtleConsole("Failed to add to undo buffer!");
+        }
     }
-    
+
     /**
      * Undo the previous script.
      * @param sender
@@ -104,14 +151,14 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             permissions = { "" },
             toolTip = "/undo")
     public void undo(MessageReceiver sender, String[] args)  {
-        
+
         //if buffer is not empty, undo last script executed 
         if (!undoBuffer.empty())  {
-            
+
             Stack<BlockRecord> blocks = undoBuffer.pop();
-            
-            while(!blocks.empty())  {
-                blocks.pop().revert();
+
+            while(!blocks.empty())  {                
+                blocks.pop().revert();                
             }
         }
     }

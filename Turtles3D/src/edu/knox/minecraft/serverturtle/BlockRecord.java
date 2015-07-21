@@ -6,7 +6,6 @@ import net.canarymod.api.world.position.Position;
 
 public class BlockRecord {
     private Block block;
-    private Position pos;
     private World world;
     
     /**
@@ -15,30 +14,21 @@ public class BlockRecord {
      * @param type
      * @param pos
      */
-    public BlockRecord(Block block, Position pos, World world)  {
+    public BlockRecord(Block block, World world)  {
         this.block = block;
-        this.pos = pos;
         this.world = world;
-    }
-
-    /**
-     * @return the type
-     */
-    public Block getBlock() {
-        return block;
-    }
-
-    /**
-     * @return the pos
-     */
-    public Position getPos() {
-        return pos;
-    }    
+    } 
     
     /**
      * Return this block to this state.
      */
     public void revert()  {
-        world.setBlockAt(pos, block);
+        world.setBlockAt(block.getPosition(), block);
+        
+    }
+    
+    @Override
+    public String toString()  {
+        return "" + block;
     }
 }

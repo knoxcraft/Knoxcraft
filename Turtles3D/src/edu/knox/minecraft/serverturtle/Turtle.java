@@ -25,7 +25,7 @@ public class Turtle {
     private Direction dir;
 
     //OTHER VARIABLES
-    private boolean bp = false;  //Block Place on/off
+    private boolean bp = true;  //Block Place on/off
     private BlockType bt = BlockType.Stone;  //default turtle block type 
     private World world;  //World in which all actions occur
     private MessageReceiver sender;  //player to send messages to
@@ -233,7 +233,7 @@ public class Turtle {
             if (bp) {
 
                 //keep track of original block to undo
-                oldBlocks.push(new BlockRecord(world.getBlockAt(gamePos), gamePos, world));
+                oldBlocks.push(new BlockRecord(world.getBlockAt(gamePos), world));
 
                 //place new block
                 world.setBlockAt(gamePos, bt);
@@ -272,7 +272,7 @@ public class Turtle {
             if (bp) {
 
                 //keep track of original block to undo
-                oldBlocks.push(new BlockRecord(world.getBlockAt(gamePos), gamePos, world));
+                oldBlocks.push(new BlockRecord(world.getBlockAt(gamePos), world));
 
                 //place new block
                 world.setBlockAt(gamePos, bt);
@@ -302,18 +302,33 @@ public class Turtle {
     }
 
     /**
-     * Return the stack of blocks replaced by this turtle (for undoing)
+     * Return a copy of the stack of blocks replaced by this turtle (for undoing)
      * @return
      */
     public Stack<BlockRecord> getOldBlocks()  {
-        return oldBlocks;
+        Stack<BlockRecord> retVal = new Stack<BlockRecord>();
+        Stack<BlockRecord> temp = new Stack<BlockRecord>();
+
+        //populate reverse stack
+        while(!oldBlocks.empty())  {
+            temp.push(oldBlocks.pop());
+        }
+
+        //restore and copy
+        while(!temp.empty())  {
+            BlockRecord block = temp.pop();
+            retVal.push(block);
+            oldBlocks.push(block);
+        }        
+
+        return retVal;
     }    
 
     /**
      * Execute a KCTScript.
      */
     public void executeScript(KCTScript script) {
-        
+
         //empty the undo buffer of previous scripts' blocks
         while (!oldBlocks.empty())  {
             oldBlocks.pop();
@@ -467,21 +482,22 @@ public class Turtle {
         d = Direction.getFromIntValue(dirInt);
         return d;
     }
-    
+
     /*
      * Execute a KCTCommand.
      */
     private void executeCommand(KCTCommand c)  {
         // TODO: Execute the command
         // TODO: Handle all of the other commands
-        
+
         String commandName = c.getCommandName();
-        
+
         if (commandName.equals(KCTCommand.FORWARD)) {
             // check args; move turtle forward the appropriate distance
-            // this will have to call back into TurtleAPI.
+            turtleMove(1);  //TODO:  parse args for real distance
         } else if (commandName.equals(KCTCommand.TURNRIGHT)) {
             // turn right
+            turtleTurn(false, 90);
         } else if (commandName.equals(KCTCommand.TURNLEFT)) {
             // turn left
         } else {

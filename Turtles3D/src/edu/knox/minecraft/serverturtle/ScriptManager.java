@@ -6,13 +6,32 @@ import edu.knoxcraft.turtle3d.KCTScript;
 
 public class ScriptManager {
     //TODO:  add database stuff?
-    //TODO:  add map methods
     
-    //Player-> (scriptName -> script)
+    //PlayerName-> (scriptName -> script)
     private HashMap<String, HashMap<String, KCTScript>> map;  
-    //TODO:  What type is the first key supposed to be?  Player?  String (name)?  MessageReceiver?
-    //look up name type in Canary docs
-
- 
+      
+    public ScriptManager()  {
+        map = new HashMap<String, HashMap<String, KCTScript>>();
+    }
     
+    /**
+     * Put a script into the map
+     * @param playerName
+     * @param script
+     */
+    public void putScript(String playerName, KCTScript script)  {
+        HashMap<String, KCTScript> scriptMap = new HashMap<String, KCTScript>();
+        scriptMap.put(script.getScriptName(), script);
+        map.put(playerName, scriptMap);
+    }
+    
+    /**
+     * Get a script from the map
+     * @param playerName
+     * @param scriptName
+     * @return
+     */
+    public KCTScript getScript(String playerName, String scriptName)  {
+        return map.get(playerName).get(scriptName);
+    }    
 }
