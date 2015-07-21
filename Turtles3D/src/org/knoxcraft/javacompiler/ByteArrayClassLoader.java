@@ -58,14 +58,14 @@ public class ByteArrayClassLoader extends ClassLoader {
 
         try {
             if (defaultClassLoader==null) {
-                logger.error("classloader isnull");
+                logger.error("classloader is null");
             }
             return defaultClassLoader.loadClass(name);
         } catch (ClassNotFoundException e) {
             byte[] classData = classes.get(name);
 
             if (classData==null) {
-                throw new ClassNotFoundException("Cannot find bytes for "+name, e);
+                throw new ClassNotFoundException(String.format("Cannot find bytes for class %s compiled using in-memory Java compiler", name), e);
             }
 
             return defineClass(name, classData, 0, classData.length);
