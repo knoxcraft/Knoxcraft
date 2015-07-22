@@ -88,12 +88,15 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             toolTip = "/sc")
     public void listScripts(MessageReceiver sender, String[] args) {
         logger.info(String.format("name of sender is: %s", sender.getName().toLowerCase()));
+        sender.message(String.format("name of sender is: %s", sender.getName().toLowerCase()));
         for (String name : scripts.getAllScripts().keySet()) {
             logger.info(name);
+            sender.message(name);
         }
         HashMap<String,KCTScript> map=scripts.getAllScriptsForPlayer(sender.getName().toLowerCase());
         for (Entry<String,KCTScript> entry : map.entrySet()) {
             logger.info(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
+            sender.message(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
         }
     }
 
