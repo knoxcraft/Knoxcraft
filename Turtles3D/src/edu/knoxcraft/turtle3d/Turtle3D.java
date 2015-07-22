@@ -28,6 +28,7 @@ public class Turtle3D
    */
     
     
+    
     private String scriptName;
     private KCTScript script;
     
@@ -80,7 +81,14 @@ public class Turtle3D
         KCTCommand cmd=new KCTCommand(FORWARD, JSONUtil.makeArgMap(DIST, distance));
         script.addCommand(cmd);
     }
-    
+    /**
+     * Move the turtle forward the given distance.
+     * @param distance
+     */
+    public void backward(int distance) {
+        KCTCommand cmd=new KCTCommand(BACKWARD, JSONUtil.makeArgMap(DIST, distance));
+        script.addCommand(cmd);
+    }
     /**
      * Turn the turtle to the right the given number of degrees.
      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
@@ -115,7 +123,7 @@ public class Turtle3D
       * @param degrees
       */
      public void down(int distance){
-         KCTCommand cmd=new KCTCommand(TURNRIGHT, JSONUtil.makeArgMap(DIST, distance));
+         KCTCommand cmd=new KCTCommand(DOWN, JSONUtil.makeArgMap(DIST, distance));
          script.addCommand(cmd);
      }
      /**
@@ -124,7 +132,7 @@ public class Turtle3D
       * @param degrees
       */
      public void blockPlace(boolean place){
-         KCTCommand cmd=new KCTCommand(TURNRIGHT, JSONUtil.makeArgMap(BLOCKPLACE, place));
+         KCTCommand cmd=new KCTCommand(BLOCKPLACE, JSONUtil.makeArgMap(PLACE, place));
          script.addCommand(cmd);
      }
      /**
@@ -133,7 +141,16 @@ public class Turtle3D
       * @param degrees
       */
      public void setBlock(int type){
-         KCTCommand cmd=new KCTCommand(TURNRIGHT, JSONUtil.makeArgMap(BLOCKTYPE, type));
+         KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type));
+         script.addCommand(cmd);
+     }
+     /**
+      * Turn the turtle to the right the given number of degrees.
+      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+      * @param degrees
+      */
+     public void setPosition(int[] position){
+         KCTCommand cmd=new KCTCommand(SETPOSITION, JSONUtil.makeArgMap(POS, position));
          script.addCommand(cmd);
      }
     // TODO: Implement the other turtle commands!
