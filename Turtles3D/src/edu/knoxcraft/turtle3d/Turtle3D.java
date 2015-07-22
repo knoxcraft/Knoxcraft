@@ -15,6 +15,7 @@ import java.util.Map;
  */
 public class Turtle3D
 {
+    
     /* Sample JSON commands:
     {
    "scriptname" : "script-test",
@@ -132,7 +133,7 @@ public class Turtle3D
       * @param degrees
       */
      public void blockPlace(boolean place){
-         KCTCommand cmd=new KCTCommand(BLOCKPLACE, JSONUtil.makeArgMap(PLACE, place));
+         KCTCommand cmd=new KCTCommand(PLACEBLOCKS, JSONUtil.makeArgMap(PLACE, place));
          script.addCommand(cmd);
      }
      /**
@@ -151,6 +152,15 @@ public class Turtle3D
       */
      public void setPosition(int[] position){
          KCTCommand cmd=new KCTCommand(SETPOSITION, JSONUtil.makeArgMap(POS, position));
+         script.addCommand(cmd);
+     }
+     /**
+      * Turn the turtle to the right the given number of degrees.
+      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+      * @param degrees
+      */
+     public void setDirection(int direction){
+         KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction));
          script.addCommand(cmd);
      }
     // TODO: Implement the other turtle commands!

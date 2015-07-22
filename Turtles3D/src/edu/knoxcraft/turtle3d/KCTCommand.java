@@ -46,9 +46,10 @@ public class KCTCommand
     public static final String BACKWARD = "backward";
     public static final String SETBLOCK = "setBlock";
     public static final String BLOCKTYPE = "blockType";
-    public static final String BLOCKPLACE = "blockPlace";
-    public static final Boolean PLACE = true;
-    public static final int[] POS = {0,0,0}; //TODO: Does this work?? Figure out POS eventually
+    public static final String PLACE = "place";
+    public static final String POS = "pos";
+    public static final String SETDIRECTION = "setDirection";
+    
     protected String commandName;
     protected Map<String, Object> arguments;
     
