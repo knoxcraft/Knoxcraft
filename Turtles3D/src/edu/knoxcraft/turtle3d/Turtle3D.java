@@ -122,12 +122,11 @@ public class Turtle3D
          script.addCommand(cmd);
      }
      /**
-      * Turn the turtle to the right the given number of degrees.
-      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+      * Toggle turtle block placement mode
       * @param degrees
       */
-     public void blockPlace(boolean place){
-         KCTCommand cmd=new KCTCommand(PLACEBLOCKS, JSONUtil.makeArgMap(PLACE, place));
+     public void blockPlace(){
+         KCTCommand cmd=new KCTCommand(PLACEBLOCKS);
          script.addCommand(cmd);
      }
      /**

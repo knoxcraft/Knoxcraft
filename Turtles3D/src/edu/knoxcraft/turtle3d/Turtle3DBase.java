@@ -2,6 +2,8 @@ package edu.knoxcraft.turtle3d;
 
 import static edu.knoxcraft.turtle3d.KCTCommand.*;
 
+//TODO:  fix comments
+
 public abstract class Turtle3DBase
 {
     private KCTScript script;
@@ -93,13 +95,12 @@ public abstract class Turtle3DBase
          script.addCommand(cmd);
      }
      /**
-      * Turn the turtle to the right the given number of degrees.
-      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+      * Toggle turtle block place mode
       * @param degrees
       */
-     public void blockPlace(boolean place){
+     public void blockPlace(){
          checkTurtle();
-         KCTCommand cmd=new KCTCommand(PLACEBLOCKS, JSONUtil.makeArgMap(PLACE, place));
+         KCTCommand cmd=new KCTCommand(PLACEBLOCKS);
          script.addCommand(cmd);
      }
      /**

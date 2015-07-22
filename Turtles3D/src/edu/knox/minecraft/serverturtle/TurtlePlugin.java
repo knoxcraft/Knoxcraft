@@ -87,11 +87,11 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             permissions = { "" },
             toolTip = "/sc")
     public void listScripts(MessageReceiver sender, String[] args) {
-        logger.info(String.format("name of sender is: %s", sender.getName()));
+        logger.info(String.format("name of sender is: %s", sender.getName().toLowerCase()));
         for (String name : scripts.getAllScripts().keySet()) {
             logger.info(name);
         }
-        HashMap<String,KCTScript> map=scripts.getAllScriptsForPlayer(sender.getName());
+        HashMap<String,KCTScript> map=scripts.getAllScriptsForPlayer(sender.getName().toLowerCase());
         for (Entry<String,KCTScript> entry : map.entrySet()) {
             logger.info(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
         }
@@ -122,7 +122,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             test.addCommand(forward);
         }
 
-        scripts.putScript(sender.getName(), test);
+        scripts.putScript(sender.getName().toLowerCase(), test);
         ////////////////////////////////////////////////////////        
 
         if (args.length<2)  {  //not enough arguments
@@ -131,7 +131,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         }
 
         String scriptName = args[1]; //get desired script name
-        String senderName = sender.getName();
+        String senderName = sender.getName().toLowerCase();
 
         String playerName = senderName; //executing own script (default)        
         if (args.length==3)  {  //executing someone else's script
@@ -198,7 +198,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
     public void undo(MessageReceiver sender, String[] args)  {
 
 
-        String senderName = sender.getName();
+        String senderName = sender.getName().toLowerCase();
 
         //sender has not executed any scripts
         if (!undoBuffers.containsKey(senderName))  {  

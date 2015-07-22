@@ -25,7 +25,6 @@ public class KCTCommand
     // Constants for each command
     // Could probably be an enum?
     public static final String FORWARD="forward";
-    //public static final String TURN="turn";
     public static final String TURNRIGHT = "turnRight";
     public static final String TURNLEFT = "turnLeft";
     public static final String DIR = "dir";
