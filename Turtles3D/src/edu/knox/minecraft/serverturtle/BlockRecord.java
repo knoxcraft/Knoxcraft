@@ -2,7 +2,6 @@ package edu.knox.minecraft.serverturtle;
 
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.Block;
-import net.canarymod.api.world.position.Position;
 
 public class BlockRecord {
     private Block block;

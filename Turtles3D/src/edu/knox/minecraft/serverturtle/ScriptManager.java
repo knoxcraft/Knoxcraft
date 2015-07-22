@@ -2,11 +2,6 @@ package edu.knox.minecraft.serverturtle;
 
 import java.util.HashMap;
 
-import net.canarymod.Canary;
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseWriteException;
-import net.canarymod.database.sqlite.SQLiteDatabase;
 import edu.knoxcraft.turtle3d.KCTScript;
 
 public class ScriptManager {

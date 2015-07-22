@@ -30,7 +30,7 @@ public class Turtle {
     private World world;  //World in which all actions occur
     private MessageReceiver sender;  //player to send messages to
     private Stack<BlockRecord> oldBlocks;  //original pos/type of all bricks laid by this turtle for undoing
-    private KCTScript script;  //script this turtle will execute
+    //private KCTScript script;  //script this turtle will execute
 
     ///////////////////////////////////////////////////////////////////////////////
 

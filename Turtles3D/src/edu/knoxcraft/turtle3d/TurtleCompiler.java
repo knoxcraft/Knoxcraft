@@ -185,6 +185,7 @@ public class TurtleCompiler
          * @return
          * @throws Exception
          */
+        @SuppressWarnings("deprecation")
         public String check(long timeout) throws Exception {
             long start=System.currentTimeMillis();
             while (System.currentTimeMillis()-start < timeout) {
