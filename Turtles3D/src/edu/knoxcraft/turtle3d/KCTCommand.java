@@ -8,8 +8,6 @@ import java.util.Map;
 
 import org.json.simple.JSONObject;
 
-import edu.knox.minecraft.serverturtle.Turtle;
-
 public class KCTCommand
 {
     /* Sample JSON commands:

@@ -1,6 +1,10 @@
 package edu.knoxcraft.turtle3d;
 
-import static edu.knoxcraft.turtle3d.KCTCommand.*;
+import static edu.knoxcraft.turtle3d.KCTCommand.DEGREES;
+import static edu.knoxcraft.turtle3d.KCTCommand.DIST;
+import static edu.knoxcraft.turtle3d.KCTCommand.FORWARD;
+import static edu.knoxcraft.turtle3d.KCTCommand.TURNLEFT;
+import static edu.knoxcraft.turtle3d.KCTCommand.TURNRIGHT;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

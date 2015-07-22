@@ -5,10 +5,6 @@ import net.canarymod.chat.MessageReceiver;
 import net.canarymod.commandsys.Command;
 import net.canarymod.commandsys.CommandDependencyException;
 import net.canarymod.commandsys.CommandListener;
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.DatabaseLoader;
-import net.canarymod.database.mysql.MySQLDatabase;
 import net.canarymod.hook.HookHandler;
 import net.canarymod.logger.Logman;
 import net.canarymod.plugin.Plugin;
@@ -547,19 +543,5 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
             turtle.turtleConsole("Block placement mode is not on.");
             return false;
         }
-    }
-    
-    public void dbtest() {
-        DatabaseLoader.load();
-        Database db=MySQLDatabase.getInstance();
-        DataAccess createTable=new DataAccess("player") {
-            @Override
-            public DataAccess getInstance() {
-                return this;
-            }
-            
-        };
-        //DataAccess d=new DataAccess("foo","bar");
-        //db.insert();
     }
 }

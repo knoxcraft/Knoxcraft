@@ -1,17 +1,16 @@
 package edu.knoxcraft.turtle3d;
 
 import static edu.knoxcraft.turtle3d.JSONUtil.quoteString;
-import static edu.knoxcraft.turtle3d.KCTCommand.*;
+import static edu.knoxcraft.turtle3d.KCTCommand.COMMANDSKEY;
+import static edu.knoxcraft.turtle3d.KCTCommand.SCRIPTNAMEKEY;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import net.canarymod.chat.MessageReceiver;
 import net.canarymod.logger.Logman;
 
 import org.json.simple.JSONObject;
 
-import edu.knox.minecraft.serverturtle.Turtle;
 import edu.knox.minecraft.serverturtle.TurtleTester;
 
 

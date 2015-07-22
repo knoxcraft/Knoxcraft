@@ -2,13 +2,13 @@ package edu.knox.minecraft.serverturtle;
 
 import java.util.Stack;
 
-import edu.knoxcraft.turtle3d.KCTCommand;
-import edu.knoxcraft.turtle3d.KCTScript;
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
 import net.canarymod.api.world.position.Position;
 import net.canarymod.chat.MessageReceiver;
+import edu.knoxcraft.turtle3d.KCTCommand;
+import edu.knoxcraft.turtle3d.KCTScript;
 
 public class Turtle {
 
@@ -30,7 +30,6 @@ public class Turtle {
     private World world;  //World in which all actions occur
     private MessageReceiver sender;  //player to send messages to
     private Stack<BlockRecord> oldBlocks;  //original pos/type of all bricks laid by this turtle for undoing
-    private KCTScript script;  //script this turtle will execute
 
     ///////////////////////////////////////////////////////////////////////////////
 
