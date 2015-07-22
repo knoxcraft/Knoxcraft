@@ -2,6 +2,7 @@ package edu.knoxcraft.turtle3d;
 
 import static edu.knoxcraft.turtle3d.KCTCommand.*;
 
+
 //TODO:  fix comments
 
 public abstract class Turtle3DBase
@@ -54,8 +55,7 @@ public abstract class Turtle3DBase
         script.addCommand(cmd);
     }
     /**
-     * Turn the turtle to the right the given number of degrees.
-     * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+     * Turn Right 
      * @param degrees
      */
     public void turnRight(int degrees){
@@ -65,19 +65,18 @@ public abstract class Turtle3DBase
     }
     
     /**
-     * Turn the turtle to the left the given number of degrees.
-     * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+     * 
      * @param degrees
-     */public void turnLeft(int degrees){
+     */
+    public void turnLeft(int degrees){
          checkTurtle();
         KCTCommand cmd=new KCTCommand(TURNLEFT, JSONUtil.makeArgMap(DEGREES, degrees));
         script.addCommand(cmd);
     }
     
      /**
-      * Turn the turtle to the right the given number of degrees.
-      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
-      * @param degrees
+      * 
+      * @param distance
       */
      public void up(int distance){
          checkTurtle();
@@ -85,9 +84,8 @@ public abstract class Turtle3DBase
          script.addCommand(cmd);
      }
      /**
-      * Turn the turtle to the right the given number of degrees.
-      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
-      * @param degrees
+      * 
+      * @param distance
       */
      public void down(int distance){
          checkTurtle();
@@ -96,7 +94,6 @@ public abstract class Turtle3DBase
      }
      /**
       * Toggle turtle block place mode
-      * @param degrees
       */
      public void blockPlace(){
          checkTurtle();
@@ -104,9 +101,8 @@ public abstract class Turtle3DBase
          script.addCommand(cmd);
      }
      /**
-      * Turn the turtle to the right the given number of degrees.
-      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
-      * @param degrees
+      * int input
+      * @param type
       */
      public void setBlock(int type){
          checkTurtle();
@@ -114,9 +110,17 @@ public abstract class Turtle3DBase
          script.addCommand(cmd);
      }
      /**
-      * Turn the turtle to the right the given number of degrees.
-      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
-      * @param degrees
+      * String input
+      * @param type
+      */
+     public void setBlock(String type){
+         checkTurtle();
+         KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type));
+         script.addCommand(cmd);
+     }
+     /**
+      * 
+      * @param position
       */
      public void setPosition(int[] position){
          checkTurtle();
@@ -124,9 +128,8 @@ public abstract class Turtle3DBase
          script.addCommand(cmd);
      }
      /**
-      * Turn the turtle to the right the given number of degrees.
-      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
-      * @param degrees
+      * 
+      * @param direction
       */
      public void setDirection(int direction){
          checkTurtle();

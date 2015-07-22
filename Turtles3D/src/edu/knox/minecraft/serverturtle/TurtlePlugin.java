@@ -16,7 +16,6 @@ import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
 import edu.knoxcraft.hooks.KCTUploadHook;
 import edu.knoxcraft.http.server.HttpUploadServer;
-import edu.knoxcraft.turtle3d.KCTCommand;
 import edu.knoxcraft.turtle3d.KCTScript;
 
 public class TurtlePlugin extends Plugin implements CommandListener, PluginListener {
@@ -112,21 +111,21 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             toolTip = "/in <scriptName> [playerName]")
     public void invoke(MessageReceiver sender, String[] args)  {
 
-        /////////////////////////////////////////////////////////
-        //Create sample script for testing-- can remove this later
-        KCTScript test = new KCTScript("test");
-        KCTCommand forward = new KCTCommand(KCTCommand.FORWARD);
-
-        for (int i=0; i<3; i++)  {
-            test.addCommand(forward);
-        }
-        test.addCommand(new KCTCommand(KCTCommand.TURNRIGHT));
-        for (int i=0; i<3; i++)  {
-            test.addCommand(forward);
-        }
-
-        scripts.putScript(sender.getName().toLowerCase(), test);
-        ////////////////////////////////////////////////////////        
+//        /////////////////////////////////////////////////////////
+//        //Create sample script for testing-- can remove this later
+//        KCTScript test = new KCTScript("test");
+//        KCTCommand forward = new KCTCommand(KCTCommand.FORWARD);
+//
+//        for (int i=0; i<3; i++)  {
+//            test.addCommand(forward);
+//        }
+//        test.addCommand(new KCTCommand(KCTCommand.TURNRIGHT));
+//        for (int i=0; i<3; i++)  {
+//            test.addCommand(forward);
+//        }
+//
+//        scripts.putScript(sender.getName().toLowerCase(), test);
+//        ////////////////////////////////////////////////////////        
 
         if (args.length<2)  {  //not enough arguments
             sender.message("Not enough arguments.");
@@ -160,7 +159,6 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
                 throw new RuntimeException("dammit Jim I'm a doctor");
             }
         }  catch (Exception e)  {
-            // TODO message to player?
             turtle.turtleConsole("Script failed to load!");
             logger.error("Script failed to load", e);
         }
@@ -169,7 +167,6 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         try  {
             turtle.executeScript(script);
         }  catch (Exception e)  {
-            // TODO message to player?
             turtle.turtleConsole("Script failed to execute!");
             logger.error("Script failed to execute", e);
         }

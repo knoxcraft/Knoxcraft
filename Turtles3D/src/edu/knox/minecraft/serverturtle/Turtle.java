@@ -77,7 +77,6 @@ public class Turtle {
     /**
      * Toggle block placement mode on/off.
      * 
-     * TODO:  IF placement off -> dont change vs AIr placement?
      * @param sender
      * @param args
      */
@@ -181,8 +180,13 @@ public class Turtle {
      * @param sender
      * @param args
      */
-    //TODO implementation-- maybe we don't need this version?
+    public void turtleSetBlockType(String blockType)
+    {
+        if (!bp)  //don't allow if block placement mode isn't on
+            return;
 
+        bt = BlockType.fromString(blockType);      
+    }
     /**
      * Report current block type
      * @param sender
@@ -477,8 +481,7 @@ public class Turtle {
      * Execute a KCTCommand.
      */
     private void executeCommand(KCTCommand c)  {
-        // TODO: Execute the command
-        // TODO: Handle all of the other commands
+        
         Map<String, Object> m = c.getArguments();
         String commandName = c.getCommandName();
 
