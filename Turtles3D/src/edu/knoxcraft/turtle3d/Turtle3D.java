@@ -27,6 +27,7 @@ public class Turtle3D
    }
    */
     
+    private static final Object BLOCKTYPE = null;
     private String scriptName;
     private KCTScript script;
     
@@ -55,8 +56,6 @@ public class Turtle3D
     private Turtle3D(String scriptName) {
         script=new KCTScript(scriptName);
     }
-    
-
     
     /**
      * No need for students to call this method.
@@ -101,5 +100,41 @@ public class Turtle3D
         script.addCommand(cmd);
     }
     
+     /**
+      * Turn the turtle to the right the given number of degrees.
+      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+      * @param degrees
+      */
+     public void up(int distance){
+         KCTCommand cmd=new KCTCommand(UP, JSONUtil.makeArgMap(DIST, distance));
+         script.addCommand(cmd);
+     }
+     /**
+      * Turn the turtle to the right the given number of degrees.
+      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+      * @param degrees
+      */
+     public void down(int distance){
+         KCTCommand cmd=new KCTCommand(TURNRIGHT, JSONUtil.makeArgMap(DIST, distance));
+         script.addCommand(cmd);
+     }
+     /**
+      * Turn the turtle to the right the given number of degrees.
+      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+      * @param degrees
+      */
+     public void blockPlace(boolean place){
+         KCTCommand cmd=new KCTCommand(TURNRIGHT, JSONUtil.makeArgMap(BLOCKPLACE, place));
+         script.addCommand(cmd);
+     }
+     /**
+      * Turn the turtle to the right the given number of degrees.
+      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+      * @param degrees
+      */
+     public void setBlock(int type){
+         KCTCommand cmd=new KCTCommand(TURNRIGHT, JSONUtil.makeArgMap(BLOCKTYPE, type));
+         script.addCommand(cmd);
+     }
     // TODO: Implement the other turtle commands!
 }

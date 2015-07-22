@@ -133,8 +133,6 @@ public class Turtle {
 
     /**
      * Report current position (relative)
-     * @param sender
-     * @param args
      */
     public void turtleReportPosition()
     {
@@ -143,8 +141,6 @@ public class Turtle {
 
     /**
      * Report current position of Turtle in game coords
-     * @param sender
-     * @param args
      */
     public void turtleReportGamePosition()
     {
@@ -153,8 +149,6 @@ public class Turtle {
 
     /**
      * Report position of relative origin (Player's pos at Turtle on) in game coords
-     * @param sender
-     * @param args
      */
     public void turtleReportOriginPosition()
     {
@@ -163,8 +157,6 @@ public class Turtle {
 
     /**
      * Report current direction (relative)
-     * @param sender
-     * @param args
      */
     public void turtleReportDirection()
     {
@@ -173,8 +165,7 @@ public class Turtle {
 
     /**
      * Set block type (int based)
-     * @param sender
-     * @param args
+     * @param int
      */
     public void turtleSetBlockType(int blockType)
     {
@@ -208,8 +199,7 @@ public class Turtle {
     /**
      * Move (forward/back)
      * 
-     * @param sender
-     * @param args
+     * @param dist
      */
     public void turtleMove(int dist)
     {
@@ -248,8 +238,7 @@ public class Turtle {
 
     /**
      * Moves turtle up/down
-     * @param sender
-     * @param args
+     * @param dist
      */
     public void turtleUpDown(int dist)
     {
@@ -283,8 +272,8 @@ public class Turtle {
     /**
      * Turn right/left.
      * 
-     * @param sender
-     * @param args
+     * @param left
+     * @param deg
      */ 
     public void turtleTurn(boolean left, int deg)
     {
@@ -494,12 +483,31 @@ public class Turtle {
 
         if (commandName.equals(KCTCommand.FORWARD)) {
             // check args; move turtle forward the appropriate distance
-            turtleMove(1);  //TODO:  parse args for real distance
+          //TODO:  parse args for real distance
+            int dist = 1; //default
+            turtleMove(dist);  
         } else if (commandName.equals(KCTCommand.TURNRIGHT)) {
             // turn right
-            turtleTurn(false, 90);
+            //Parse for amount to turn
+            int ang = 90; //default
+            turtleTurn(false, ang);
         } else if (commandName.equals(KCTCommand.TURNLEFT)) {
             // turn left
+            int ang = 90; //default
+            //Parse for amount to turn
+            turtleTurn(true, ang);
+        } else if (commandName.equals(KCTCommand.PLACEBLOCKS)) {
+            // place blocks on/off
+        } else if (commandName.equals(KCTCommand.SETPOSITION)) {
+            // set position
+        } else if (commandName.equals(KCTCommand.UP)) {
+            // go up
+        } else if (commandName.equals(KCTCommand.DOWN)) {
+            // go down
+        } else if (commandName.equals(KCTCommand.BACKWARD)) {
+            // go backward
+        } else if (commandName.equals(KCTCommand.SETBLOCK)) {
+            // Set block type
         } else {
             // TODO: Handle an unknown command. Is Runtime Exception the correct exception?
             // Are there better ways to handle this?

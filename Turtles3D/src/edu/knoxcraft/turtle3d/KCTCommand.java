@@ -39,6 +39,12 @@ public class KCTCommand
     public static final String SCRIPTNAMEKEY = "\"scriptname\"";
     public static final String COMMANDSKEY = "\"commands\"";
     public static final String DIST = "dist";
+    public static final String PLACEBLOCKS = "placeBlocks";
+    public static final String SETPOSITION = "setPosition";
+    public static final String UP = "up";
+    public static final String DOWN = "down";
+    public static final String BACKWARD = "backward";
+    public static final String SETBLOCK = "setBlock";
     
     protected String commandName;
     protected Map<String, Object> arguments;
