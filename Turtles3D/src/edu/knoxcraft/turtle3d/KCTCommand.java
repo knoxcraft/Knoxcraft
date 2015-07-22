@@ -45,6 +45,8 @@ public class KCTCommand
     public static final String DOWN = "down";
     public static final String BACKWARD = "backward";
     public static final String SETBLOCK = "setBlock";
+    public static final String BLOCKTYPE = "blockType";
+    public static final String BLOCKPLACE = "blockPlace";
     
     protected String commandName;
     protected Map<String, Object> arguments;

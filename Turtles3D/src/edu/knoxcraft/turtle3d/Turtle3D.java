@@ -27,7 +27,7 @@ public class Turtle3D
    }
    */
     
-    private static final Object BLOCKTYPE = null;
+    
     private String scriptName;
     private KCTScript script;
     
