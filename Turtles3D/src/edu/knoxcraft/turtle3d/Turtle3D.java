@@ -6,11 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * @deprecated This class is not finished!
- * 
- * TODO: Finish this class, and add httpserver support for it
- * 
- * @author jspacco
+ * @author ppypp emhastings hahaha
  *
  */
 public class Turtle3D
@@ -27,8 +23,6 @@ public class Turtle3D
    ]
    }
    */
-    
-    
     
     private String scriptName;
     private KCTScript script;

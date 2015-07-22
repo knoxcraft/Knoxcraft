@@ -548,7 +548,7 @@ public class Turtle {
             // Set block type
             int type;
             if (!m.containsKey(KCTCommand.BLOCKTYPE)){ //TODO VERIFY!!!
-                type = 1; //default
+                type = 1; //default is Stone
             }else{
                 type = (int)m.get(KCTCommand.BLOCKTYPE); //Magic hand wavey stuff
             }
