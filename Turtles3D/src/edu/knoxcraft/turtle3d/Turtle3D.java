@@ -77,7 +77,7 @@ public class Turtle3D
         script.addCommand(cmd);
     }
     /**
-     * Move the turtle forward the given distance.
+     * Move the turtle backward the given distance.
      * @param distance
      */
     public void backward(int distance) {
@@ -86,7 +86,7 @@ public class Turtle3D
     }
     /**
      * Turn the turtle to the right the given number of degrees.
-     * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+     * (Rounds to multiples of 45 deg)
      * @param degrees
      */
     public void turnRight(int degrees){
@@ -96,7 +96,7 @@ public class Turtle3D
     
     /**
      * Turn the turtle to the left the given number of degrees.
-     * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+     * (Rounds to multiples of 45 deg)
      * @param degrees
      */public void turnLeft(int degrees){
         KCTCommand cmd=new KCTCommand(TURNLEFT, JSONUtil.makeArgMap(DEGREES, degrees));
@@ -104,8 +104,7 @@ public class Turtle3D
     }
     
      /**
-      * Turn the turtle to the right the given number of degrees.
-      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+      * Move the turtle up the given distance.
       * @param degrees
       */
      public void up(int distance){
@@ -113,8 +112,7 @@ public class Turtle3D
          script.addCommand(cmd);
      }
      /**
-      * Turn the turtle to the right the given number of degrees.
-      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+      * Move the turtle down the given distance.
       * @param degrees
       */
      public void down(int distance){
@@ -123,38 +121,33 @@ public class Turtle3D
      }
      /**
       * Toggle turtle block placement mode
-      * @param degrees
       */
      public void blockPlace(){
          KCTCommand cmd=new KCTCommand(PLACEBLOCKS);
          script.addCommand(cmd);
      }
      /**
-      * Turn the turtle to the right the given number of degrees.
-      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
-      * @param degrees
+      * Set turtle block type (int-based)
+      * @param type
       */
      public void setBlock(int type){
          KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type));
          script.addCommand(cmd);
      }
      /**
-      * Turn the turtle to the right the given number of degrees.
-      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
-      * @param degrees
+      * Set the turtle's relative position
+      * @param position [x, y, z]
       */
      public void setPosition(int[] position){
          KCTCommand cmd=new KCTCommand(SETPOSITION, JSONUtil.makeArgMap(POS, position));
          script.addCommand(cmd);
      }
      /**
-      * Turn the turtle to the right the given number of degrees.
-      * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+      * Set the turtle's direction (int-based)
       * @param degrees
       */
      public void setDirection(int direction){
          KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction));
          script.addCommand(cmd);
      }
-    // TODO: Implement the other turtle commands!
 }
