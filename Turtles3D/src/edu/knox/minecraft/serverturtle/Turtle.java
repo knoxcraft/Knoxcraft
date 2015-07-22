@@ -1,5 +1,6 @@
 package edu.knox.minecraft.serverturtle;
 
+import java.util.Map;
 import java.util.Stack;
 
 import edu.knoxcraft.turtle3d.KCTCommand;
@@ -478,36 +479,80 @@ public class Turtle {
     private void executeCommand(KCTCommand c)  {
         // TODO: Execute the command
         // TODO: Handle all of the other commands
-
+        Map<String, Object> m = c.getArguments();
         String commandName = c.getCommandName();
 
         if (commandName.equals(KCTCommand.FORWARD)) {
             // check args; move turtle forward the appropriate distance
-          //TODO:  parse args for real distance
-            int dist = 1; //default
+            int dist;
+            if (!m.containsKey(KCTCommand.DIST)){ //TODO VERIFY!!!
+                dist = 1; //default
+            }else{
+                dist = (int)m.get(KCTCommand.DIST); //Magic hand wavey stuff
+            }
             turtleMove(dist);  
-        } else if (commandName.equals(KCTCommand.TURNRIGHT)) {
+        }  else if (commandName.equals(KCTCommand.BACKWARD)) {
+            // go backward
+            int dist;
+            if (!m.containsKey(KCTCommand.DIST)){ //TODO VERIFY!!!
+                dist = -1; //default
+            }else{
+                dist = -(int)m.get(KCTCommand.DIST); //Magic hand wavey stuff
+            }
+            turtleMove(dist); 
+        }else if (commandName.equals(KCTCommand.TURNRIGHT)) {
             // turn right
             //Parse for amount to turn
-            int ang = 90; //default
+            int ang;
+            if (!m.containsKey(KCTCommand.DEGREES)){ //TODO VERIFY!!!
+                ang = 90; //default
+            }else{
+                ang = (int)m.get(KCTCommand.DEGREES); //Magic hand wavey stuff
+            }
             turtleTurn(false, ang);
         } else if (commandName.equals(KCTCommand.TURNLEFT)) {
             // turn left
-            int ang = 90; //default
+            int ang;
+            if (!m.containsKey(KCTCommand.DEGREES)){ //TODO VERIFY!!!
+                ang = 90; //default
+            }else{
+                ang = (int)m.get(KCTCommand.DEGREES); //Magic hand wavey stuff
+            }
             //Parse for amount to turn
             turtleTurn(true, ang);
         } else if (commandName.equals(KCTCommand.PLACEBLOCKS)) {
             // place blocks on/off
+            turtleToggleBlockPlace();
         } else if (commandName.equals(KCTCommand.SETPOSITION)) {
             // set position
+            turtleSetRelPosition(0, 0, 0);
         } else if (commandName.equals(KCTCommand.UP)) {
             // go up
+            int dist;
+            if (!m.containsKey(KCTCommand.DIST)){ //TODO VERIFY!!!
+                dist = 1; //default
+            }else{
+                dist = (int)m.get(KCTCommand.DIST); //Magic hand wavey stuff
+            }
+            turtleUpDown(dist);
         } else if (commandName.equals(KCTCommand.DOWN)) {
             // go down
-        } else if (commandName.equals(KCTCommand.BACKWARD)) {
-            // go backward
+            int dist;
+            if (!m.containsKey(KCTCommand.DIST)){ //TODO VERIFY!!!
+                dist = -1; //default
+            }else{
+                dist = -(int)m.get(KCTCommand.DIST); //Magic hand wavey stuff
+            }
+            turtleUpDown(dist);
         } else if (commandName.equals(KCTCommand.SETBLOCK)) {
             // Set block type
+            int type;
+            if (!m.containsKey(KCTCommand.BLOCKTYPE)){ //TODO VERIFY!!!
+                type = 1; //default
+            }else{
+                type = (int)m.get(KCTCommand.BLOCKTYPE); //Magic hand wavey stuff
+            }
+            turtleSetBlockType(type);
         } else {
             // TODO: Handle an unknown command. Is Runtime Exception the correct exception?
             // Are there better ways to handle this?
