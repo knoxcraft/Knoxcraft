@@ -1,7 +1,8 @@
 package edu.knoxcraft.turtle3d;
 
 import static edu.knoxcraft.turtle3d.JSONUtil.quoteString;
-import static edu.knoxcraft.turtle3d.KCTCommand.*;
+import static edu.knoxcraft.turtle3d.KCTCommand.COMMANDSKEY;
+import static edu.knoxcraft.turtle3d.KCTCommand.SCRIPTNAMEKEY;
 
 import java.util.LinkedList;
 import java.util.List;

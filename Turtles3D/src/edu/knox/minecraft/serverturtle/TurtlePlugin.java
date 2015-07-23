@@ -10,10 +10,15 @@ import net.canarymod.chat.MessageReceiver;
 import net.canarymod.commandsys.Command;
 import net.canarymod.commandsys.CommandDependencyException;
 import net.canarymod.commandsys.CommandListener;
+import net.canarymod.database.Database;
+import net.canarymod.database.exceptions.DatabaseWriteException;
 import net.canarymod.hook.HookHandler;
 import net.canarymod.logger.Logman;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
+
+import org.knoxcraft.database.KCTScriptAccess;
+
 import edu.knoxcraft.hooks.KCTUploadHook;
 import edu.knoxcraft.http.server.HttpUploadServer;
 import edu.knoxcraft.turtle3d.KCTScript;
@@ -76,6 +81,19 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         Collection<KCTScript> list = hook.getScripts();
         for (KCTScript script : list)  {
             scripts.putScript(hook.getPlayerName(), script);
+            
+            // This will create the table if it doesn't exist
+            // and then insert data for the script into a new row
+            KCTScriptAccess data=new KCTScriptAccess();
+            data.json=script.toJSONString();
+            data.source=script.getSourceCode();
+            data.playerName=hook.getPlayerName();
+            data.language=script.getLanguage();
+            try {
+                Database.get().insert(data);
+            } catch (DatabaseWriteException e) {
+                logger.error(e);
+            }
         }
     }  
 
