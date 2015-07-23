@@ -1,6 +1,7 @@
 /bin/
 .settings
 target
+plugins
 lib/*
 build.properties
 # ignoring minecraft files in case someone runs the server from inside the git repo
