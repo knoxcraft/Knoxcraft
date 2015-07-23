@@ -28,7 +28,7 @@ public class KCTUploadHook extends Hook implements Iterable<KCTScript>
         return playerName;
     }
     public void setPlayerName(String playerName) {
-        this.playerName = playerName;
+        this.playerName = playerName.toLowerCase();
     }
     public Collection<KCTScript> getScripts() {
         return this.turtleScripts;

@@ -1,24 +1,17 @@
 package edu.knoxcraft.turtle3d;
 
-import static edu.knoxcraft.turtle3d.KCTCommand.DEGREES;
-import static edu.knoxcraft.turtle3d.KCTCommand.DIST;
-import static edu.knoxcraft.turtle3d.KCTCommand.FORWARD;
-import static edu.knoxcraft.turtle3d.KCTCommand.TURNLEFT;
-import static edu.knoxcraft.turtle3d.KCTCommand.TURNRIGHT;
+import static edu.knoxcraft.turtle3d.KCTCommand.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * @deprecated This class is not finished!
- * 
- * TODO: Finish this class, and add httpserver support for it
- * 
- * @author jspacco
+ * @author ppypp emhastings hahaha
  *
  */
 public class Turtle3D
 {
+    
     /* Sample JSON commands:
     {
    "scriptname" : "script-test",
@@ -60,8 +53,6 @@ public class Turtle3D
         script=new KCTScript(scriptName);
     }
     
-
-    
     /**
      * No need for students to call this method.
      * @return
@@ -85,10 +76,17 @@ public class Turtle3D
         KCTCommand cmd=new KCTCommand(FORWARD, JSONUtil.makeArgMap(DIST, distance));
         script.addCommand(cmd);
     }
-    
+    /**
+     * Move the turtle backward the given distance.
+     * @param distance
+     */
+    public void backward(int distance) {
+        KCTCommand cmd=new KCTCommand(BACKWARD, JSONUtil.makeArgMap(DIST, distance));
+        script.addCommand(cmd);
+    }
     /**
      * Turn the turtle to the right the given number of degrees.
-     * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+     * (Rounds to multiples of 45 deg)
      * @param degrees
      */
     public void turnRight(int degrees){
@@ -98,12 +96,58 @@ public class Turtle3D
     
     /**
      * Turn the turtle to the left the given number of degrees.
-     * TODO: Can we handle values that aren't multiples of 45? -> NO must be 45 (or round to them)
+     * (Rounds to multiples of 45 deg)
      * @param degrees
      */public void turnLeft(int degrees){
         KCTCommand cmd=new KCTCommand(TURNLEFT, JSONUtil.makeArgMap(DEGREES, degrees));
         script.addCommand(cmd);
     }
     
-    // TODO: Implement the other turtle commands!
+     /**
+      * Move the turtle up the given distance.
+      * @param degrees
+      */
+     public void up(int distance){
+         KCTCommand cmd=new KCTCommand(UP, JSONUtil.makeArgMap(DIST, distance));
+         script.addCommand(cmd);
+     }
+     /**
+      * Move the turtle down the given distance.
+      * @param degrees
+      */
+     public void down(int distance){
+         KCTCommand cmd=new KCTCommand(DOWN, JSONUtil.makeArgMap(DIST, distance));
+         script.addCommand(cmd);
+     }
+     /**
+      * Toggle turtle block placement mode
+      */
+     public void blockPlace(){
+         KCTCommand cmd=new KCTCommand(PLACEBLOCKS);
+         script.addCommand(cmd);
+     }
+     /**
+      * Set turtle block type (int-based)
+      * @param type
+      */
+     public void setBlock(int type){
+         KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type));
+         script.addCommand(cmd);
+     }
+     /**
+      * Set the turtle's relative position
+      * @param position [x, y, z]
+      */
+     public void setPosition(int[] position){
+         KCTCommand cmd=new KCTCommand(SETPOSITION, JSONUtil.makeArgMap(POS, position));
+         script.addCommand(cmd);
+     }
+     /**
+      * Set the turtle's direction (int-based)
+      * @param degrees
+      */
+     public void setDirection(int direction){
+         KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction));
+         script.addCommand(cmd);
+     }
 }
