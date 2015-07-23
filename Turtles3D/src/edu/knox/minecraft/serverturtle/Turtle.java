@@ -550,12 +550,21 @@ public class Turtle {
         } else if (commandName.equals(KCTCommand.SETBLOCK)) {
             // Set block type
             int type;
-            if (!m.containsKey(KCTCommand.BLOCKTYPE)){ //TODO VERIFY!!!
+            String strType = "";
+            if (!m.containsKey(KCTCommand.BLOCKTYPE)){ //Default
                 type = 1; //default is Stone
+                turtleSetBlockType(type);
             }else{
-                type = (int)m.get(KCTCommand.BLOCKTYPE); //Magic hand wavey stuff
+                Object o = m.get(KCTCommand.BLOCKTYPE);
+                if (o instanceof String) {//STR vs INT
+                    strType = (String)o;
+                    turtleSetBlockType(strType);
+                } else{ // Otherwise its an int
+                    type = (int)o; //Magic hand wavey stuff
+                    turtleSetBlockType(type);
+                }
             }
-            turtleSetBlockType(type);
+            
         } else {
             // TODO: Handle an unknown command. Is Runtime Exception the correct exception?
             // Are there better ways to handle this?
