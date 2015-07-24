@@ -222,7 +222,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                 logger.trace("Upload from web");
                                 // must have both Json and source, either in text area or as uploaded files
                                 if (sourceText!=null && jsonText!=null) {
-                                    KCTScript script=TurtleCompiler.parseFromJson(jsonText);
+                                    KCTScript script=turtleCompiler.parseFromJson(jsonText);
                                     script.setLanguage(language);
                                     script.setSourceCode(sourceText);
                                     res.append(String.format("Successfully uploaded KnoxCraft Turtle program "
@@ -233,7 +233,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                 } else if (files.containsKey("jsonfile") && files.containsKey("sourcefile")) {
                                     UploadedFile sourceUpload=files.get("sourcefile");
                                     UploadedFile jsonUpload=files.get("jsonfile");
-                                    KCTScript script=TurtleCompiler.parseFromJson(jsonUpload.body);
+                                    KCTScript script=turtleCompiler.parseFromJson(jsonUpload.body);
                                     script.setLanguage(language);
                                     script.setSourceCode(sourceUpload.body);
                                     res.append(String.format("Successfully uploaded KnoxCraft Turtle program "

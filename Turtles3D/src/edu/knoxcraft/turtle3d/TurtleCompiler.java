@@ -58,7 +58,7 @@ public class TurtleCompiler
      * @return
      * @throws TurtleException If there are any errors in the json
      */
-    public static KCTScript parseFromJson(String jsonText)
+    public KCTScript parseFromJson(String jsonText)
     throws TurtleException
     {
         JSONParser parser=new JSONParser();
