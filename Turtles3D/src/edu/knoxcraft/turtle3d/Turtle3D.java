@@ -60,6 +60,7 @@ public class Turtle3D
     public String getScriptName() {
         return this.scriptName;
     }
+    
     /**
      * No need for students to call this method.
      * @return
@@ -76,6 +77,7 @@ public class Turtle3D
         KCTCommand cmd=new KCTCommand(FORWARD, JSONUtil.makeArgMap(DIST, distance));
         script.addCommand(cmd);
     }
+    
     /**
      * Move the turtle backward the given distance.
      * @param distance
@@ -84,6 +86,7 @@ public class Turtle3D
         KCTCommand cmd=new KCTCommand(BACKWARD, JSONUtil.makeArgMap(DIST, distance));
         script.addCommand(cmd);
     }
+    
     /**
      * Turn the turtle to the right the given number of degrees.
      * (Rounds to multiples of 45 deg)
@@ -111,6 +114,7 @@ public class Turtle3D
          KCTCommand cmd=new KCTCommand(UP, JSONUtil.makeArgMap(DIST, distance));
          script.addCommand(cmd);
      }
+     
      /**
       * Move the turtle down the given distance.
       * @param degrees
@@ -119,13 +123,16 @@ public class Turtle3D
          KCTCommand cmd=new KCTCommand(DOWN, JSONUtil.makeArgMap(DIST, distance));
          script.addCommand(cmd);
      }
+     
      /**
-      * Toggle turtle block placement mode
+      * Set turtle block placement mode
+      * @param mode
       */
-     public void blockPlace(){
-         KCTCommand cmd=new KCTCommand(PLACEBLOCKS);
+     public void setBlockPlace(boolean mode){
+         KCTCommand cmd=new KCTCommand(PLACEBLOCKS, JSONUtil.makeArgMap(BLOCKPLACEMODE, mode));
          script.addCommand(cmd);
      }
+     
      /**
       * Set turtle block type (int-based)
       * @param type
@@ -134,6 +141,16 @@ public class Turtle3D
          KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type));
          script.addCommand(cmd);
      }
+     
+     /**
+      * Set turtle block type (string-based)
+      * @param type
+      */
+     public void setBlock(String type){
+         KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type));
+         script.addCommand(cmd);
+     }
+     
      /**
       * Set the turtle's relative position
       * @param position [x, y, z]
@@ -142,6 +159,7 @@ public class Turtle3D
          KCTCommand cmd=new KCTCommand(SETPOSITION, JSONUtil.makeArgMap(POS, position));
          script.addCommand(cmd);
      }
+     
      /**
       * Set the turtle's direction (int-based)
       * @param degrees

@@ -2,9 +2,6 @@ package edu.knoxcraft.turtle3d;
 
 import static edu.knoxcraft.turtle3d.KCTCommand.*;
 
-
-//TODO:  fix comments
-
 public abstract class Turtle3DBase
 {
     private KCTScript script;
@@ -19,6 +16,7 @@ public abstract class Turtle3DBase
     public void setTurtleName(String name) {
         script=new KCTScript(name);
     }
+    
     public String getTurtleName() {
         return script.getScriptName();
     }
@@ -38,8 +36,7 @@ public abstract class Turtle3DBase
             // currently this just exists to prevent a NPE
             throw new RuntimeException("You must name your turtle");
         }
-    }
-    
+    }    
   
     /**
      * Move the turtle forward the given distance.
@@ -50,8 +47,9 @@ public abstract class Turtle3DBase
         KCTCommand cmd=new KCTCommand(FORWARD, JSONUtil.makeArgMap(DIST, distance));
         script.addCommand(cmd);
     }
+    
     /**
-     * Move the turtle forward the given distance.
+     * Move the turtle backward the given distance.
      * @param distance
      */
     public void backward(int distance) {
@@ -59,8 +57,9 @@ public abstract class Turtle3DBase
         KCTCommand cmd=new KCTCommand(BACKWARD, JSONUtil.makeArgMap(DIST, distance));
         script.addCommand(cmd);
     }
+    
     /**
-     * Turn Right 
+     * Turn Right the specified number of degrees (must be multiples of 45)
      * @param degrees
      */
     public void turnRight(int degrees){
@@ -70,7 +69,7 @@ public abstract class Turtle3DBase
     }
     
     /**
-     * 
+     * Turn left the specified number of degrees (must be multiples of 45)
      * @param degrees
      */
     public void turnLeft(int degrees){
@@ -80,7 +79,7 @@ public abstract class Turtle3DBase
     }
     
      /**
-      * 
+      * Move the turtle up the specified distance
       * @param distance
       */
      public void up(int distance){
@@ -88,8 +87,9 @@ public abstract class Turtle3DBase
          KCTCommand cmd=new KCTCommand(UP, JSONUtil.makeArgMap(DIST, distance));
          script.addCommand(cmd);
      }
+     
      /**
-      * 
+      * Move the turtle down the specified distance
       * @param distance
       */
      public void down(int distance){
@@ -97,16 +97,18 @@ public abstract class Turtle3DBase
          KCTCommand cmd=new KCTCommand(DOWN, JSONUtil.makeArgMap(DIST, distance));
          script.addCommand(cmd);
      }
+     
      /**
-      * Toggle turtle block place mode
+      * Set turtle block place mode
       */
-     public void blockPlace(){
+     public void setBlockPlace(boolean mode){
          checkTurtle();
-         KCTCommand cmd=new KCTCommand(PLACEBLOCKS);
+         KCTCommand cmd=new KCTCommand(PLACEBLOCKS, JSONUtil.makeArgMap(BLOCKPLACEMODE, mode));
          script.addCommand(cmd);
      }
+     
      /**
-      * int input
+      * Set block type-- int input
       * @param type
       */
      public void setBlock(int type){
@@ -114,8 +116,9 @@ public abstract class Turtle3DBase
          KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type));
          script.addCommand(cmd);
      }
+     
      /**
-      * String input
+      * Set block type-- String input
       * @param type
       */
      public void setBlock(String type){
@@ -123,8 +126,9 @@ public abstract class Turtle3DBase
          KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type));
          script.addCommand(cmd);
      }
+     
      /**
-      * 
+      * Set turtle's relative position
       * @param position
       */
      public void setPosition(int[] position){
@@ -132,8 +136,9 @@ public abstract class Turtle3DBase
          KCTCommand cmd=new KCTCommand(SETPOSITION, JSONUtil.makeArgMap(POS, position));
          script.addCommand(cmd);
      }
+     
      /**
-      * 
+      * Set turtle's direction
       * @param direction
       */
      public void setDirection(int direction){
@@ -141,5 +146,4 @@ public abstract class Turtle3DBase
          KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction));
          script.addCommand(cmd);
      }
-    // TODO: Other methods in the API
 }

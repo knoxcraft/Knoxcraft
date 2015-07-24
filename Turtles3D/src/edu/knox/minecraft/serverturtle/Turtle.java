@@ -74,14 +74,14 @@ public class Turtle {
     }  
 
     /**
-     * Toggle block placement mode on/off.
+     * Turn block placement mode on/off.
      * 
      * @param sender
      * @param args
      */
-    public void turtleToggleBlockPlace()
+    public void turtleSetBlockPlace(boolean mode)
     {
-        bp = !bp;
+        bp = mode;
         turtleBlockPlaceStatus();  //alert user about change
     }
 
@@ -489,14 +489,15 @@ public class Turtle {
         String commandName = c.getCommandName();
 
         if (commandName.equals(KCTCommand.FORWARD)) {
-            // check args; move turtle forward the appropriate distance
+            // go forward
             int dist;
             if (!m.containsKey(KCTCommand.DIST)){ //TODO VERIFY!!!
                 dist = 1; //default
             }else{
                 dist = toInt(m.get(KCTCommand.DIST));
             }
-            turtleMove(dist);  
+            turtleMove(dist); 
+            
         }  else if (commandName.equals(KCTCommand.BACKWARD)) {
             // go backward
             int dist;
@@ -506,6 +507,7 @@ public class Turtle {
                 dist = -toInt(m.get(KCTCommand.DIST));
             }
             turtleMove(dist); 
+            
         }else if (commandName.equals(KCTCommand.TURNRIGHT)) {
             // turn right
             //Parse for amount to turn
@@ -516,6 +518,7 @@ public class Turtle {
                 ang = toInt(m.get(KCTCommand.DEGREES));
             }
             turtleTurn(false, ang);
+            
         } else if (commandName.equals(KCTCommand.TURNLEFT)) {
             // turn left
             int ang;
@@ -526,12 +529,19 @@ public class Turtle {
             }
             //Parse for amount to turn
             turtleTurn(true, ang);
+            
         } else if (commandName.equals(KCTCommand.PLACEBLOCKS)) {
-            // place blocks on/off
-            turtleToggleBlockPlace();
+            // place blocks on/off 
+            //only changes mode if arg map contains valid arg
+            if (m.containsKey(KCTCommand.BLOCKPLACEMODE)){ //TODO VERIFY!!!
+                boolean mode = (boolean)m.get(KCTCommand.BLOCKPLACEMODE);  //TODO:  does this work?
+                turtleSetBlockPlace(mode);
+            }
+            
         } else if (commandName.equals(KCTCommand.SETPOSITION)) {
             // TODO set position
             turtleSetRelPosition(0, 0, 0);
+            
         } else if (commandName.equals(KCTCommand.UP)) {
             // go up
             int dist;
@@ -541,6 +551,7 @@ public class Turtle {
                 dist = toInt(m.get(KCTCommand.DIST)); //Magic hand wavey stuff)
             }
             turtleUpDown(dist);
+            
         } else if (commandName.equals(KCTCommand.DOWN)) {
             // go down
             int dist;
@@ -550,6 +561,7 @@ public class Turtle {
                 dist = -toInt(m.get(KCTCommand.DIST)); //Magic hand wavey stuff)
             }
             turtleUpDown(dist);
+            
         } else if (commandName.equals(KCTCommand.SETBLOCK)) {
             // Set block type
             int type;

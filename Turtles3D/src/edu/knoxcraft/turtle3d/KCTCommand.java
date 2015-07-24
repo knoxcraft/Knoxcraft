@@ -46,6 +46,7 @@ public class KCTCommand
     public static final String COMMANDSKEY = "\"commands\"";
 
     public static final String PLACEBLOCKS = "placeBlocks";
+    public static final String BLOCKPLACEMODE = "blockPlaceMode";
     public static final String SETDIRECTION = "setDirection";
     public static final String SETPOSITION = "setPosition";
     public static final String SETBLOCK = "setBlock";
