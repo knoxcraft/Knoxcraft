@@ -28,6 +28,7 @@
 				<include name="**/Turtle3DBase.class"/>
 				<include name="**/KCTCommand.class"/>
 				<include name="**/KCTScript.class"/>
+				<include name="**/JSONUtil.class"/>
 			</fileset>
 		</jar>
 	</target>
