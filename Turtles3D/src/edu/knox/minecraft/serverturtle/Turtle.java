@@ -476,6 +476,10 @@ public class Turtle {
         return d;
     }
 
+    private static int toInt(Object o) {
+        return (int)((Long)o).longValue();
+    }
+    
     /*
      * Execute a KCTCommand.
      */
@@ -490,7 +494,7 @@ public class Turtle {
             if (!m.containsKey(KCTCommand.DIST)){ //TODO VERIFY!!!
                 dist = 1; //default
             }else{
-                dist = (int)m.get(KCTCommand.DIST); //Magic hand wavey stuff
+                dist = toInt(m.get(KCTCommand.DIST));
             }
             turtleMove(dist);  
         }  else if (commandName.equals(KCTCommand.BACKWARD)) {
@@ -499,7 +503,7 @@ public class Turtle {
             if (!m.containsKey(KCTCommand.DIST)){ //TODO VERIFY!!!
                 dist = -1; //default
             }else{
-                dist = -(int)m.get(KCTCommand.DIST); //Magic hand wavey stuff
+                dist = -toInt(m.get(KCTCommand.DIST));
             }
             turtleMove(dist); 
         }else if (commandName.equals(KCTCommand.TURNRIGHT)) {
@@ -509,7 +513,7 @@ public class Turtle {
             if (!m.containsKey(KCTCommand.DEGREES)){ //TODO VERIFY!!!
                 ang = 90; //default
             }else{
-                ang = (int)m.get(KCTCommand.DEGREES); //Magic hand wavey stuff
+                ang = toInt(m.get(KCTCommand.DEGREES));
             }
             turtleTurn(false, ang);
         } else if (commandName.equals(KCTCommand.TURNLEFT)) {
@@ -518,7 +522,7 @@ public class Turtle {
             if (!m.containsKey(KCTCommand.DEGREES)){ //TODO VERIFY!!!
                 ang = 90; //default
             }else{
-                ang = (int)m.get(KCTCommand.DEGREES); //Magic hand wavey stuff
+                ang = toInt(m.get(KCTCommand.DEGREES)); //Magic hand wavey stuff
             }
             //Parse for amount to turn
             turtleTurn(true, ang);
@@ -526,7 +530,7 @@ public class Turtle {
             // place blocks on/off
             turtleToggleBlockPlace();
         } else if (commandName.equals(KCTCommand.SETPOSITION)) {
-            // set position
+            // TODO set position
             turtleSetRelPosition(0, 0, 0);
         } else if (commandName.equals(KCTCommand.UP)) {
             // go up
@@ -534,7 +538,7 @@ public class Turtle {
             if (!m.containsKey(KCTCommand.DIST)){ //TODO VERIFY!!!
                 dist = 1; //default
             }else{
-                dist = (int)m.get(KCTCommand.DIST); //Magic hand wavey stuff
+                dist = toInt(m.get(KCTCommand.DIST)); //Magic hand wavey stuff)
             }
             turtleUpDown(dist);
         } else if (commandName.equals(KCTCommand.DOWN)) {
@@ -543,7 +547,7 @@ public class Turtle {
             if (!m.containsKey(KCTCommand.DIST)){ //TODO VERIFY!!!
                 dist = -1; //default
             }else{
-                dist = -(int)m.get(KCTCommand.DIST); //Magic hand wavey stuff
+                dist = -toInt(m.get(KCTCommand.DIST)); //Magic hand wavey stuff)
             }
             turtleUpDown(dist);
         } else if (commandName.equals(KCTCommand.SETBLOCK)) {
@@ -559,7 +563,7 @@ public class Turtle {
                     strType = (String)o;
                     turtleSetBlockType(strType);
                 } else{ // Otherwise its an int
-                    type = (int)o; //Magic hand wavey stuff
+                    type = toInt(o);
                     turtleSetBlockType(type);
                 }
             }

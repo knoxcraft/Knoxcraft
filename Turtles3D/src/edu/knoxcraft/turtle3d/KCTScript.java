@@ -27,10 +27,6 @@ public class KCTScript
        ]
    }
    */
-    static {
-        logger=TurtleTester.logger;
-    }
-    public static Logman logger;
     private String scriptName;
     private List<KCTCommand> commands;
     // TODO: Add support for turtle scripts that store the source code that generated the list of commands
