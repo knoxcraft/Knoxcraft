@@ -1,28 +1,18 @@
 package org.knoxcraft.database;
 
 import net.canarymod.database.Column;
-import net.canarymod.database.Column.ColumnType;
 import net.canarymod.database.Column.DataType;
 import net.canarymod.database.DataAccess;
 
 public class KCTScriptAccess extends DataAccess
 {
-    // XXX shoudl we read KCTSCRIPT_TABLE_NAME out of a configuration file?
+    // XXX should we read KCTSCRIPT_TABLE_NAME out of a configuration file?
     public static final String KCTSCRIPT_TABLE_NAME="kctscript";
-    
-    // TODO Can we also load schema from XML file?
     
     public KCTScriptAccess() {
         super(KCTSCRIPT_TABLE_NAME);
         timestamp=System.currentTimeMillis();
     }
-
-    @Column(columnName="id",
-            dataType=DataType.INTEGER,
-            columnType=ColumnType.PRIMARY,
-            autoIncrement=true, 
-            notNull=true)
-    public int id;
 
     @Column(columnName="playerName",
             dataType=DataType.STRING,
@@ -45,6 +35,10 @@ public class KCTScriptAccess extends DataAccess
     @Column(columnName="timestamp",
             dataType=DataType.LONG)
     public Long timestamp;
+    
+    @Column(columnName="scriptName",
+            dataType=DataType.STRING)
+    public String scriptName;
     
     @Override
     public DataAccess getInstance() {

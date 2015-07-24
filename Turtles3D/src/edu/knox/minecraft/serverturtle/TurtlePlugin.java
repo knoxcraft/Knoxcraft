@@ -2,26 +2,31 @@ package edu.knox.minecraft.serverturtle;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Stack;
-
-import net.canarymod.Canary;
-import net.canarymod.chat.MessageReceiver;
-import net.canarymod.commandsys.Command;
-import net.canarymod.commandsys.CommandDependencyException;
-import net.canarymod.commandsys.CommandListener;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseWriteException;
-import net.canarymod.hook.HookHandler;
-import net.canarymod.logger.Logman;
-import net.canarymod.plugin.Plugin;
-import net.canarymod.plugin.PluginListener;
 
 import org.knoxcraft.database.KCTScriptAccess;
 
 import edu.knoxcraft.hooks.KCTUploadHook;
 import edu.knoxcraft.http.server.HttpUploadServer;
 import edu.knoxcraft.turtle3d.KCTScript;
+import edu.knoxcraft.turtle3d.TurtleCompiler;
+import edu.knoxcraft.turtle3d.TurtleException;
+import net.canarymod.Canary;
+import net.canarymod.chat.MessageReceiver;
+import net.canarymod.commandsys.Command;
+import net.canarymod.commandsys.CommandListener;
+import net.canarymod.database.DataAccess;
+import net.canarymod.database.Database;
+import net.canarymod.database.exceptions.DatabaseReadException;
+import net.canarymod.database.exceptions.DatabaseWriteException;
+import net.canarymod.hook.HookHandler;
+import net.canarymod.logger.Logman;
+import net.canarymod.plugin.Plugin;
+import net.canarymod.plugin.PluginListener;
 
 public class TurtlePlugin extends Plugin implements CommandListener, PluginListener {
 
@@ -64,10 +69,63 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             getLogman().info("Enabling "+getName() + " Version " + getVersion()); 
             getLogman().info("Authored by "+getAuthor());
             Canary.commands().registerCommands(this, this, false);
+            
+            lookupFromDB();
+            
             return true;
-        } catch (CommandDependencyException e){
-            logger.error(e);
-            throw new RuntimeException(e);
+        } catch (Exception e){
+            if (httpServer!=null) {
+                httpServer.disable();
+            }
+            logger.error("Cannot initialize TurtlePlugin", e);
+            return false;
+        }
+    }
+    
+    /**
+     * Load the latest version of each script from the DB for each player on this world
+     * TODO Check how Canary handles worlds; do we have only one XML file of scripts
+     * for worlds and shoudl we include the world name or world ID with the script?
+     */
+    private void lookupFromDB() {
+        KCTScriptAccess data=new KCTScriptAccess();
+        List<DataAccess> results=new LinkedList<DataAccess>();
+        Map<String,KCTScriptAccess> mostRecentScripts=new HashMap<String,KCTScriptAccess>();
+        
+        try {
+            Map<String,Object> filters=new HashMap<String,Object>();
+            Database.get().loadAll(data, results, filters);
+            for (DataAccess d : results) {
+                KCTScriptAccess scriptAccess=(KCTScriptAccess)d;
+                // Figure out the most recent script for each player-scriptname combo
+                String key=scriptAccess.playerName+"-"+scriptAccess.scriptName;
+                if (!mostRecentScripts.containsKey(key)) {
+                    mostRecentScripts.put(key, scriptAccess);
+                } else {
+                    if (scriptAccess.timestamp > mostRecentScripts.get(key).timestamp) {
+                        mostRecentScripts.put(key,scriptAccess);
+                    }
+                }
+                logger.trace(String.format("from DB: player %s has script %s at time %d%n", 
+                        scriptAccess.playerName, scriptAccess.scriptName, scriptAccess.timestamp));
+            }
+            TurtleCompiler turtleCompiler=new TurtleCompiler(logger);
+            for (KCTScriptAccess scriptAccess : mostRecentScripts.values()) {
+                try {
+                    KCTScript script=turtleCompiler.parseFromJson(scriptAccess.json);
+                    script.setLanguage(scriptAccess.language);
+                    script.setScriptName(scriptAccess.scriptName);
+                    script.setSourceCode(scriptAccess.source);
+                    
+                    scripts.putScript(scriptAccess.playerName, script);
+                    logger.info(String.format("Loaded script %s for player %s", 
+                            scriptAccess.scriptName, scriptAccess.playerName));
+                } catch (TurtleException e){
+                    logger.error("Internal Server error", e);
+                }
+            }
+        } catch (DatabaseReadException e) {
+            logger.error("cannot read DB", e);
         }
     }
 
@@ -88,6 +146,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             data.json=script.toJSONString();
             data.source=script.getSourceCode();
             data.playerName=hook.getPlayerName();
+            data.scriptName=script.getScriptName();
             data.language=script.getLanguage();
             try {
                 Database.get().insert(data);

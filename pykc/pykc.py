@@ -41,6 +41,7 @@ class Turtle:
 	# TODO: Other turtle methods!
 
 	def toJson(self):
+		# future work: use the actual Python json library instead of rewriting it...
 		cmdList=[]
 		for cmd in self.commands:
 			cmdList.append(str(cmd))
@@ -55,6 +56,7 @@ class Turtle:
 		conn = http.client.HTTPConnection(url)
 		json = self.toJson()
 		params = {'jsontext': json, 
+			# TODO: upload source
 			'sourcetext': 'TODO: source text', 
 			'language': 'python', 
 			'playerName' : minecraftName, 

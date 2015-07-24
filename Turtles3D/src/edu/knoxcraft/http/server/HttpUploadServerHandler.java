@@ -53,9 +53,10 @@ import java.util.Map.Entry;
 import net.canarymod.Canary;
 import net.canarymod.logger.Logman;
 import edu.knoxcraft.hooks.KCTUploadHook;
-import edu.knoxcraft.turtle3d.InvalidTurtleCodeException;
+import edu.knoxcraft.turtle3d.TurtleException;
 import edu.knoxcraft.turtle3d.KCTScript;
 import edu.knoxcraft.turtle3d.TurtleCompiler;
+import edu.knoxcraft.turtle3d.TurtleCompilerException;
 
 /**
  * Based on: https://netty.io/4.0/xref/io/netty/example/http/upload/package-summary.html
@@ -200,11 +201,11 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                             if (playerName==null || playerName.equals("")) {
                                 // XXX How do we know that the playerName is valid?
                                 // TODO: authenticate against Mojang's server?
-                                throw new InvalidTurtleCodeException("You must specify your MineCraft player name!");
+                                throw new TurtleException("You must specify your MineCraft player name!");
                             }
                             
                             if (client==null) {
-                                throw new InvalidTurtleCodeException("Your uploading and submission system must specify "
+                                throw new TurtleException("Your uploading and submission system must specify "
                                         + "the type of client used for the upload (i.e. bluej, web, pykc, etc)");
                             }
 
@@ -221,7 +222,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                 logger.trace("Upload from web");
                                 // must have both Json and source, either in text area or as uploaded files
                                 if (sourceText!=null && jsonText!=null) {
-                                    KCTScript script=TurtleCompiler.parseFromJson(jsonText);
+                                    KCTScript script=turtleCompiler.parseFromJson(jsonText);
                                     script.setLanguage(language);
                                     script.setSourceCode(sourceText);
                                     res.append(String.format("Successfully uploaded KnoxCraft Turtle program "
@@ -232,7 +233,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                 } else if (files.containsKey("jsonfile") && files.containsKey("sourcefile")) {
                                     UploadedFile sourceUpload=files.get("sourcefile");
                                     UploadedFile jsonUpload=files.get("jsonfile");
-                                    KCTScript script=TurtleCompiler.parseFromJson(jsonUpload.body);
+                                    KCTScript script=turtleCompiler.parseFromJson(jsonUpload.body);
                                     script.setLanguage(language);
                                     script.setSourceCode(sourceUpload.body);
                                     res.append(String.format("Successfully uploaded KnoxCraft Turtle program "
@@ -241,25 +242,31 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                     success++;
                                     hook.addScript(script);
                                 } else {
-                                    throw new InvalidTurtleCodeException("You must upload BOTH json and the corresponding source code "
+                                    throw new TurtleException("You must upload BOTH json and the corresponding source code "
                                             + " (either as files or pasted into the text areas)");
                                 }
                             } else if ("bluej".equalsIgnoreCase(client)) {
                                 logger.trace("Upload from bluej");
                                 for (Entry<String,UploadedFile> entry : files.entrySet()) {
-                                    // TODO: compile one file at a time
                                     try {
                                         UploadedFile uploadedFile=entry.getValue();
-                                        logger.trace(String.format("Processing uploaded file named %s", uploadedFile.filename));
+                                        res.append(String.format("Trying to upload and compile file %s\n", uploadedFile.filename));
+                                        logger.trace(String.format("Trying to upload and compile file %s\n", uploadedFile.filename));
                                         KCTScript script=turtleCompiler.compileJavaTurtleCode(uploadedFile.filename, uploadedFile.body);
                                         logger.trace("Returned KCTScript (it's JSON is): "+script.toJSONString());
                                         hook.addScript(script);
-                                        res.append(String.format("Successfully uploaded KnoxCraft Turtle program "
-                                                + "named %s, in programming language %s\n", 
-                                                script.getScriptName(), script.getLanguage()));
+                                        res.append(String.format("Successfully uploaded file %s and compiled KnoxCraft Turtle program "
+                                                + "named %s in programming language %s\n\n", 
+                                                uploadedFile.filename, script.getScriptName(), script.getLanguage()));
                                         success++;
+                                    } catch (TurtleCompilerException e) {
+                                        logger.warn("Unable to compile Turtle code",e);
+                                        res.append(String.format("%s\n\n", e.getMessage()));
+                                    } catch (TurtleException e) {
+                                        logger.error("Error in compiling (possibly a server side error)", e);
+                                        res.append(String.format("Unable to process Turtle code %s", e.getMessage()));
                                     } catch (Exception e) {
-                                        logger.error("Unable to upload and compile KCT script", e);
+                                        logger.error("Unexpected error compiling Turtle code to KCTScript", e);
                                         failure++;
                                         res.append(String.format("Failed to load script %s\n", entry.getKey()));
                                     }
@@ -278,7 +285,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                             writeResponse(ctx.channel(), fullRequest, res.toString(), client);
 
                             
-                        } catch (InvalidTurtleCodeException e) {
+                        } catch (TurtleException e) {
                             // TODO: Convert exception into clearer error message to send back to client
                             writeResponse(ctx.channel(), fullRequest, e.getMessage(), "error");
                         }

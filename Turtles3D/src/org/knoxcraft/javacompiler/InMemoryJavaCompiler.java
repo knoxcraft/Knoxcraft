@@ -52,6 +52,9 @@ public class InMemoryJavaCompiler
 	 */
 	public InMemoryJavaCompiler() {
 		compiler = ToolProvider.getSystemJavaCompiler();
+		if (compiler==null) {
+		    throw new IllegalStateException("No ToolProvider.getSystemJavaCompiler() available!");
+		}
 		fm = new MemoryFileManager(compiler.getStandardFileManager(null, null, null));
 		sources = new ArrayList<JavaFileObject>();
 	}

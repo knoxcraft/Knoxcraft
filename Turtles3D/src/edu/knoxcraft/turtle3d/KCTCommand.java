@@ -77,9 +77,11 @@ public class KCTCommand
         this.commandName=(String)cmd.get(CMD);
         this.arguments=new HashMap<String, Object>();
         JSONObject args=(JSONObject)cmd.get(ARGS);
-        for (Object o : args.keySet()) {
-            String s=(String)o;
-            this.arguments.put(s, args.get(s));
+        if (args!=null){
+            for (Object o : args.keySet()) {
+                String s=(String)o;
+                this.arguments.put(s, args.get(s));
+            }
         }
     }
     

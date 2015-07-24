@@ -7,11 +7,7 @@ import static edu.knoxcraft.turtle3d.KCTCommand.SCRIPTNAMEKEY;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.canarymod.logger.Logman;
-
 import org.json.simple.JSONObject;
-
-import edu.knox.minecraft.serverturtle.TurtleTester;
 
 
 public class KCTScript
@@ -27,10 +23,6 @@ public class KCTScript
        ]
    }
    */
-    static {
-        logger=TurtleTester.logger;
-    }
-    public static Logman logger;
     private String scriptName;
     private List<KCTCommand> commands;
     // TODO: Add support for turtle scripts that store the source code that generated the list of commands

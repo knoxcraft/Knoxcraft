@@ -11,6 +11,11 @@ public abstract class Turtle3DBase
     
     public abstract void run();
     
+    public void checkCode() {
+        run();
+        System.out.println("No runtime errors in the code detected.");
+    }
+    
     public void setTurtleName(String name) {
         script=new KCTScript(name);
     }
