@@ -34,7 +34,7 @@
 	</target>
 	<target name="install-kct-java" depends="kct-java-api">
 		<mkdir dir="${kct.java.install.location}"/>
-		<copy file="${dest}/kct-java.jar" tofile="${kct.java.install.location}/kct-java.jar"/>
+		<copy file="${dest}/kct-java.jar" tofile="${kct.java.install.location}/kct-java.jar" overwrite="true"/>
 	</target>
 
     <target name="build" depends="turtles3d" description="description"/>
@@ -46,5 +46,7 @@
 	<target name="install" depends="build">
 		<copy file="${dest}/Turtles3D.jar" todir="${install.location}"/>
 	</target>
+	
+	<target name="install-all" depends="install, install-kct-java"/>
 
 </project> 

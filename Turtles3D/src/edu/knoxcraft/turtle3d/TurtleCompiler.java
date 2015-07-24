@@ -36,10 +36,10 @@ public class TurtleCompiler
      * @param filename
      * @param javaSource
      * @return
-     * @throws InvalidTurtleCodeException
+     * @throws TurtleException
      */
     public KCTScript compileJavaTurtleCode(String filename, String javaSource)
-    throws InvalidTurtleCodeException
+    throws TurtleException
     {
         String className=filename.replace(".java", "");
         String json=getJSONTurtle3DBase(className, javaSource);
@@ -56,10 +56,10 @@ public class TurtleCompiler
      * 
      * @param jsonText
      * @return
-     * @throws InvalidTurtleCodeException If there are any errors in the json
+     * @throws TurtleException If there are any errors in the json
      */
     public static KCTScript parseFromJson(String jsonText)
-    throws InvalidTurtleCodeException
+    throws TurtleException
     {
         JSONParser parser=new JSONParser();
         try {
@@ -81,7 +81,7 @@ public class TurtleCompiler
             return script;
         } catch (ParseException e) {
             // TODO: log better? handle better?
-            throw new InvalidTurtleCodeException(e);
+            throw new TurtleException(e);
         }
     }
 
@@ -91,16 +91,23 @@ public class TurtleCompiler
      * @param className Name of the student class containing the Turtle code
      * @param source The source code as a String
      * @return The JSON code as a String
-     * @throws InvalidTurtleCodeException If anything goes wrong.
+     * @throws TurtleException If anything goes wrong.
      */
     String getJSONTurtle3DBase(String className, String source)
-    throws InvalidTurtleCodeException
+    throws TurtleException
     {
         // TODO Change these (if necessary) once we standardize the package names
         String turtleClassName="edu.knoxcraft.turtle3d.Turtle3DBase";
         String pluginName="edu.knox.minecraft.serverturtle.TurtlePlugin";
         
-        InMemoryJavaCompiler compiler=new InMemoryJavaCompiler();
+        InMemoryJavaCompiler compiler=null;
+        try {
+            compiler=new InMemoryJavaCompiler();
+        } catch (IllegalStateException e) {
+            throw new TurtleCompilerException("No ToolProvider.getSystemJavaCompiler() available on server.\n"
+                    + "This usually means the server is running with a JRE rather than a JDK."
+                    + "Please run the server with a JDK (or tell your instructor that they should do so)");
+        }
         // Apparently we need to add extra classpath containing the Turtle code
         // at least I think this is what does that...
         Plugin plugin=Canary.pluginManager().getPlugin(pluginName);
@@ -127,9 +134,10 @@ public class TurtleCompiler
             CompilationResult c=compiler.getCompileResult();
             StringBuilder s=new StringBuilder();
             for (CompilerDiagnostic d : c.getCompilerDiagnosticList()) {
-                s.append(d.toString()+"\n");
+                s.append(String.format("%s at or around line %d", d.getMessage(), d.getStartLine()));
+                break;
             }
-            throw new InvalidTurtleCodeException("Unable to compile: "+s.toString());
+            throw new TurtleCompilerException("Unable to compile: "+s.toString());
         }
         logger.debug("Successfully compiled driver!");
         
@@ -149,10 +157,10 @@ public class TurtleCompiler
         } catch (ReflectiveOperationException e){
             // TODO: Log this as an internal server error, since the problem is reflection
             logger.error("Unexpected reflection error compiling", e);
-            throw new InvalidTurtleCodeException(e);
+            throw new TurtleException(e);
         } catch (Exception e){
             logger.error("Unexpected exception compiling", e);
-            throw new InvalidTurtleCodeException(e);
+            throw new TurtleException(e);
         }
     }
     
