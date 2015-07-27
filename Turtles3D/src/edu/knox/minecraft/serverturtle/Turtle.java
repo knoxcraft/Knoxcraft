@@ -3,13 +3,15 @@ package edu.knox.minecraft.serverturtle;
 import java.util.Map;
 import java.util.Stack;
 
+import edu.knoxcraft.turtle3d.KCTCommand;
+import edu.knoxcraft.turtle3d.KCTScript;
+import edu.knoxcraft.turtle3d.TurtleCommandException;
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
 import net.canarymod.api.world.position.Position;
 import net.canarymod.chat.MessageReceiver;
-import edu.knoxcraft.turtle3d.KCTCommand;
-import edu.knoxcraft.turtle3d.KCTScript;
+import net.canarymod.logger.Logman;
 
 public class Turtle {
 
@@ -31,8 +33,12 @@ public class Turtle {
     private World world;  //World in which all actions occur
     private MessageReceiver sender;  //player to send messages to
     private Stack<BlockRecord> oldBlocks;  //original pos/type of all bricks laid by this turtle for undoing
+    private Logman logger;
 
     ///////////////////////////////////////////////////////////////////////////////
+    public Turtle(Logman logger) {
+        this.logger=logger;
+    }
 
     /**
      * Initialize the turtle.  Called when executing a script (or turning command line turtle on) 
@@ -329,7 +335,13 @@ public class Turtle {
 
         //execute each command of the new script
         for (KCTCommand c : script.getCommands())  {
-            executeCommand(c);
+            try {
+                executeCommand(c);
+            } catch (TurtleCommandException e) {
+                sender.asPlayer().message(e.getMessage());
+                sender.asPlayer().message("Unable to execute Turtle program "+script.getScriptName());
+                return;
+            }
         }
     }
 
@@ -483,7 +495,7 @@ public class Turtle {
     /*
      * Execute a KCTCommand.
      */
-    private void executeCommand(KCTCommand c)  {
+    private void executeCommand(KCTCommand c) throws TurtleCommandException {
         
         Map<String, Object> m = c.getArguments();
         String commandName = c.getCommandName();
@@ -583,7 +595,9 @@ public class Turtle {
         } else {
             // TODO: Handle an unknown command. Is Runtime Exception the correct exception?
             // Are there better ways to handle this?
-            throw new RuntimeException("Unknown command: "+commandName);
+            String msg=String.format("Unknown command: %s", commandName);
+            logger.error(msg);
+            throw new TurtleCommandException(msg);
         }
     }
 }

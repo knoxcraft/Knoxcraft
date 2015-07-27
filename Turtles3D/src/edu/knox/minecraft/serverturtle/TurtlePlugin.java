@@ -202,7 +202,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         }
 
         //Create turtle
-        Turtle turtle = new Turtle();
+        Turtle turtle = new Turtle(logger);
         turtle.turtleInit(sender);
 
         //Get script from map
