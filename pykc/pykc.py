@@ -31,14 +31,30 @@ class Command:
 		return '{"cmd" : "%s", "args" : {%s}}' % (self.command, argStr)
 
 class Turtle:
+	#TODO testing
+	#TODO Add value support? (verify it atleast)
+	#TODO Anything I missed
 	def __init__(self, name):
 		self.name=name
 		self.commands=[]
 	def forward(self, numBlocks):
 		self.commands.append(Command('forward', {'dist' : numBlocks}))
+	def backward(self, numBlocks):
+		self.commands.append(Command('backward', {'dist' : numBlocks}))
+	def up(self, numBlocks):
+		self.commands.append(Command('up', {'dist' : numBlocks}))
+	def down(self, numBlocks):
+		self.commands.append(Command('down', {'dist' : numBlocks}))		
 	def turnRight(self, numDegrees):
 		self.commands.append(Command('turnRight', {'degrees' : numDegrees}))
-	# TODO: Other turtle methods!
+	def turnLeft(self, numDegrees):
+		self.commands.append(Command('turnLeft', {'degrees' : numDegrees}))
+	def setPosition(self, position):
+		self.commands.append(Command('setPosition', {'position' : position}))
+	def setDirection(self, direction):
+		self.commands.append(Command('setDirection', {'direction' : direction}))
+	def blockPlace(self, place):
+		self.commands.append(Command('blockPlace', {'dist' : place}))
 
 	def toJson(self):
 		# future work: use the actual Python json library instead of rewriting it...
