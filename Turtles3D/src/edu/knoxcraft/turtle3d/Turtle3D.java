@@ -2,6 +2,7 @@ package edu.knoxcraft.turtle3d;
 
 import static edu.knoxcraft.turtle3d.KCTCommand.*;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class Turtle3D
     
     // Map for the static factory pattern.
     // TODO: How to handle race conditions for the turtleMap in multithreading?
-    static Map<String,Turtle3D> turtleMap=new LinkedHashMap<String,Turtle3D>();
+    public static Map<Thread,Map<String,Turtle3D>> turtleMap=new LinkedHashMap<Thread,Map<String,Turtle3D>>();
     /**
      * Static factory instead of constructor
      * This lets us get the Turtle instances after running main, and then get their KCTScripts and generate 
@@ -40,8 +41,13 @@ public class Turtle3D
      * in the same main method, you will actually keep getting back the same turtle!
      */
     public static Turtle3D createTurtle(String name) {
+        Thread currentThread=Thread.currentThread();
+        if (!turtleMap.containsKey(currentThread)) {
+            turtleMap.put(currentThread, new HashMap<String,Turtle3D>());
+        }
+        Map<String,Turtle3D> map=turtleMap.get(currentThread);
         Turtle3D turtle=new Turtle3D(name);
-        turtleMap.put(name, turtle);
+        map.put(name, turtle);
         return turtle;
     }
     

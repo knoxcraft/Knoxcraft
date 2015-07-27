@@ -26,6 +26,7 @@
 		<jar destfile="${dest}/kct-java.jar" update="true">
 			<fileset dir="bin">
 				<include name="**/Turtle3DBase.class"/>
+				<include name="**/Turtle3D.class"/>
 				<include name="**/KCTCommand.class"/>
 				<include name="**/KCTScript.class"/>
 				<include name="**/JSONUtil.class"/>
