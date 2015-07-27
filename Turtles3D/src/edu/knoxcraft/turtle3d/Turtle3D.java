@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import net.canarymod.api.world.blocks.BlockType;
+
 /**
  * @author ppypp emhastings hahaha
  *
@@ -145,6 +147,15 @@ public class Turtle3D
       */
      public void setBlock(int type){
          KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type));
+         script.addCommand(cmd);
+     }
+     
+     /**
+      * Set block type-- using constants from CanaryMod
+      * @param type
+      */
+    public void setBlock(BlockType type) {
+         KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type.getId()));
          script.addCommand(cmd);
      }
      

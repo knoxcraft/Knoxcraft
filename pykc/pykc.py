@@ -55,6 +55,8 @@ class Turtle:
 		self.commands.append(Command('setDirection', {'direction' : direction}))
 	def blockPlace(self, place):
 		self.commands.append(Command('blockPlace', {'dist' : place}))
+	def setBlock(self, blockType):
+		self.commands.append(Command('setBlock', {'type' : blockType}))
 
 	def toJson(self):
 		# future work: use the actual Python json library instead of rewriting it...
@@ -106,4 +108,13 @@ class Turtle:
 			print('Failed to upload...')
 			print(response.status, response.reason)	
 			print(response.read().decode("utf-8"))
+
+
+class BlockType:
+	'''Sort of like an enum, but we literally want the int values and we don't
+need any of the features we get from extending a Python Enum.
+	'''
+	air = 0
+	stone = 1
+	# TODO: rest of the constant values from CanaryMod's BlockType class
 

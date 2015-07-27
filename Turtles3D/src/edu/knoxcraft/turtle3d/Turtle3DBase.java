@@ -2,6 +2,8 @@ package edu.knoxcraft.turtle3d;
 
 import static edu.knoxcraft.turtle3d.KCTCommand.*;
 
+import net.canarymod.api.world.blocks.BlockType;
+
 public abstract class Turtle3DBase
 {
     private KCTScript script;
@@ -124,6 +126,16 @@ public abstract class Turtle3DBase
      public void setBlock(String type){
          checkTurtle();
          KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type));
+         script.addCommand(cmd);
+     }
+     
+     /**
+      * Set block type-- using constants from CanaryMod
+      * @param type
+      */
+    public void setBlock(BlockType type) {
+         checkTurtle();
+         KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type.getId()));
          script.addCommand(cmd);
      }
      
