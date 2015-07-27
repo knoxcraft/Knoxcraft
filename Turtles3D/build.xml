@@ -23,6 +23,9 @@
 		</jar>
 	</target>
 	<target name="kct-java-api" depends="depends" description="">
+		<unzip src="lib/CanaryMod-1.2.0.jar" dest="bin">
+			<patternset includes="net/canarymod/api/world/blocks/BlockType.class"/>
+		</unzip>
 		<jar destfile="${dest}/kct-java.jar" update="true">
 			<fileset dir="bin">
 				<include name="**/Turtle3DBase.class"/>
@@ -30,8 +33,10 @@
 				<include name="**/KCTCommand.class"/>
 				<include name="**/KCTScript.class"/>
 				<include name="**/JSONUtil.class"/>
+				<include name="net/canarymod/api/world/blocks/BlockType.class"/>
 			</fileset>
 		</jar>
+		
 	</target>
 	<target name="install-kct-java" depends="kct-java-api">
 		<mkdir dir="${kct.java.install.location}"/>
