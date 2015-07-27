@@ -1,8 +1,11 @@
+/**
+ * Jaime's sample program testing Turtle3D.
+ */
+
 package edu.knoxcraft.turtle3d;
 
-public class SampleProgram
+public class Turtle3DTest1
 {
-    @SuppressWarnings("deprecation")
     public static void main(String[] args) {
         // This uses the 
         Turtle3D t=Turtle3D.createTurtle("sample");
@@ -10,5 +13,4 @@ public class SampleProgram
         t.turnRight(90);
         System.out.println(t.getScript().toJSONString());
     }
-
 }

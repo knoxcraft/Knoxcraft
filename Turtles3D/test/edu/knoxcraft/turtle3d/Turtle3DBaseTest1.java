@@ -1,6 +1,10 @@
+/**
+ * Jaime's sample program testing Turtle3DBase.
+ */
+
 package edu.knoxcraft.turtle3d;
 
-public class SampleProgram2 extends Turtle3DBase
+public class Turtle3DBaseTest1 extends Turtle3DBase
 {
     public void run() {
         // this version uses inheritance with Turtle3DBase,

@@ -79,7 +79,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
     public void TurtleOn(MessageReceiver sender, String[] args)
     {
         //Make Turtle
-        turtle = new Turtle();
+        turtle = new Turtle(logger);
         turtle.turtleInit(sender);
 
         //Turning on Turtle
