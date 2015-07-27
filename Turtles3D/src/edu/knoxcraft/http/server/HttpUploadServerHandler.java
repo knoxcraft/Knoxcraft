@@ -210,7 +210,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                             }
 
                             hook.setPlayerName(playerName);
-                            res.append(String.format("Hello %s! Thanks for using KnoxCraft Turtles\n", playerName));
+                            res.append(String.format("Hello %s! Thanks for using KnoxCraft Turtles\n\n", playerName));
 
                             TurtleCompiler turtleCompiler=new TurtleCompiler(logger);
                             int success=0;
@@ -264,9 +264,11 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                     } catch (TurtleCompilerException e) {
                                         logger.warn("Unable to compile Turtle code",e);
                                         res.append(String.format("%s\n\n", e.getMessage()));
+                                        failure++;
                                     } catch (TurtleException e) {
                                         logger.error("Error in compiling (possibly a server side error)", e);
-                                        res.append(String.format("Unable to process Turtle code %s", e.getMessage()));
+                                        res.append(String.format("Unable to process Turtle code %s\n\n", e.getMessage()));
+                                        failure++;
                                     } catch (Exception e) {
                                         logger.error("Unexpected error compiling Turtle code to KCTScript", e);
                                         failure++;
@@ -284,12 +286,9 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                 res.append(String.format("\nFailed to upload %d KnoxCraft Turtles programs\n", failure));
                             }
                             Canary.hooks().callHook(hook);
-                            // TODO: Upload a message about how many scripts were uploaded, and their names
                             writeResponse(ctx.channel(), fullRequest, res.toString(), client);
-
-                            
                         } catch (TurtleException e) {
-                            // TODO: Convert exception into clearer error message to send back to client
+                            // XXX can this still happen? Don't we catch all of these?
                             writeResponse(ctx.channel(), fullRequest, e.getMessage(), "error");
                         }
                     }
