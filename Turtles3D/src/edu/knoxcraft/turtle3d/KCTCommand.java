@@ -1,7 +1,7 @@
 package edu.knoxcraft.turtle3d;
 
 import static edu.knoxcraft.turtle3d.JSONUtil.quoteString;
-import static edu.knoxcraft.turtle3d.JSONUtil.toJSONStringOrInt;
+import static edu.knoxcraft.turtle3d.JSONUtil.toJSONStringOrIntOrBoolean;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -93,7 +93,7 @@ public class KCTCommand
         for (Map.Entry<String,Object> entry : arguments.entrySet()) {
             buf.append(String.format("%s : %s,\n", 
                     quoteString(entry.getKey()), 
-                    toJSONStringOrInt(entry.getValue())));
+                    toJSONStringOrIntOrBoolean(entry.getValue())));
         }
         if (buf.length()>0) {
             // remove the comma at the very end

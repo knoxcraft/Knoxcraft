@@ -13,11 +13,14 @@ public class JSONUtil
         return "\"" + s + "\"";
     }
     
-    public static String toJSONStringOrInt(Object o) {
+    public static String toJSONStringOrIntOrBoolean(Object o) {
         if (o instanceof String) {
             return quoteString((String)o);
         }
         if (o instanceof Integer || o instanceof Long) {
+            return o.toString();
+        }
+        if (o instanceof Boolean) {
             return o.toString();
         }
         throw new IllegalArgumentException(String.format("Unknown type: %s is of type %s, should be Integer or String", 
@@ -28,7 +31,7 @@ public class JSONUtil
         StringBuffer buf=new StringBuffer();
         for (Entry<String,Object> entry : map.entrySet()) {
             Object val=entry.getValue();
-            buf.append(String.format("%s : %s",quoteString(entry.getKey()), toJSONStringOrInt(val)));
+            buf.append(String.format("%s : %s",quoteString(entry.getKey()), toJSONStringOrIntOrBoolean(val)));
         }
         return String.format("{\n%s\n}", buf.toString());
     }

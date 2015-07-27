@@ -219,6 +219,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                     client.equalsIgnoreCase("testclient") ||
                                     client.startsWith("pykc"))
                             {
+                                // WEB OR PYTHON UPLOAD
                                 logger.trace("Upload from web");
                                 // must have both Json and source, either in text area or as uploaded files
                                 if (sourceText!=null && jsonText!=null) {
@@ -246,6 +247,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                             + " (either as files or pasted into the text areas)");
                                 }
                             } else if ("bluej".equalsIgnoreCase(client)) {
+                                // BLUEJ UPLOAD
                                 logger.trace("Upload from bluej");
                                 for (Entry<String,UploadedFile> entry : files.entrySet()) {
                                     try {
@@ -272,6 +274,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                                     }
                                 }
                             } else {
+                                // UNKNOWN CLIENT UPLOAD
                                 // TODO Unknown client; make a best effort to handle upload
                                 res.append(String.format("Unknown upload client: %s; making our best effort to handle the upload"));
                             }
