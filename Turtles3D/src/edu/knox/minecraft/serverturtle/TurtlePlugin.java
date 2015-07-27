@@ -188,22 +188,6 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             toolTip = "/in <scriptName> [playerName]")
     public void invoke(MessageReceiver sender, String[] args)  {
 
-//        /////////////////////////////////////////////////////////
-//        //Create sample script for testing-- can remove this later
-//        KCTScript test = new KCTScript("test");
-//        KCTCommand forward = new KCTCommand(KCTCommand.FORWARD);
-//
-//        for (int i=0; i<3; i++)  {
-//            test.addCommand(forward);
-//        }
-//        test.addCommand(new KCTCommand(KCTCommand.TURNRIGHT));
-//        for (int i=0; i<3; i++)  {
-//            test.addCommand(forward);
-//        }
-//
-//        scripts.putScript(sender.getName().toLowerCase(), test);
-//        ////////////////////////////////////////////////////////        
-
         if (args.length<2)  {  //not enough arguments
             sender.message("Not enough arguments.");
             return;
@@ -233,7 +217,9 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             }
             script = scripts.getScript(playerName, scriptName);
             if (script==null) {
-                throw new RuntimeException("dammit Jim I'm a doctor");
+                logger.warn(String.format("player %s cannot find script %s", playerName, scriptName));
+                sender.asPlayer().message(String.format("%s, you have no script named %s", playerName, scriptName));
+                return;
             }
         }  catch (Exception e)  {
             turtle.turtleConsole("Script failed to load!");
