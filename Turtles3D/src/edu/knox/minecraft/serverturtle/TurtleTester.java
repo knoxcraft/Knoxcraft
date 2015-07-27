@@ -167,12 +167,16 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
         if (!checkTT(sender))  //Don't allow if turtle mode is not on
             return;
 
-        turtle.turtleToggleBlockPlace();
+        if (turtle.getBP())  {
+            turtle.turtleSetBlockPlace(false);
+        }  else {
+            turtle.turtleSetBlockPlace(true);
+        }
         turtle.turtleBlockPlaceStatus();  //alert user about change
     }
 
     /**
-     * Checks whether block placement mode is on.
+     * Checks whether block placement mode is on and alerts player.
      * @param sender
      * @param args
      */
