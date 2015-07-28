@@ -24,7 +24,10 @@
 	</target>
 	<target name="kct-java-api" depends="depends" description="">
 		<unzip src="lib/CanaryMod-1.2.0.jar" dest="bin">
-			<patternset includes="net/canarymod/api/world/blocks/BlockType.class"/>
+			<patternset>
+				<include name="net/canarymod/api/world/blocks/BlockType.class"/>
+				<include name="net/canarymod/api/world/position/Direction.class"/>
+			</patternset>
 		</unzip>
 		<jar destfile="${dest}/kct-java.jar" update="true">
 			<fileset dir="bin">
@@ -34,6 +37,7 @@
 				<include name="**/KCTScript.class"/>
 				<include name="**/JSONUtil.class"/>
 				<include name="net/canarymod/api/world/blocks/BlockType.class"/>
+				<include name="net/canarymod/api/world/position/Direction.class"/>
 			</fileset>
 		</jar>
 		
