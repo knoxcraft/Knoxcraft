@@ -35,6 +35,9 @@ public class KCTCommand
     public static final String DEGREES = "degrees";
     public static final String PLACE = "place";
     public static final String POS = "pos";
+    public static final String X = "x";
+    public static final String Y = "y";
+    public static final String Z = "z";
     public static final String DIST = "dist";
     public static final String BLOCKTYPE = "blockType";
     
@@ -50,9 +53,6 @@ public class KCTCommand
     public static final String SETDIRECTION = "setDirection";
     public static final String SETPOSITION = "setPosition";
     public static final String SETBLOCK = "setBlock";
-    
-
-
     
     protected String commandName;
     protected Map<String, Object> arguments;

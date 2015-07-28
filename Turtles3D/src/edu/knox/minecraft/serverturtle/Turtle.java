@@ -491,89 +491,104 @@ public class Turtle {
     private static int toInt(Object o) {
         return (int)((Long)o).longValue();
     }
-    
+
     /*
      * Execute a KCTCommand.
      */
     private void executeCommand(KCTCommand c) throws TurtleCommandException {
-        
+
         Map<String, Object> m = c.getArguments();
         String commandName = c.getCommandName();
 
         if (commandName.equals(KCTCommand.FORWARD)) {
             // go forward
             int dist;
-            if (!m.containsKey(KCTCommand.DIST)){ //TODO VERIFY!!!
+            if (!m.containsKey(KCTCommand.DIST)){ 
                 dist = 1; //default
             }else{
                 dist = toInt(m.get(KCTCommand.DIST));
             }
             turtleMove(dist); 
-            
+
         }  else if (commandName.equals(KCTCommand.BACKWARD)) {
             // go backward
             int dist;
-            if (!m.containsKey(KCTCommand.DIST)){ //TODO VERIFY!!!
+            if (!m.containsKey(KCTCommand.DIST)){ 
                 dist = -1; //default
             }else{
                 dist = -toInt(m.get(KCTCommand.DIST));
             }
             turtleMove(dist); 
-            
+
         }else if (commandName.equals(KCTCommand.TURNRIGHT)) {
             // turn right
             //Parse for amount to turn
             int ang;
-            if (!m.containsKey(KCTCommand.DEGREES)){ //TODO VERIFY!!!
+            if (!m.containsKey(KCTCommand.DEGREES)){ 
                 ang = 90; //default
             }else{
                 ang = toInt(m.get(KCTCommand.DEGREES));
             }
             turtleTurn(false, ang);
-            
+
         } else if (commandName.equals(KCTCommand.TURNLEFT)) {
             // turn left
             int ang;
-            if (!m.containsKey(KCTCommand.DEGREES)){ //TODO VERIFY!!!
+            if (!m.containsKey(KCTCommand.DEGREES)){ 
                 ang = 90; //default
             }else{
                 ang = toInt(m.get(KCTCommand.DEGREES)); //Magic hand wavey stuff
             }
             //Parse for amount to turn
             turtleTurn(true, ang);
-            
+
         } else if (commandName.equals(KCTCommand.PLACEBLOCKS)) {
             // place blocks on/off 
             //only changes mode if arg map contains valid arg
-            if (m.containsKey(KCTCommand.BLOCKPLACEMODE)){ //TODO VERIFY!!!
+            if (m.containsKey(KCTCommand.BLOCKPLACEMODE)){ 
                 boolean mode = (boolean)m.get(KCTCommand.BLOCKPLACEMODE);  //TODO:  does this work?
                 turtleSetBlockPlace(mode);
             }
-            
+
         } else if (commandName.equals(KCTCommand.SETPOSITION)) {
-            // TODO set position
-            turtleSetRelPosition(0, 0, 0);
-            
+            //set turtle relative position
+            if (m.containsKey(KCTCommand.POS))  {  
+                //had array position
+                int x = (int)((int[])m.get(KCTCommand.POS))[0]; 
+                int y = (int)((int[])m.get(KCTCommand.POS))[1]; 
+                int z = (int)((int[])m.get(KCTCommand.POS))[2]; 
+                turtleSetRelPosition(x, y, z);
+            }  else if (m.containsKey(KCTCommand.X) && m.containsKey(KCTCommand.Y) && m.containsKey(KCTCommand.Z))  {
+                //had int arg position
+                int x = (int)m.get(KCTCommand.X); 
+                int y = (int)m.get(KCTCommand.Y);
+                int z = (int)m.get(KCTCommand.Z);
+                turtleSetRelPosition(x, y, z);
+            }  else {
+                //neither of these
+                //do nothing
+            }            
+
         } else if (commandName.equals(KCTCommand.UP)) {
             // go up
             int dist;
-            if (!m.containsKey(KCTCommand.DIST)){ //TODO VERIFY!!!
+            if (!m.containsKey(KCTCommand.DIST)){ 
                 dist = 1; //default
             }else{
-                dist = toInt(m.get(KCTCommand.DIST)); //Magic hand wavey stuff)
+                dist = toInt(m.get(KCTCommand.DIST)); //Magic hand wavey stuff
             }
             turtleUpDown(dist);
-            
+
         } else if (commandName.equals(KCTCommand.DOWN)) {
             // go down
             int dist;
-            if (!m.containsKey(KCTCommand.DIST)){ //TODO VERIFY!!!
+            if (!m.containsKey(KCTCommand.DIST)){ 
                 dist = -1; //default
             }else{
-                dist = -toInt(m.get(KCTCommand.DIST)); //Magic hand wavey stuff)
+                dist = -toInt(m.get(KCTCommand.DIST)); //Magic hand wavey stuff
             }
             turtleUpDown(dist);
-            
+
         } else if (commandName.equals(KCTCommand.SETBLOCK)) {
             // Set block type
             int type;
@@ -591,10 +606,8 @@ public class Turtle {
                     turtleSetBlockType(type);
                 }
             }
-            
-        } else {
-            // TODO: Handle an unknown command. Is Runtime Exception the correct exception?
-            // Are there better ways to handle this?
+
+        } else {            
             String msg=String.format("Unknown command: %s", commandName);
             logger.error(msg);
             throw new TurtleCommandException(msg);
