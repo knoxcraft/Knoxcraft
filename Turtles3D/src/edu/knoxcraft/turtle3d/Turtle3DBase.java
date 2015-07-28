@@ -124,7 +124,7 @@ public abstract class Turtle3DBase
       * Set block type-- String input
       * @param type
       */
-     public void setBlock(String type){
+     protected void setBlock(String type){
          checkTurtle();
          KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type));
          script.addCommand(cmd);
@@ -147,6 +147,16 @@ public abstract class Turtle3DBase
      public void setPosition(int[] position){
          checkTurtle();
          KCTCommand cmd=new KCTCommand(SETPOSITION, JSONUtil.makeArgMap(POS, position));
+         script.addCommand(cmd);
+     }
+     
+     /**
+      * Set the turtle's relative position
+      * @param position x, y, z
+      */
+     public void setPosition(int x, int y, int z){
+         checkTurtle();
+         KCTCommand cmd=new KCTCommand(SETPOSITION, JSONUtil.makeArgMap(X, x, Y, y, Z, z));
          script.addCommand(cmd);
      }
      

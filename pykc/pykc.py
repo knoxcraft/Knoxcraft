@@ -3,7 +3,7 @@ import urllib
 import time
 
 
-VERSION='0.0.0.1'
+VERSION='0.1'
 
 '''
 {"scriptname" : "Phillipe", 
@@ -33,7 +33,6 @@ class Command:
 class Turtle:
 	#TODO testing
 	#TODO Add value support? (verify it atleast)
-	#TODO Anything I missed
 	def __init__(self, name):
 		self.name=name
 		self.commands=[]
@@ -49,8 +48,8 @@ class Turtle:
 		self.commands.append(Command('turnRight', {'degrees' : numDegrees}))
 	def turnLeft(self, numDegrees):
 		self.commands.append(Command('turnLeft', {'degrees' : numDegrees}))
-	def setPosition(self, position):
-		self.commands.append(Command('setPosition', {'position' : position}))
+	def setPosition(self, x, y, z):
+		self.commands.append(Command('setPosition', {'x' : 'x'}{'y' : 'y'}{'z' : 'z'}))
 	def setDirection(self, direction):
 		self.commands.append(Command('setDirection', {'direction' : direction}))
 	def blockPlace(self, place):
