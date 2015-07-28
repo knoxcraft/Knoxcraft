@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.canarymod.api.world.blocks.BlockType;
+import net.canarymod.api.world.position.Direction;
 
 /**
  * @author ppypp emhastings hahaha
@@ -178,11 +179,11 @@ public class Turtle3D
      }
      
      /**
-      * Set the turtle's direction (int-based)
-      * @param degrees
+      * Set the turte's direction using direction constants (i.e. Direction.EAST, Direction.NORTHEAST, etc) 
+      * @param direction
       */
-     public void setDirection(int direction){
-         KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction));
+    public void setDirection(Direction direction) {
+         KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));
          script.addCommand(cmd);
      }
 }

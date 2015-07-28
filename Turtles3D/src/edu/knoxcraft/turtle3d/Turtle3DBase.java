@@ -3,6 +3,7 @@ package edu.knoxcraft.turtle3d;
 import static edu.knoxcraft.turtle3d.KCTCommand.*;
 
 import net.canarymod.api.world.blocks.BlockType;
+import net.canarymod.api.world.position.Direction;
 
 public abstract class Turtle3DBase
 {
@@ -150,12 +151,12 @@ public abstract class Turtle3DBase
      }
      
      /**
-      * Set turtle's direction
+      * Set the turte's direction using direction constants (i.e. Direction.EAST, Direction.NORTHEAST, etc) 
       * @param direction
       */
-     public void setDirection(int direction){
+    public void setDirection(Direction direction) {
          checkTurtle();
-         KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction));
+         KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));
          script.addCommand(cmd);
      }
 }
