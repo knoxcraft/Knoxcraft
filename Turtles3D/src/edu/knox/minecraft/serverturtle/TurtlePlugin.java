@@ -69,9 +69,9 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             getLogman().info("Enabling "+getName() + " Version " + getVersion()); 
             getLogman().info("Authored by "+getAuthor());
             Canary.commands().registerCommands(this, this, false);
-            
+
             lookupFromDB();
-            
+
             return true;
         } catch (Exception e){
             if (httpServer!=null) {
@@ -81,17 +81,17 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             return false;
         }
     }
-    
+
     /**
      * Load the latest version of each script from the DB for each player on this world
      * TODO Check how Canary handles worlds; do we have only one XML file of scripts
-     * for worlds and shoudl we include the world name or world ID with the script?
+     * for worlds and should we include the world name or world ID with the script?
      */
     private void lookupFromDB() {
         KCTScriptAccess data=new KCTScriptAccess();
         List<DataAccess> results=new LinkedList<DataAccess>();
         Map<String,KCTScriptAccess> mostRecentScripts=new HashMap<String,KCTScriptAccess>();
-        
+
         try {
             Map<String,Object> filters=new HashMap<String,Object>();
             Database.get().loadAll(data, results, filters);
@@ -116,7 +116,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
                     script.setLanguage(scriptAccess.language);
                     script.setScriptName(scriptAccess.scriptName);
                     script.setSourceCode(scriptAccess.source);
-                    
+
                     scripts.putScript(scriptAccess.playerName, script);
                     logger.info(String.format("Loaded script %s for player %s", 
                             scriptAccess.scriptName, scriptAccess.playerName));
@@ -131,15 +131,20 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
 
     //HOOK HANDLERS
 
+    /**
+     * Hook called when scripts are uploaded to the server
+     * 
+     * @param hook
+     */
     @HookHandler
     public void uploadJSON(KCTUploadHook hook) {
         logger.info("Hook called!");
 
-        //add scripts to manager
+        //add scripts to manager and db
         Collection<KCTScript> list = hook.getScripts();
         for (KCTScript script : list)  {
             scripts.putScript(hook.getPlayerName(), script);
-            
+
             // This will create the table if it doesn't exist
             // and then insert data for the script into a new row
             KCTScriptAccess data=new KCTScriptAccess();
@@ -158,6 +163,12 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
 
     //COMMANDS
 
+    /**
+     * List all the scripts.
+     * 
+     * @param sender
+     * @param args
+     */
     @Command(aliases = { "scripts", "sc" },
             description = "List KCTScripts",
             permissions = { "" },
@@ -169,7 +180,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             logger.info(name);
             sender.message(name);
         }
-        HashMap<String,KCTScript> map=scripts.getAllScriptsForPlayer(sender.getName().toLowerCase());
+        Map<String,KCTScript> map=scripts.getAllScriptsForPlayer(sender.getName().toLowerCase());
         for (Entry<String,KCTScript> entry : map.entrySet()) {
             logger.info(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
             sender.message(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
@@ -178,6 +189,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
 
     /**
      * Invoke a script.
+     * 
      * @param sender
      * @param args
      */
@@ -250,6 +262,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
 
     /**
      * Undo the previous script.
+     * 
      * @param sender
      * @param args
      */
@@ -260,13 +273,12 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             toolTip = "/undo")
     public void undo(MessageReceiver sender, String[] args)  {
 
-
         String senderName = sender.getName().toLowerCase();
 
         //sender has not executed any scripts
         if (!undoBuffers.containsKey(senderName))  {  
             sender.message("You have not executed any scripts to undo!");
-            
+
         }  else {  //buffer exists
 
             //get buffer
@@ -274,7 +286,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
 
             if (buffer.empty()){  //buffer empty
                 sender.message("There are no more scripts to undo!");
-                
+
             }  else  {  //okay to undo last script executed
 
                 //get buffer

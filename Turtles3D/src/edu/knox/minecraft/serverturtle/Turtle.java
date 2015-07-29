@@ -36,12 +36,18 @@ public class Turtle {
     private Logman logger;
 
     ///////////////////////////////////////////////////////////////////////////////
+    /**
+     * Constructor.
+     * 
+     * @param logger
+     */
     public Turtle(Logman logger) {
         this.logger=logger;
     }
 
     /**
      * Initialize the turtle.  Called when executing a script (or turning command line turtle on) 
+     * 
      * @param sender
      */
     public void turtleInit(MessageReceiver sender)  {
@@ -88,7 +94,6 @@ public class Turtle {
     public void turtleSetBlockPlace(boolean mode)
     {
         bp = mode;
-        turtleBlockPlaceStatus();  //alert user about change
     }
 
     /**
@@ -133,6 +138,7 @@ public class Turtle {
         // 6 = WEST
         // 7 = NORTHWEST
         // Else = ERROR 
+        
         this.dir = (Direction.getFromIntValue(dir));
     }
 
@@ -170,37 +176,35 @@ public class Turtle {
 
     /**
      * Set block type (int based)
+     * 
      * @param int
      */
     public void turtleSetBlockType(int blockType)
     {
-        if (!bp)  //don't allow if block placement mode isn't on
-            return;
-
         bt = BlockType.fromId(blockType);      
     }
 
     /**
      * set Block type (string/BlockType based)
+     * 
      * @param sender
      * @param args
      */
     public void turtleSetBlockType(String blockType)
     {
-        if (!bp)  //don't allow if block placement mode isn't on
-            return;
-
         bt = BlockType.fromString(blockType);      
     }
+    
     /**
      * Report current block type
+     * 
      * @param sender
      * @param args
      */
     public void turtleReportBlockType()
     {
         if (!bp)  //don't allow if block placement mode isn't on
-            return;
+            turtleConsole("Block placement mode is not on.");
 
         //report current BT of turtle   
         turtleConsole("" + bt);
@@ -292,7 +296,7 @@ public class Turtle {
     }
 
     /**
-     * Return whether block placement mode is on.  Called by TurtleTester.
+     * Return whether block placement mode is on.
      * 
      * @return the value of bp
      */
@@ -302,7 +306,8 @@ public class Turtle {
 
     /**
      * Return a copy of the stack of blocks replaced by this turtle (for undoing)
-     * @return
+     * 
+     * @return undo stack
      */
     public Stack<BlockRecord> getOldBlocks()  {
         Stack<BlockRecord> retVal = new Stack<BlockRecord>();
@@ -325,6 +330,8 @@ public class Turtle {
 
     /**
      * Execute a KCTScript.
+     * 
+     * @param script
      */
     public void executeScript(KCTScript script) {
 
@@ -338,8 +345,8 @@ public class Turtle {
             try {
                 executeCommand(c);
             } catch (TurtleCommandException e) {
-                sender.asPlayer().message(e.getMessage());
-                sender.asPlayer().message("Unable to execute Turtle program "+script.getScriptName());
+                turtleConsole(e.getMessage());
+                turtleConsole("Unable to execute Turtle program "+script.getScriptName());
                 return;
             }
         }
@@ -363,7 +370,7 @@ public class Turtle {
         int zr = relPos.getBlockZ();
 
         //update game position
-        //gamePos = originPos + relPos;
+        //for each coord, gamePos = originPos + relPos;
         gamePos.setX(xo+xr);
         gamePos.setY(yo+yr);
         gamePos.setZ(zo+zr);
@@ -488,18 +495,27 @@ public class Turtle {
         return d;
     }
 
+    /**
+     * Helper method to cast object coming from command arg array to int.
+     * 
+     * @param o
+     * @return o as an int
+     */
     private static int toInt(Object o) {
-        return (int)((Long)o).longValue();
+        return (int)((Long)o).longValue();   //Magic hand wavey stuff
     }
 
-    /*
+    /**
      * Execute a KCTCommand.
+     * 
+     * @param c
      */
     private void executeCommand(KCTCommand c) throws TurtleCommandException {
-
+        //get command info
         Map<String, Object> m = c.getArguments();
         String commandName = c.getCommandName();
 
+        //execute command
         if (commandName.equals(KCTCommand.FORWARD)) {
             // go forward
             int dist;
@@ -522,7 +538,6 @@ public class Turtle {
 
         }else if (commandName.equals(KCTCommand.TURNRIGHT)) {
             // turn right
-            //Parse for amount to turn
             int ang;
             if (!m.containsKey(KCTCommand.DEGREES)){ 
                 ang = 90; //default
@@ -537,16 +552,15 @@ public class Turtle {
             if (!m.containsKey(KCTCommand.DEGREES)){ 
                 ang = 90; //default
             }else{
-                ang = toInt(m.get(KCTCommand.DEGREES)); //Magic hand wavey stuff
+                ang = toInt(m.get(KCTCommand.DEGREES)); 
             }
-            //Parse for amount to turn
             turtleTurn(true, ang);
 
         } else if (commandName.equals(KCTCommand.PLACEBLOCKS)) {
             // place blocks on/off 
             //only changes mode if arg map contains valid arg
             if (m.containsKey(KCTCommand.BLOCKPLACEMODE)){ 
-                boolean mode = (boolean)m.get(KCTCommand.BLOCKPLACEMODE);  //TODO:  does this work?
+                boolean mode = (boolean)m.get(KCTCommand.BLOCKPLACEMODE);
                 turtleSetBlockPlace(mode);
             }
 
@@ -565,8 +579,8 @@ public class Turtle {
                 int z = (int)m.get(KCTCommand.Z);
                 turtleSetRelPosition(x, y, z);
             }  else {
-                //neither of these
-                //do nothing
+                //neither of these/bad input
+                logger.error("Could not set position.");
             }            
 
         } else if (commandName.equals(KCTCommand.UP)) {
@@ -575,7 +589,7 @@ public class Turtle {
             if (!m.containsKey(KCTCommand.DIST)){ 
                 dist = 1; //default
             }else{
-                dist = toInt(m.get(KCTCommand.DIST)); //Magic hand wavey stuff
+                dist = toInt(m.get(KCTCommand.DIST));
             }
             turtleUpDown(dist);
 
@@ -585,7 +599,7 @@ public class Turtle {
             if (!m.containsKey(KCTCommand.DIST)){ 
                 dist = -1; //default
             }else{
-                dist = -toInt(m.get(KCTCommand.DIST)); //Magic hand wavey stuff
+                dist = -toInt(m.get(KCTCommand.DIST));
             }
             turtleUpDown(dist);
 
@@ -593,7 +607,7 @@ public class Turtle {
             // Set block type
             int type;
             String strType = "";
-            if (!m.containsKey(KCTCommand.BLOCKTYPE)){ //Default
+            if (!m.containsKey(KCTCommand.BLOCKTYPE)){ //Not in arg map -> Default
                 type = 1; //default is Stone
                 turtleSetBlockType(type);
             }else{

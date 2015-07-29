@@ -33,6 +33,9 @@ public abstract class Turtle3DBase
         return script;
     }
     
+    /**
+     * Make sure the script is not null.
+     */
     protected void checkTurtle() {
         if (script==null) {
             // TODO: better exception
@@ -43,6 +46,7 @@ public abstract class Turtle3DBase
   
     /**
      * Move the turtle forward the given distance.
+     * 
      * @param distance
      */
     public void forward(int distance) {
@@ -53,6 +57,7 @@ public abstract class Turtle3DBase
     
     /**
      * Move the turtle backward the given distance.
+     * 
      * @param distance
      */
     public void backward(int distance) {
@@ -63,6 +68,7 @@ public abstract class Turtle3DBase
     
     /**
      * Turn Right the specified number of degrees (must be multiples of 45)
+     * 
      * @param degrees
      */
     public void turnRight(int degrees){
@@ -73,6 +79,7 @@ public abstract class Turtle3DBase
     
     /**
      * Turn left the specified number of degrees (must be multiples of 45)
+     * 
      * @param degrees
      */
     public void turnLeft(int degrees){
@@ -83,6 +90,7 @@ public abstract class Turtle3DBase
     
      /**
       * Move the turtle up the specified distance
+      * 
       * @param distance
       */
      public void up(int distance){
@@ -93,6 +101,7 @@ public abstract class Turtle3DBase
      
      /**
       * Move the turtle down the specified distance
+      * 
       * @param distance
       */
      public void down(int distance){
@@ -103,6 +112,8 @@ public abstract class Turtle3DBase
      
      /**
       * Set turtle block place mode
+      * 
+      * @param mode
       */
      public void setBlockPlace(boolean mode){
          checkTurtle();
@@ -112,6 +123,7 @@ public abstract class Turtle3DBase
      
      /**
       * Set block type-- int input
+      * 
       * @param type
       */
      public void setBlock(int type){
@@ -122,6 +134,8 @@ public abstract class Turtle3DBase
      
      /**
       * Set block type-- String input
+      * Not recommended for student use.
+      * 
       * @param type
       */
      protected void setBlock(String type){
@@ -132,6 +146,7 @@ public abstract class Turtle3DBase
      
      /**
       * Set block type-- using constants from CanaryMod
+      * 
       * @param type
       */
     public void setBlock(BlockType type) {
@@ -142,6 +157,7 @@ public abstract class Turtle3DBase
      
      /**
       * Set turtle's relative position
+      * 
       * @param position
       */
      public void setPosition(int[] position){
@@ -152,6 +168,7 @@ public abstract class Turtle3DBase
      
      /**
       * Set the turtle's relative position
+      * 
       * @param position x, y, z
       */
      public void setPosition(int x, int y, int z){
@@ -161,7 +178,8 @@ public abstract class Turtle3DBase
      }
      
      /**
-      * Set the turte's direction using direction constants (i.e. Direction.EAST, Direction.NORTHEAST, etc) 
+      * Set the turtle's direction using direction constants (i.e. Direction.EAST, Direction.NORTHEAST, etc) 
+      * 
       * @param direction
       */
     public void setDirection(Direction direction) {

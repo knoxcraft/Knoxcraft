@@ -34,6 +34,7 @@ public class Turtle3D
     // Map for the static factory pattern.
     // TODO: How to handle race conditions for the turtleMap in multithreading?
     public static Map<Thread,Map<String,Turtle3D>> turtleMap=new LinkedHashMap<Thread,Map<String,Turtle3D>>();
+   
     /**
      * Static factory instead of constructor
      * This lets us get the Turtle instances after running main, and then get their KCTScripts and generate 
@@ -56,6 +57,7 @@ public class Turtle3D
     
     /**
      * Private constructor to enforce static factory pattern
+     * 
      * @param scriptName
      */
     private Turtle3D(String scriptName) {
@@ -64,6 +66,7 @@ public class Turtle3D
     
     /**
      * No need for students to call this method.
+     * 
      * @return
      */
     public String getScriptName() {
@@ -72,6 +75,7 @@ public class Turtle3D
     
     /**
      * No need for students to call this method.
+     * 
      * @return
      */
     public KCTScript getScript() {
@@ -80,6 +84,7 @@ public class Turtle3D
     
     /**
      * Move the turtle forward the given distance.
+     * 
      * @param distance
      */
     public void forward(int distance) {
@@ -89,6 +94,7 @@ public class Turtle3D
     
     /**
      * Move the turtle backward the given distance.
+     * 
      * @param distance
      */
     public void backward(int distance) {
@@ -99,6 +105,7 @@ public class Turtle3D
     /**
      * Turn the turtle to the right the given number of degrees.
      * (Rounds to multiples of 45 deg)
+     * 
      * @param degrees
      */
     public void turnRight(int degrees){
@@ -109,6 +116,7 @@ public class Turtle3D
     /**
      * Turn the turtle to the left the given number of degrees.
      * (Rounds to multiples of 45 deg)
+     * 
      * @param degrees
      */public void turnLeft(int degrees){
         KCTCommand cmd=new KCTCommand(TURNLEFT, JSONUtil.makeArgMap(DEGREES, degrees));
@@ -117,6 +125,7 @@ public class Turtle3D
     
      /**
       * Move the turtle up the given distance.
+      * 
       * @param degrees
       */
      public void up(int distance){
@@ -126,6 +135,7 @@ public class Turtle3D
      
      /**
       * Move the turtle down the given distance.
+      * 
       * @param degrees
       */
      public void down(int distance){
@@ -135,6 +145,7 @@ public class Turtle3D
      
      /**
       * Set turtle block placement mode
+      * 
       * @param mode
       */
      public void setBlockPlace(boolean mode){
@@ -144,6 +155,7 @@ public class Turtle3D
      
      /**
       * Set turtle block type (int-based)
+      * 
       * @param type
       */
      public void setBlock(int type){
@@ -153,6 +165,7 @@ public class Turtle3D
      
      /**
       * Set block type-- using constants from CanaryMod
+      * 
       * @param type
       */
     public void setBlock(BlockType type) {
@@ -161,7 +174,9 @@ public class Turtle3D
      }
      
      /**
-      * Set turtle block type (string-based)
+      * Set turtle block type (string-based).
+      * Not recommended for student use.
+      * 
       * @param type
       */
      protected void setBlock(String type){
@@ -171,6 +186,7 @@ public class Turtle3D
      
      /**
       * Set the turtle's relative position
+      * 
       * @param position [x, y, z]
       */
      public void setPosition(int[] position){
@@ -180,6 +196,7 @@ public class Turtle3D
      
      /**
       * Set the turtle's relative position
+      * 
       * @param position x, y, z
       */
      public void setPosition(int x, int y, int z){
@@ -189,6 +206,7 @@ public class Turtle3D
      
      /**
       * Set the turte's direction using direction constants (i.e. Direction.EAST, Direction.NORTHEAST, etc) 
+      * 
       * @param direction
       */
     public void setDirection(Direction direction) {

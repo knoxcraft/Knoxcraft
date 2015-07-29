@@ -6,6 +6,8 @@
 
 package edu.knoxcraft.turtle3d;
 
+import net.canarymod.api.world.position.Direction;
+
 public class Turtle3DBaseTest5 extends Turtle3DBase
 {
     public void run() {
@@ -22,6 +24,12 @@ public class Turtle3DBaseTest5 extends Turtle3DBase
         setPosition(pos2);
         forward(10);
 
-        //TODO: setDir  
+        //setDir  
+        setDirection(Direction.NORTH);
+        forward(10);
+        setDirection(Direction.EAST);
+        forward(10);
+        setDirection(Direction.SOUTH);
+        forward(10);
     }
 }

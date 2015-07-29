@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.json.simple.JSONObject;
 
-
 public class KCTScript
 {
     /* Sample JSON commands:
@@ -23,6 +22,7 @@ public class KCTScript
        ]
    }
    */
+    
     private String scriptName;
     private List<KCTCommand> commands;
     // TODO: Add support for turtle scripts that store the source code that generated the list of commands

@@ -5,16 +5,10 @@ import net.canarymod.chat.MessageReceiver;
 import net.canarymod.commandsys.Command;
 import net.canarymod.commandsys.CommandDependencyException;
 import net.canarymod.commandsys.CommandListener;
-import net.canarymod.hook.HookHandler;
 import net.canarymod.logger.Logman;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
-import edu.knoxcraft.hooks.KCTUploadHook;
 import edu.knoxcraft.http.server.HttpUploadServer;
-
-//Things need to be overly simple during testing for ease of use
-
-//In time, need to build in string verification for correct input style (ie. All caps, etc)
 
 public class TurtleTester extends Plugin implements CommandListener, PluginListener {
 
@@ -44,6 +38,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
     /**
      * Called when plugin is enabled. 
+     * 
      * @return
      */
     @Override
@@ -68,6 +63,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
     /**
      * Turn on turtle mode.  Sets up relative position. 
      * (0,0,0) is player position.  Forward is player direction.
+     * 
      * @param sender
      * @param args
      */
@@ -91,6 +87,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
     /**
      * Turn off turtle mode.
+     * 
      * @param sender
      * @param args
      */
@@ -109,6 +106,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
     /**
      * Toggle turtle mode on/off.
+     * 
      * @param sender
      * @param args
      */
@@ -177,6 +175,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
     /**
      * Checks whether block placement mode is on and alerts player.
+     * 
      * @param sender
      * @param args
      */
@@ -195,6 +194,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
     /**
      * Set turtle position (relative coords)
+     * 
      * @param sender
      * @param args
      */
@@ -260,6 +260,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
     /**
      * Get current position (relative)
+     * 
      * @param sender
      * @param args
      */
@@ -279,6 +280,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
     /**
      * Get current position of Turtle in game coords
+     * 
      * @param sender
      * @param args
      */
@@ -298,6 +300,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
     /**
      * Get position of relative origin (Player's pos at Turtle on) in game coords
+     * 
      * @param sender
      * @param args
      */
@@ -317,6 +320,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
     /**
      * Get current direction
+     * 
      * @param sender
      * @param args
      */
@@ -336,6 +340,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
     /**
      * Set block type (int based)
+     * 
      * @param sender
      * @param args
      */
@@ -352,6 +357,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
         if (!checkBP(sender))  //don't allow if block placement mode isn't on either
             return;
 
+
         if (args.length<2)  {  //not enough arguments
             turtle.turtleConsole("Not enough arguments.");
             return;
@@ -359,14 +365,9 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
         //set current BT of turtle	
         try  {
-            if (!(args.length == 3))
-            {
+            if (!(args.length == 3))  {
                 turtle.turtleSetBlockType(Integer.parseInt(args[1]));
-            }  /*else{
-                temp = BlockType.fromIdAndData(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-            }*/
-            //TODO:  finish fixing else case.  It probably won't work since I changed things.
-
+            }
         }  catch (Exception e)  {  //bad arguments
             turtle.turtleConsole("Not a valid block type.");
         }
@@ -374,13 +375,15 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
     /**
      * set Block type (string/BlockType based)
+     * 
      * @param sender
      * @param args
      */
-    //TODO implementation-- maybe we don't need this version?
+    //TODO implementation-- maybe we don't need this version for TurtleTester?
 
     /**
      * Get current block type
+     * 
      * @param sender
      * @param args
      */
@@ -436,7 +439,8 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
     }
 
     /**
-     * Moves turtle up/down
+     * Move (up/down)
+     * 
      * @param sender
      * @param args
      */
@@ -515,16 +519,12 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
         turtle.turtleTurn(left, deg);
     }
 
-    @HookHandler
-    public void uploadJSON(KCTUploadHook hook) {
-        logger.info("Hook called (TurtleTester, is this still being launched?)");
-    }
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //PRIVATE HELPER FUNCTIONS
 
     /**
      * Checks whether turtle mode is on.  If so, returns true.  If not, alerts user and returns false.
+     * 
      * @return Status of turtle mode
      */
     private boolean checkTT(MessageReceiver sender)  {
@@ -538,6 +538,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
 
     /**
      * Checks whether block placement mode is on.  If so, returns true.  If not, alerts user and returns false.
+     * 
      * @return Status of block placement mode
      */
     private boolean checkBP(MessageReceiver sender)  {

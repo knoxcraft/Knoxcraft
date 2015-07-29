@@ -1,6 +1,7 @@
 package edu.knox.minecraft.serverturtle;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import edu.knoxcraft.turtle3d.KCTScript;
 
@@ -8,20 +9,31 @@ public class ScriptManager {
     //TODO:  add database stuff?
     
     //PlayerName-> (scriptName -> script)
-    private HashMap<String, HashMap<String, KCTScript>> map;  
+    private Map<String, Map<String, KCTScript>> map;  
+    
+    /**
+     * Constructor.
+     */
     public ScriptManager()  {
-        map = new HashMap<String, HashMap<String, KCTScript>>();
+        map = new HashMap<String, Map<String, KCTScript>>();
     }
     
     /**
-     * TODO error checking and documentation
+     * Return a map containing all scripts belonging to the given player.
+     * 
      * @param playerName
-     * @return
+     * @return map of player's scripts
      */
-    public HashMap<String, KCTScript> getAllScriptsForPlayer(String playerName) {
+    public Map<String, KCTScript> getAllScriptsForPlayer(String playerName) {
         return map.get(playerName);
     }
-    public HashMap<String, HashMap<String,KCTScript>> getAllScripts() {
+    
+    /**
+     * Return the map containing all players' scripts.
+     * 
+     * @return map of scripts
+     */
+    public Map<String, Map<String,KCTScript>> getAllScripts() {
         return map;
     }
     
@@ -34,17 +46,22 @@ public class ScriptManager {
     //Data Access belong to a table
     
     /**
-     * Put a script into the map
+     * Put a script into the map.
+     * 
      * @param playerName
      * @param script
      */
     public void putScript(String playerName, KCTScript script)  {
         if (!map.containsKey(playerName)) {
+            //create a map for the player if one doesn't exist
             map.put(playerName, new HashMap<String, KCTScript>());
         }
-        HashMap<String,KCTScript> scriptMap=map.get(playerName);
+        
+        //put script into player's map
+        Map<String,KCTScript> scriptMap=map.get(playerName);
         scriptMap.put(script.getScriptName(), script);
         
+        //insert into db        
 //        try {
 //            //Insert Script into DB
 //            //DataAccess data = new DataAccess("Script");
@@ -61,10 +78,11 @@ public class ScriptManager {
     }
     
     /**
-     * Get a script from the map
+     * Get a script from the map.
+     * 
      * @param playerName
      * @param scriptName
-     * @return
+     * @return the script
      */
     public KCTScript getScript(String playerName, String scriptName)  {
         return map.get(playerName).get(scriptName);
