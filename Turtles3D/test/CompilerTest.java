@@ -6,6 +6,8 @@ public class CompilerTest {
         javax.tools.ToolProvider.getSystemJavaCompiler();
     if (systemCompiler == null) {
       throw new Error("systemCompiler == null!");
+    }  else  {
+        System.out.println("It worked!");
     }
   }
 }

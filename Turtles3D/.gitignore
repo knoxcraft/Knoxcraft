@@ -11,5 +11,10 @@ config/db.cfg
 config/motd.txt
 config/ops.cfg
 config/server.cfg
+config/metrics.cfg
+config/plugin_priorities.cfg
+lang/canary/*
+usercache.json
 db
 logs
+crash-reports
