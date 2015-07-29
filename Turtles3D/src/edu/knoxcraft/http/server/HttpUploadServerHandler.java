@@ -66,8 +66,6 @@ import edu.knoxcraft.turtle3d.TurtleCompilerException;
  */
 public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
-    // Relies on HttpUploadServer classloading first, which should happen
-    // because HttpUploadServer references this class in its enable() method
     private static Logman logger;
     
     public HttpUploadServerHandler(Logman logger){
