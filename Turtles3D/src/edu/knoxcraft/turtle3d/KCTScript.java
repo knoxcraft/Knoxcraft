@@ -60,8 +60,11 @@ public class KCTScript
             cmdstr.append(c.toJSONString());
             cmdstr.append(", ");
         }
+        
         // Remove trailing ", " end of cmdstr
-        cmdstr.delete(cmdstr.length()-2, cmdstr.length());
+        if (cmdstr.length()>=2)  //make sure string isn't empty first
+            cmdstr.delete(cmdstr.length()-2, cmdstr.length());
+        
         return String.format("{%s : %s, %s : [\n%s\n]}", 
                 SCRIPTNAMEKEY, 
                 quoteString(this.scriptName),

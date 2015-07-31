@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.canarymod.api.world.blocks.BlockType;
+import net.canarymod.api.world.position.Direction;
+
 public class JSONUtil
 {
     // private constructor to prevent instantiation
@@ -13,14 +16,20 @@ public class JSONUtil
         return "\"" + s + "\"";
     }
     
-    public static String toJSONStringOrIntOrBoolean(Object o) {
+    public static String argToJSONString(Object o) {
         if (o instanceof String) {
             return quoteString((String)o);
         }
-        if (o instanceof Integer || o instanceof Long) {
+        if (o instanceof Integer || o instanceof Long || o instanceof Short) {
             return o.toString();
         }
         if (o instanceof Boolean) {
+            return o.toString();
+        }
+        if (o instanceof BlockType) {
+            return o.toString();
+        }
+        if (o instanceof Direction) {
             return o.toString();
         }
         throw new IllegalArgumentException(String.format("Unknown type: %s is of type %s, should be Integer or String", 
@@ -31,7 +40,7 @@ public class JSONUtil
         StringBuffer buf=new StringBuffer();
         for (Entry<String,Object> entry : map.entrySet()) {
             Object val=entry.getValue();
-            buf.append(String.format("%s : %s",quoteString(entry.getKey()), toJSONStringOrIntOrBoolean(val)));
+            buf.append(String.format("%s : %s",quoteString(entry.getKey()), argToJSONString(val)));
         }
         return String.format("{\n%s\n}", buf.toString());
     }

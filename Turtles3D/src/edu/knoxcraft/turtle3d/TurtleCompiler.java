@@ -28,11 +28,11 @@ public class TurtleCompiler
     public static final String PYTHON="python";
     public static final String BLOCKLY="blockly";
     public static Logman logger;
-    
+
     public TurtleCompiler(Logman logger) {
         TurtleCompiler.logger=logger;
     }
-    
+
     /**
      * Convert Java source code into a KCTScript, by way of JSON.
      * 
@@ -44,7 +44,7 @@ public class TurtleCompiler
      * @throws TurtleException
      */
     public KCTScript compileJavaTurtleCode(String filename, String javaSource)
-    throws TurtleException
+            throws TurtleException
     {
         String className=filename.replace(".java", "");
         if (javaSource.contains(TURTLE3D_BASE)) {
@@ -67,7 +67,7 @@ public class TurtleCompiler
             return script;
         }
     }
-    
+
     /**
      * Static factory method to parse Json and produce a KCTScript.
      * 
@@ -76,19 +76,19 @@ public class TurtleCompiler
      * @throws TurtleException If there are any errors in the json
      */
     public KCTScript parseFromJson(String jsonText)
-    throws TurtleException
+            throws TurtleException
     {
         JSONParser parser=new JSONParser();
         try {
             logger.info(jsonText);
             JSONObject json=(JSONObject)parser.parse(jsonText);
-    
+
             String scriptname=(String)json.get("scriptname");
-    
+
             KCTScript script=new KCTScript(scriptname);
-    
+
             logger.debug(String.format("%s\n", scriptname));
-    
+
             JSONArray lang= (JSONArray) json.get("commands");
             for (int i=0; i<lang.size(); i++) {
                 JSONObject cmd=(JSONObject)lang.get(i);
@@ -111,7 +111,7 @@ public class TurtleCompiler
      * @throws TurtleException If anything goes wrong.
      */
     String getJSONTurtle3DBase(String className, String source)
-    throws TurtleException
+            throws TurtleException
     {
         InMemoryJavaCompiler compiler=null;
         try {
@@ -130,10 +130,10 @@ public class TurtleCompiler
         compiler.addSourceFile(className, source);
         //String driverName="Driver"+System.currentTimeMillis();
         String driverName="Driver";
-        
+
         String driver=String.format(
                 "import %s;\n" +
-                "public class %s {\n"+
+                        "public class %s {\n"+
                         "  public static String run() {\n"+
                         "    Turtle3DBase t=new %s();\n"+
                         "    t.run();\n"+
@@ -153,7 +153,7 @@ public class TurtleCompiler
             throw new TurtleCompilerException("Unable to compile: "+s.toString());
         }
         logger.debug("Successfully compiled driver!");
-        
+
         // XXX Not sure why, but it is necessary to set the default classloader
         // for the bytearrayclassloader as the classloader that loaded TurtleCompiler
         // Probably anything in the package with TurtlePlugin would work, actually
@@ -162,7 +162,7 @@ public class TurtleCompiler
         try {
             logger.trace("Trying to load "+driverName);
             Class<?> c=classLoader.loadClass(driverName);
-            
+
             Method m=c.getMethod("run");
             ThreadChecker<String> t=new ThreadChecker<String>(m);
             t.start();
@@ -178,9 +178,9 @@ public class TurtleCompiler
             throw new TurtleException(e);
         }
     }
-    
+
     String getJSONTurtle3D(String className, String source) 
-    throws TurtleException
+            throws TurtleException
     {
         InMemoryJavaCompiler compiler=null;
         try {
@@ -201,11 +201,11 @@ public class TurtleCompiler
         String driverName="Driver";
         String driver=String.format(
                 "import %s;\n"
-                + "public class Driver {\n"
-                + "  public static void runMain() {\n"
-                + "    %s.main(new String[] {});\n"
-                + "  }\n"
-                + "}\n", TURTLE3D_BASE, className);
+                        + "public class Driver {\n"
+                        + "  public static void runMain() {\n"
+                        + "    %s.main(new String[] {});\n"
+                        + "  }\n"
+                        + "}\n", TURTLE3D_BASE, className);
         logger.debug("About to compile: \n"+driver);
         compiler.addSourceFile(driverName, driver);
         boolean compileSuccess=compiler.compile();
@@ -219,13 +219,13 @@ public class TurtleCompiler
             throw new TurtleCompilerException("Unable to compile: "+s.toString());
         }
         logger.debug("Successfully compiled driver!");
-        
+
         ByteArrayClassLoader classLoader=new ByteArrayClassLoader(this.getClass().getClassLoader(), compiler.getFileManager().getClasses());
         ByteArrayClassLoader.logger=logger;
         try {
             logger.trace("Trying to load "+driverName);
             Class<?> c=classLoader.loadClass(driverName);
-            
+
             // weird trick to get vararg methods such as main
             Method m=c.getMethod("runMain");
             ThreadChecker<Void> t=new ThreadChecker<Void>(m);
@@ -238,10 +238,12 @@ public class TurtleCompiler
             Field f=turtle3Dclass.getField("turtleMap");
             Map<Thread,Map<String,Turtle3D>> turtleMap=(Map<Thread,Map<String,Turtle3D>>)f.get(null);
             Map<String,Turtle3D> map=turtleMap.get(t);
-            for (String turtleName : map.keySet()) {
-                logger.warn("turtleName: "+turtleName);
-                Turtle3D turtle=map.get(turtleName);
-                return turtle.getScript().toJSONString();
+            if (map != null)  {
+                for (String turtleName : map.keySet()) {           
+                    logger.warn("turtleName: "+turtleName);
+                    Turtle3D turtle=map.get(turtleName);
+                    return turtle.getScript().toJSONString();
+                }
             }
             throw new TurtleException("Unable to find any KnoxCraft Turtle code to return");
         } catch (TimeoutException e) {
@@ -255,13 +257,13 @@ public class TurtleCompiler
             throw new TurtleException(e);
         }
     }
-    
+
     private static class ThreadChecker<T> extends Thread
     {
         private Method method;
         T result;
         Exception error;
-        
+
         public ThreadChecker(Method m) {
             this.method=m;
         }

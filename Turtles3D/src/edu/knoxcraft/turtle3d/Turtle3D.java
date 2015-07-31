@@ -190,7 +190,10 @@ public class Turtle3D
       * @param position [x, y, z]
       */
      public void setPosition(int[] position){
-         KCTCommand cmd=new KCTCommand(SETPOSITION, JSONUtil.makeArgMap(POS, position));
+         int x = position[0];
+         int y = position[1];
+         int z = position[2];
+         KCTCommand cmd=new KCTCommand(SETPOSITION, JSONUtil.makeArgMap(X, x, Y, y, Z, z));
          script.addCommand(cmd);
      }
      

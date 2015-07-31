@@ -1,7 +1,5 @@
 /**
  * Sample program testing setPos and setDir in Turtle3D.  
- * 
- * TODO: test setDir when decided on argument type
  */
 
 package edu.knoxcraft.turtle3d;
@@ -20,8 +18,7 @@ public class Turtle3DTest5
         t.setPosition(pos);
         t.forward(10);
 
-        int[] pos2 = {-1, 1, -1};
-        t.setPosition(pos2);
+        t.setPosition(-1, 1, -1);
         t.forward(10);
 
         //setDir   
