@@ -567,14 +567,20 @@ public class Turtle {
         } else if (commandName.equals(KCTCommand.SETPOSITION)) {
             //set turtle relative position
             if (m.containsKey(KCTCommand.X) && m.containsKey(KCTCommand.Y) && m.containsKey(KCTCommand.Z))  {
-                //had int arg position
-                int x = (int)m.get(KCTCommand.X); 
-                int y = (int)m.get(KCTCommand.Y);
-                int z = (int)m.get(KCTCommand.Z);
+                int x = toInt(m.get(KCTCommand.X)); 
+                int y = toInt(m.get(KCTCommand.Y));
+                int z = toInt(m.get(KCTCommand.Z));
                 turtleSetRelPosition(x, y, z);
             }          
 
-        } else if (commandName.equals(KCTCommand.UP)) {
+        } else if (commandName.equals(KCTCommand.SETDIRECTION)) {
+            //set turtle direction
+            if (m.containsKey(KCTCommand.DIR))  {
+                int dir = toInt(m.get(KCTCommand.DIR));
+                turtleSetDirection(dir);
+            } 
+            
+        }  else if (commandName.equals(KCTCommand.UP)) {
             // go up
             int dist;
             if (!m.containsKey(KCTCommand.DIST)){ 
