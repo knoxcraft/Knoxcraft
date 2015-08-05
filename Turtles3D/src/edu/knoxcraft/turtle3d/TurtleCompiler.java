@@ -289,6 +289,10 @@ public class TurtleCompiler
                     Thread.sleep(100);
                     if (!isAlive()) {
                         if (error!=null) {
+                            //get source of error to give user better message                            
+                            while (error.getCause()!=null)  {
+                                error = (Exception)error.getCause();
+                            }
                             throw error;
                         }
                         return result;
@@ -300,7 +304,7 @@ public class TurtleCompiler
             // XXX: It's OK to kill this thread since it cannot be holding any locks
             // Seriously, this is totally fine. Nothing to see here.
             this.stop();
-            throw new TimeoutException("Student code did not finish");
+            throw new TimeoutException("Student code did not finish.  Check for infinite loops.");
         }
     }
 }
