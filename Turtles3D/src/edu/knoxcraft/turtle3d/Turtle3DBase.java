@@ -9,26 +9,53 @@ public abstract class Turtle3DBase
 {
     private KCTScript script;
     
+    /**
+     * The turtle's run method.  
+     * This should be implemented by students in their subclasses.
+     */
     public abstract void run();
     
+    /**
+     * Execute the turtle's run method to check for runtime errors.
+     */
     public void checkCode() {
         run();
         System.out.println("No runtime errors in the code detected.");
     }
     
+    /**
+     * Set the turtle's name
+     * 
+     * @param name The name of the turtle
+     */
     public void setTurtleName(String name) {
         script=new KCTScript(name);
     }
     
+    /**
+     * Get the turtle's name
+     * 
+     * @return The name of the turtle
+     */
     public String getTurtleName() {
         return script.getScriptName();
     }
     
+    /**
+     * No need for students to call this method.
+     * 
+     * @return The JSON string
+     */
     public String getJSON() {
         checkTurtle();
         return script.toJSONString();
     }
     
+    /**
+     * No need for students to call this method.
+     * 
+     * @return The script
+     */
     public KCTScript getKCTScript() {
         return script;
     }
@@ -47,7 +74,7 @@ public abstract class Turtle3DBase
     /**
      * Move the turtle forward the given distance.
      * 
-     * @param distance
+     * @param distance The distance to move
      */
     public void forward(int distance) {
         checkTurtle();
@@ -58,7 +85,7 @@ public abstract class Turtle3DBase
     /**
      * Move the turtle backward the given distance.
      * 
-     * @param distance
+     * @param distance The distance to move
      */
     public void backward(int distance) {
         checkTurtle();
@@ -69,7 +96,7 @@ public abstract class Turtle3DBase
     /**
      * Turn Right the specified number of degrees (must be multiples of 45)
      * 
-     * @param degrees
+     * @param degrees The degrees to turn
      */
     public void turnRight(int degrees){
         checkTurtle();
@@ -80,7 +107,7 @@ public abstract class Turtle3DBase
     /**
      * Turn left the specified number of degrees (must be multiples of 45)
      * 
-     * @param degrees
+     * @param degrees The degrees to turn
      */
     public void turnLeft(int degrees){
          checkTurtle();
@@ -91,7 +118,7 @@ public abstract class Turtle3DBase
      /**
       * Move the turtle up the specified distance
       * 
-      * @param distance
+      * @param distance The distance to move
       */
      public void up(int distance){
          checkTurtle();
@@ -102,7 +129,7 @@ public abstract class Turtle3DBase
      /**
       * Move the turtle down the specified distance
       * 
-      * @param distance
+      * @param distance The distance to move
       */
      public void down(int distance){
          checkTurtle();
@@ -113,7 +140,7 @@ public abstract class Turtle3DBase
      /**
       * Set turtle block place mode
       * 
-      * @param mode
+      * @param mode The mode
       */
      public void setBlockPlace(boolean mode){
          checkTurtle();
@@ -124,7 +151,7 @@ public abstract class Turtle3DBase
      /**
       * Set block type-- int input
       * 
-      * @param type
+      * @param type The int representing the block type
       */
      public void setBlock(int type){
          checkTurtle();
@@ -136,7 +163,7 @@ public abstract class Turtle3DBase
       * Set block type-- String input
       * Not recommended for student use.
       * 
-      * @param type
+      * @param type The String name of the block type
       */
      protected void setBlock(String type){
          checkTurtle();
@@ -147,7 +174,7 @@ public abstract class Turtle3DBase
      /**
       * Set block type-- using constants from CanaryMod
       * 
-      * @param type
+      * @param type The block type
       */
     public void setBlock(BlockType type) {
          checkTurtle();
@@ -158,7 +185,7 @@ public abstract class Turtle3DBase
      /**
       * Set turtle's relative position
       * 
-      * @param position
+      * @param position The position as an array of ints
       */
      public void setPosition(int[] position){
          checkTurtle();
@@ -172,7 +199,9 @@ public abstract class Turtle3DBase
      /**
       * Set the turtle's relative position
       * 
-      * @param position x, y, z
+      * @param x The x coord
+      * @param y The y coord
+      * @param z The z coord
       */
      public void setPosition(int x, int y, int z){
          checkTurtle();
@@ -183,7 +212,7 @@ public abstract class Turtle3DBase
      /**
       * Set the turtle's direction using direction constants (i.e. Direction.EAST, Direction.NORTHEAST, etc) 
       * 
-      * @param direction
+      * @param direction The direction
       */
     public void setDirection(Direction direction) {
          checkTurtle();

@@ -138,7 +138,7 @@ public class Turtle {
         // 6 = WEST
         // 7 = NORTHWEST
         // Else = ERROR 
-        
+
         this.dir = (Direction.getFromIntValue(dir));
     }
 
@@ -194,7 +194,7 @@ public class Turtle {
     {
         bt = BlockType.fromString(blockType);      
     }
-    
+
     /**
      * Report current block type
      * 
@@ -236,10 +236,13 @@ public class Turtle {
             //Place block if block placement mode on
             if (bp) {
 
-                //keep track of original block to undo
-                oldBlocks.push(new BlockRecord(world.getBlockAt(gamePos), world));
+                //keep track of original block to undo, if not already in stack
+                BlockRecord br = new BlockRecord(world.getBlockAt(gamePos), world);
+                if(!oldBlocks.contains(br))  {
+                    oldBlocks.push(br);
+                }
 
-                //place new block
+                //place new block              
                 world.setBlockAt(gamePos, bt);
             }
         }
@@ -274,8 +277,11 @@ public class Turtle {
             //Place block if block placement mode on
             if (bp) {
 
-                //keep track of original block to undo
-                oldBlocks.push(new BlockRecord(world.getBlockAt(gamePos), world));
+                //keep track of original block to undo, if not already in stack
+                BlockRecord br = new BlockRecord(world.getBlockAt(gamePos), world);
+                if(!oldBlocks.contains(br))  {
+                    oldBlocks.push(br);
+                }
 
                 //place new block
                 world.setBlockAt(gamePos, bt);
@@ -579,7 +585,7 @@ public class Turtle {
                 int dir = toInt(m.get(KCTCommand.DIR));
                 turtleSetDirection(dir);
             } 
-            
+
         }  else if (commandName.equals(KCTCommand.UP)) {
             // go up
             int dist;
