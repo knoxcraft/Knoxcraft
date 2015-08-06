@@ -40,7 +40,7 @@ public class Turtle3D
      * This lets us get the Turtle instances after running main, and then get their KCTScripts and generate 
      * the JSON code.
      * 
-     * @param name
+     * @param name The name of the turtle
      * @return The turtle with the given name. If you try to create multiple turtles with the same name
      * in the same main method, you will actually keep getting back the same turtle!
      */
@@ -58,7 +58,7 @@ public class Turtle3D
     /**
      * Private constructor to enforce static factory pattern
      * 
-     * @param scriptName
+     * @param scriptName The name of the script
      */
     private Turtle3D(String scriptName) {
         script=new KCTScript(scriptName);
@@ -67,7 +67,7 @@ public class Turtle3D
     /**
      * No need for students to call this method.
      * 
-     * @return
+     * @return The name of the script
      */
     public String getScriptName() {
         return this.scriptName;
@@ -76,7 +76,7 @@ public class Turtle3D
     /**
      * No need for students to call this method.
      * 
-     * @return
+     * @return The script
      */
     public KCTScript getScript() {
         return this.script;
@@ -85,7 +85,7 @@ public class Turtle3D
     /**
      * Move the turtle forward the given distance.
      * 
-     * @param distance
+     * @param distance The distance to move
      */
     public void forward(int distance) {
         KCTCommand cmd=new KCTCommand(FORWARD, JSONUtil.makeArgMap(DIST, distance));
@@ -95,7 +95,7 @@ public class Turtle3D
     /**
      * Move the turtle backward the given distance.
      * 
-     * @param distance
+     * @param distance The distance to move
      */
     public void backward(int distance) {
         KCTCommand cmd=new KCTCommand(BACKWARD, JSONUtil.makeArgMap(DIST, distance));
@@ -106,7 +106,7 @@ public class Turtle3D
      * Turn the turtle to the right the given number of degrees.
      * (Rounds to multiples of 45 deg)
      * 
-     * @param degrees
+     * @param degrees The degrees to turn
      */
     public void turnRight(int degrees){
         KCTCommand cmd=new KCTCommand(TURNRIGHT, JSONUtil.makeArgMap(DEGREES, degrees));
@@ -117,7 +117,7 @@ public class Turtle3D
      * Turn the turtle to the left the given number of degrees.
      * (Rounds to multiples of 45 deg)
      * 
-     * @param degrees
+     * @param degrees The degrees to turn
      */public void turnLeft(int degrees){
         KCTCommand cmd=new KCTCommand(TURNLEFT, JSONUtil.makeArgMap(DEGREES, degrees));
         script.addCommand(cmd);
@@ -126,7 +126,7 @@ public class Turtle3D
      /**
       * Move the turtle up the given distance.
       * 
-      * @param degrees
+      * @param distance The distance to move
       */
      public void up(int distance){
          KCTCommand cmd=new KCTCommand(UP, JSONUtil.makeArgMap(DIST, distance));
@@ -136,7 +136,7 @@ public class Turtle3D
      /**
       * Move the turtle down the given distance.
       * 
-      * @param degrees
+      * @param distance The distance to move
       */
      public void down(int distance){
          KCTCommand cmd=new KCTCommand(DOWN, JSONUtil.makeArgMap(DIST, distance));
@@ -146,7 +146,7 @@ public class Turtle3D
      /**
       * Set turtle block placement mode
       * 
-      * @param mode
+      * @param mode The mode
       */
      public void setBlockPlace(boolean mode){
          KCTCommand cmd=new KCTCommand(PLACEBLOCKS, JSONUtil.makeArgMap(BLOCKPLACEMODE, mode));
@@ -156,7 +156,7 @@ public class Turtle3D
      /**
       * Set turtle block type (int-based)
       * 
-      * @param type
+      * @param type The int representing the block type
       */
      public void setBlock(int type){
          KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type));
@@ -166,7 +166,7 @@ public class Turtle3D
      /**
       * Set block type-- using constants from CanaryMod
       * 
-      * @param type
+      * @param type The block type
       */
     public void setBlock(BlockType type) {
          KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type.getId()));
@@ -177,7 +177,7 @@ public class Turtle3D
       * Set turtle block type (string-based).
       * Not recommended for student use.
       * 
-      * @param type
+      * @param type The String name of the block type
       */
      protected void setBlock(String type){
          KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type));
@@ -187,7 +187,7 @@ public class Turtle3D
      /**
       * Set the turtle's relative position
       * 
-      * @param position [x, y, z]
+      * @param position [x, y, z] The position as an array of ints
       */
      public void setPosition(int[] position){
          int x = position[0];
@@ -200,7 +200,9 @@ public class Turtle3D
      /**
       * Set the turtle's relative position
       * 
-      * @param position x, y, z
+      * @param x The x coord
+      * @param y The y coord
+      * @param z The z coord
       */
      public void setPosition(int x, int y, int z){
          KCTCommand cmd=new KCTCommand(SETPOSITION, JSONUtil.makeArgMap(X, x, Y, y, Z, z));
@@ -208,9 +210,9 @@ public class Turtle3D
      }
      
      /**
-      * Set the turte's direction using direction constants (i.e. Direction.EAST, Direction.NORTHEAST, etc) 
+      * Set the turtle's direction using direction constants (i.e. Direction.EAST, Direction.NORTHEAST, etc) 
       * 
-      * @param direction
+      * @param direction The direction
       */
     public void setDirection(Direction direction) {
          KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));

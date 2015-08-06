@@ -7,7 +7,6 @@ import edu.knoxcraft.turtle3d.KCTCommand;
 import edu.knoxcraft.turtle3d.KCTScript;
 import edu.knoxcraft.turtle3d.TurtleCommandException;
 import net.canarymod.api.world.World;
-import net.canarymod.api.world.blocks.Block;
 import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
 import net.canarymod.api.world.position.Position;
