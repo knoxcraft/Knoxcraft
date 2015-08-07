@@ -7,15 +7,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
-import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-
-import org.knoxcraft.util.IterableEnumeration;
 
 import edu.knoxcraft.hooks.KCTUploadHook;
 import edu.knoxcraft.turtle3d.KCTScript;
@@ -25,7 +22,6 @@ import edu.knoxcraft.turtle3d.TurtleException;
 import net.canarymod.Canary;
 import net.canarymod.logger.Logman;
 
-//@MultipartConfig(location="/tmp", fileSizeThreshold=3*1024*1024,maxFileSize=1024*1024*10, maxRequestSize=1024*1024*5*6)
 @MultipartConfig
 public class KCTUploadServlet extends HttpServlet
 {
