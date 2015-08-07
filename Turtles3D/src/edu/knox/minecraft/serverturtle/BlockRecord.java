@@ -5,6 +5,9 @@ import net.canarymod.api.world.blocks.Block;
 
 public class BlockRecord {
     private Block block;
+
+    // TODO Should world be an instance variable? What if we pass the world to the revert() method
+    // Is it even possible for two blocks from different worlds to end up in the same undo buffer?
     private World world;
     
     /**
@@ -54,10 +57,19 @@ public class BlockRecord {
     public boolean equals(Object other)  {
         if (other instanceof BlockRecord)  {
             BlockRecord br = (BlockRecord)other;        
-            //equal if in same posiiton in same world
+            //equal if in same position in same world
             return (this.block.getPosition().equals(br.getBlock().getPosition())) &&
                     (this.world.equals(br.getWorld()));
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((block.getPosition() == null) ? 0 : block.getPosition().hashCode());
+        result = prime * result + ((world == null) ? 0 : world.hashCode());
+        return result;
     }
 }

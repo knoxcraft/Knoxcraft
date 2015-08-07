@@ -17,6 +17,8 @@ import edu.knoxcraft.turtle3d.KCTScript;
 import edu.knoxcraft.turtle3d.TurtleCompiler;
 import edu.knoxcraft.turtle3d.TurtleException;
 import net.canarymod.Canary;
+import net.canarymod.api.world.World;
+import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.chat.MessageReceiver;
 import net.canarymod.commandsys.Command;
 import net.canarymod.commandsys.CommandListener;
@@ -200,7 +202,6 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         }
         if (map==null) {
             sender.message(String.format("We cannot find any scripts for %s", sender.getName()));
-            return;
         }
         for (Entry<String,KCTScript> entry : map.entrySet()) {
             logger.info(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
@@ -314,8 +315,13 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
                 Stack<BlockRecord> blocks = buffer.pop();
 
                 //replace original blocks
-                while(!blocks.empty())  {                
-                    blocks.pop().revert();                
+                while(!blocks.empty())  {
+                    // FIXME Currently, we just use the coordinates to replace the block with air, so it won't work 
+                    // underwater for example. 
+                    BlockRecord b=blocks.pop();
+                    World world = sender.asPlayer().getWorld();
+                    world.setBlockAt(b.getBlock().getPosition(), BlockType.Air);
+                    //blocks.pop().revert();
                 }
             }
         }
