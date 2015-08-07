@@ -10,6 +10,18 @@ import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
 
 /**
+ * Class for procedural-style programming. Students must create instances using the
+ * createTurtle() factory method rather than with a constructor. This is for technical
+ * reasons having to do with how we handle the code server-side. For those interested
+ * in the gory details: Basically, we need to create instances, then get the instances
+ * after the program is finished executing. Since the Minecraft server may be running
+ * in a multiuser environment, this means that we need to use the executing thread
+ * to find the Turtles created by that thread.
+ * 
+ * From the student perspective, use the createTurtle() method to create a Turtle, and then
+ * use the turtle to lay out blocks.
+ * 
+ * 
  * @author ppypp emhastings hahaha
  *
  */

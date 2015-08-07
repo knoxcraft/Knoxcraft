@@ -40,7 +40,6 @@
 				<include name="net/canarymod/api/world/position/Direction.class"/>
 			</fileset>
 		</jar>
-		
 	</target>
 	<target name="install-kct-java" depends="kct-java-api">
 		<mkdir dir="${kct.java.install.location}"/>
@@ -48,7 +47,31 @@
 	</target>
 
     <target name="build" depends="turtles3d" description="description"/>
-
+	
+	<target name="javadoc">
+		<unzip src="${cmodsrc}" dest="bin">
+			<patternset>
+				<include name="java/net/canarymod/api/world/blocks/BlockType.java"/>
+				<include name="java/net/canarymod/api/world/position/Direction.java"/>
+			</patternset>
+		</unzip>		
+		<javadoc destdir="docs">
+			<fileset dir="src">
+				<include name="**/Turtle3D*java"/>
+			</fileset>
+			<fileset dir="bin">
+				<include name="java/net/canarymod/api/world/blocks/BlockType.java"/>
+				<include name="java/net/canarymod/api/world/position/Direction.java"/>
+			</fileset>
+		</javadoc>
+		<delete>
+			<fileset dir="bin">
+				<include name="java/net/canarymod/api/world/blocks/BlockType.java"/>
+				<include name="java/net/canarymod/api/world/position/Direction.java"/>
+			</fileset>
+		</delete>
+	</target>
+	
     <target name="depends">
     	<mkdir dir="${dest}"/>
     </target>

@@ -5,6 +5,13 @@ import static edu.knoxcraft.turtle3d.KCTCommand.*;
 import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
 
+/**
+ * Base class to be extended by students. Students override the run() method 
+ * and invoke all of the inherited methods.
+ * 
+ * @author jspacco
+ *
+ */
 public abstract class Turtle3DBase
 {
     private KCTScript script;
@@ -17,6 +24,9 @@ public abstract class Turtle3DBase
     
     /**
      * Execute the turtle's run method to check for runtime errors.
+     * 
+     * Note that this method is actually pretty useless in BlueJ because it shows up in the menu with
+     * all of the other inherited methods.
      */
     public void checkCode() {
         run();
