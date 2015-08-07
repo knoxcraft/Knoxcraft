@@ -52,6 +52,7 @@ public class ScriptManager {
      * @param script
      */
     public void putScript(String playerName, KCTScript script)  {
+        playerName=playerName.toLowerCase();
         if (!map.containsKey(playerName)) {
             //create a map for the player if one doesn't exist
             map.put(playerName, new HashMap<String, KCTScript>());

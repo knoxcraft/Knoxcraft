@@ -100,6 +100,7 @@ public class KCTUploadServlet extends HttpServlet
             }
             
             KCTUploadHook hook = new KCTUploadHook();
+            hook.setPlayerName(playerName);
             StringBuilder res=new StringBuilder();
             
             TurtleCompiler turtleCompiler=new TurtleCompiler(logger);

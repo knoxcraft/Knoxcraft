@@ -20,6 +20,8 @@
 		<copy file="config/Canary.inf" tofile="${bin}/Canary.inf" overwrite="true"/>
 		<jar destfile="${dest}/Turtles3D.jar" update="true">
 			<fileset file="${bin}/**"/>
+			<zipfileset includes="**" src="${servlet.jar}"/>
+			<zipfileset includes="**" src="${jetty.jar}"/>
 		</jar>
 	</target>
 	<target name="kct-java-api" depends="depends" description="">
@@ -45,6 +47,19 @@
 		<mkdir dir="${kct.java.install.location}"/>
 		<copy file="${dest}/kct-java.jar" tofile="${kct.java.install.location}/kct-java.jar" overwrite="true"/>
 	</target>
+	
+	<!-- Unsure we need this; makes more sense to put Jetty with the plugin than with Canary
+	<target name="canary-jar">
+		<jar destfile="${dest}/CanaryMod-Jetty-1.2.0.jar">
+			<zipfileset includes="**" src="lib/${canary.jar}"/>
+			<zipfileset includes="**" src="lib/${servlet.jar}"/>
+			<zipfileset includes="**" src="lib/${jetty.jar}"/>
+		    <manifest>
+		      <attribute name="Main-Class" value="net.canarymod.Main"/>
+		    </manifest>
+		</jar>
+	</target>
+	-->
 
     <target name="build" depends="turtles3d" description="description"/>
 	

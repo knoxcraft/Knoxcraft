@@ -152,12 +152,12 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
      */
     @HookHandler
     public void uploadJSON(KCTUploadHook hook) {
-        logger.info("Hook called!");
+        logger.debug("Hook called!");
 
         //add scripts to manager and db
         Collection<KCTScript> list = hook.getScripts();
         for (KCTScript script : list)  {
-            scripts.putScript(hook.getPlayerName(), script);
+            scripts.putScript(hook.getPlayerName().toLowerCase(), script);
 
             // This will create the table if it doesn't exist
             // and then insert data for the script into a new row
@@ -195,6 +195,13 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             sender.message(name);
         }
         Map<String,KCTScript> map=scripts.getAllScriptsForPlayer(sender.getName().toLowerCase());
+        if (map==null) {
+            map=scripts.getAllScriptsForPlayer(sender.getName());
+        }
+        if (map==null) {
+            sender.message(String.format("We cannot find any scripts for %s", sender.getName()));
+            return;
+        }
         for (Entry<String,KCTScript> entry : map.entrySet()) {
             logger.info(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
             sender.message(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
