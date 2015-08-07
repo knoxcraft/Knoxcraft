@@ -19,3 +19,4 @@ db
 logs
 crash-reports
 docs*
+.DS_Store

@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Stack;
 
 import org.knoxcraft.database.KCTScriptAccess;
+import org.knoxcraft.jetty.server.JettyServer;
 
 import edu.knoxcraft.hooks.KCTUploadHook;
 import edu.knoxcraft.http.server.HttpUploadServer;
@@ -31,6 +32,7 @@ import net.canarymod.plugin.PluginListener;
 public class TurtlePlugin extends Plugin implements CommandListener, PluginListener {
 
     private HttpUploadServer httpServer;
+    private JettyServer jettyServer;
     public static Logman logger;
     private ScriptManager scripts;
     private HashMap<String, Stack<Stack<BlockRecord>>> undoBuffers;  //PlayerName->buffer
@@ -51,7 +53,12 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
      */
     @Override
     public void disable() {
-        httpServer.disable();
+        if (httpServer!=null) {
+            httpServer.disable();
+        }
+        if (jettyServer!=null) {
+            jettyServer.disable();
+        }
     }
 
     /**
@@ -63,9 +70,13 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         try {
             getLogman().info("Registering plugin");
             Canary.hooks().registerListener(this, this);
-            httpServer=new HttpUploadServer();
-            httpServer.enable(getLogman());
-            //getName() returns the class name, in this case TurtlePlugin
+            
+            jettyServer=new JettyServer();
+            jettyServer.enable(logger);
+            
+            //httpServer=new HttpUploadServer();
+            //httpServer.enable(getLogman());
+            
             getLogman().info("Enabling "+getName() + " Version " + getVersion()); 
             getLogman().info("Authored by "+getAuthor());
             Canary.commands().registerCommands(this, this, false);
@@ -74,6 +85,9 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
 
             return true;
         } catch (Exception e){
+            if (jettyServer!=null) {
+                jettyServer.disable();
+            }
             if (httpServer!=null) {
                 httpServer.disable();
             }
