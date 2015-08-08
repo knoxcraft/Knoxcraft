@@ -20,6 +20,8 @@
 		<copy file="config/Canary.inf" tofile="${bin}/Canary.inf" overwrite="true"/>
 		<jar destfile="${dest}/Turtles3D.jar" update="true">
 			<fileset file="${bin}/**"/>
+			<zipfileset includes="**" src="${servlet.jar}"/>
+			<zipfileset includes="**" src="${jetty.jar}"/>
 		</jar>
 	</target>
 	<target name="kct-java-api" depends="depends" description="">
@@ -40,15 +42,51 @@
 				<include name="net/canarymod/api/world/position/Direction.class"/>
 			</fileset>
 		</jar>
-		
 	</target>
 	<target name="install-kct-java" depends="kct-java-api">
 		<mkdir dir="${kct.java.install.location}"/>
 		<copy file="${dest}/kct-java.jar" tofile="${kct.java.install.location}/kct-java.jar" overwrite="true"/>
 	</target>
+	
+	<!-- Unsure we need this; makes more sense to put Jetty with the plugin than with Canary
+	<target name="canary-jar">
+		<jar destfile="${dest}/CanaryMod-Jetty-1.2.0.jar">
+			<zipfileset includes="**" src="lib/${canary.jar}"/>
+			<zipfileset includes="**" src="lib/${servlet.jar}"/>
+			<zipfileset includes="**" src="lib/${jetty.jar}"/>
+		    <manifest>
+		      <attribute name="Main-Class" value="net.canarymod.Main"/>
+		    </manifest>
+		</jar>
+	</target>
+	-->
 
     <target name="build" depends="turtles3d" description="description"/>
-
+	
+	<target name="javadoc">
+		<unzip src="${cmodsrc}" dest="bin">
+			<patternset>
+				<include name="java/net/canarymod/api/world/blocks/BlockType.java"/>
+				<include name="java/net/canarymod/api/world/position/Direction.java"/>
+			</patternset>
+		</unzip>		
+		<javadoc destdir="docs">
+			<fileset dir="src">
+				<include name="**/Turtle3D*java"/>
+			</fileset>
+			<fileset dir="bin">
+				<include name="java/net/canarymod/api/world/blocks/BlockType.java"/>
+				<include name="java/net/canarymod/api/world/position/Direction.java"/>
+			</fileset>
+		</javadoc>
+		<delete>
+			<fileset dir="bin">
+				<include name="java/net/canarymod/api/world/blocks/BlockType.java"/>
+				<include name="java/net/canarymod/api/world/position/Direction.java"/>
+			</fileset>
+		</delete>
+	</target>
+	
     <target name="depends">
     	<mkdir dir="${dest}"/>
     </target>

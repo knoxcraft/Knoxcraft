@@ -341,6 +341,8 @@ public class Turtle {
      */
     public void executeScript(KCTScript script) {
 
+        // FIXME I don't think that oldBlocks can ever have anything in it from a previous script, since
+        // each script runs with its own fresh turtle
         //empty the undo buffer of previous scripts' blocks
         while (!oldBlocks.empty())  {
             oldBlocks.pop();
