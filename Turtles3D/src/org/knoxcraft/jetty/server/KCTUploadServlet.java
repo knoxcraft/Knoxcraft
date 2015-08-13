@@ -22,12 +22,12 @@ import edu.knoxcraft.turtle3d.TurtleException;
 import net.canarymod.Canary;
 import net.canarymod.logger.Logman;
 
-@MultipartConfig
+@MultipartConfig(location="/tmp", fileSizeThreshold=6*1024*1024, maxFileSize=30*1024*1024, maxRequestSize=3*1024*1024)
 public class KCTUploadServlet extends HttpServlet
 {
     private final Logman logger;
-    public KCTUploadServlet(Logman logger){
-        this.logger=logger;
+    public KCTUploadServlet(){
+        this.logger=Logman.getLogman(KCTUploadServlet.class.getName());
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
