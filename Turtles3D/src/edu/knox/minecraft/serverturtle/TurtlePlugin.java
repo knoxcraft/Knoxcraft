@@ -132,6 +132,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
                     script.setLanguage(scriptAccess.language);
                     script.setScriptName(scriptAccess.scriptName);
                     script.setSourceCode(scriptAccess.source);
+                    script.setPlayerName(scriptAccess.playerName);
 
                     scripts.putScript(scriptAccess.playerName, script);
                     logger.info(String.format("Loaded script %s for player %s", 

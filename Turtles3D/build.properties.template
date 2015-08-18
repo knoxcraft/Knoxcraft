@@ -3,6 +3,3 @@ dest=target
 install.location=/path/to/Canarymod/plugins
 kct.java.install.location=/path/to/bluej/+libs
 cmodsrc=lib/cmodsrc.zip
-canary.jar=lib/CanaryMod-1.2.0.jar
-servlet.jar=lib/javax.servlet-api-3.1.0.jar
-jetty.jar=lib/jetty-all-9.3.2.v20150730-uber.jar

@@ -46,7 +46,7 @@ public final class HttpUploadServer {
     public HttpUploadServer() {
     }
     
-    public boolean enable(Logman logger) {
+    public boolean enable(final Logman logger) {
         thread=new Thread() {
             public void run() {
                 bossGroup = new NioEventLoopGroup(1);

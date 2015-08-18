@@ -33,7 +33,10 @@
 		jarfile full of the external jarfiles 
 		-->
 		<jar destfile="${dest}/Turtles3D.jar" update="false">
-			<fileset file="${bin}/**"/>
+			<fileset dir="${bin}">
+				<include name="**"/>
+				<exclude name="external-libs.jar"/>
+			</fileset>
 			<zipfileset src="${bin}/external-libs.jar">
 				<exclude name="META-INF/**"/>
 			</zipfileset>
