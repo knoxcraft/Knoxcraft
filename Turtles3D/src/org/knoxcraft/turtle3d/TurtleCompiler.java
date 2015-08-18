@@ -21,9 +21,9 @@ import org.knoxcraft.javacompiler.InMemoryJavaCompiler;
 
 public class TurtleCompiler
 {
-    public static final String TURTLE_PLUGIN = "edu.knoxcraft.serverturtle.TurtlePlugin";
-    public static final String TURTLE3D_BASE = "edu.knoxcraft.turtle3d.Turtle3DBase";
-    public static final String TURTLE3D_MAIN = "edu.knoxcraft.turtle3d.Turtle3D";
+    public static final String TURTLE_PLUGIN = "org.knoxcraft.serverturtle.TurtlePlugin";
+    public static final String TURTLE3D_BASE = "org.knoxcraft.turtle3d.Turtle3DBase";
+    public static final String TURTLE3D_MAIN = "org.knoxcraft.turtle3d.Turtle3D";
     public static final String JAVA="java";
     public static final String PYTHON="python";
     public static final String BLOCKLY="blockly";
