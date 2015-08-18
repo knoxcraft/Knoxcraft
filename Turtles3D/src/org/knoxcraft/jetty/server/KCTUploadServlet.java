@@ -14,11 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import edu.knoxcraft.hooks.KCTUploadHook;
-import edu.knoxcraft.turtle3d.KCTScript;
-import edu.knoxcraft.turtle3d.TurtleCompiler;
-import edu.knoxcraft.turtle3d.TurtleCompilerException;
-import edu.knoxcraft.turtle3d.TurtleException;
+import org.knoxcraft.hooks.KCTUploadHook;
+import org.knoxcraft.turtle3d.KCTScript;
+import org.knoxcraft.turtle3d.TurtleCompiler;
+import org.knoxcraft.turtle3d.TurtleCompilerException;
+import org.knoxcraft.turtle3d.TurtleException;
 import net.canarymod.Canary;
 import net.canarymod.logger.Logman;
 
