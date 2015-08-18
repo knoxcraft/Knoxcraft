@@ -13,14 +13,13 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
 import org.knoxcraft.database.KCTScriptAccess;
+import org.knoxcraft.turtle3d.KCTScript;
+import org.knoxcraft.turtle3d.TurtleCompiler;
+import org.knoxcraft.turtle3d.TurtleException;
 
-import edu.knoxcraft.turtle3d.KCTScript;
-import edu.knoxcraft.turtle3d.TurtleCompiler;
-import edu.knoxcraft.turtle3d.TurtleException;
 import net.canarymod.database.DataAccess;
 import net.canarymod.database.Database;
 import net.canarymod.database.exceptions.DatabaseReadException;

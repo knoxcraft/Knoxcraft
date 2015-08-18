@@ -1,4 +1,4 @@
-main-class=edu.knox.minecraft.serverturtle.TurtlePlugin
+main-class=org.knoxcraft.serverturtle.TurtlePlugin
 author = ppypp and emhastings
 version = 0.0.0.1
 language = java
