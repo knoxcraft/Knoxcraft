@@ -10,13 +10,14 @@ import java.util.Stack;
 
 import org.knoxcraft.database.KCTScriptAccess;
 import org.knoxcraft.hooks.KCTUploadHook;
-import org.knoxcraft.http.server.HttpUploadServer;
 import org.knoxcraft.jetty.server.JettyServer;
+import org.knoxcraft.netty.server.HttpUploadServer;
 import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.TurtleCompiler;
 import org.knoxcraft.turtle3d.TurtleException;
 
 import net.canarymod.Canary;
+import net.canarymod.api.entity.living.humanoid.HumanCapabilities;
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.chat.MessageReceiver;
@@ -27,6 +28,7 @@ import net.canarymod.database.Database;
 import net.canarymod.database.exceptions.DatabaseReadException;
 import net.canarymod.database.exceptions.DatabaseWriteException;
 import net.canarymod.hook.HookHandler;
+import net.canarymod.hook.player.ConnectionHook;
 import net.canarymod.logger.Logman;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
@@ -70,7 +72,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
     @Override
     public boolean enable() {
         try {
-            getLogman().info("Registering plugin");
+            getLogman().info("Registering Knoxcraft Turtles plugin");
             Canary.hooks().registerListener(this, this);
             
             jettyServer=new JettyServer();
@@ -149,13 +151,27 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
     //HOOK HANDLERS
 
     /**
+     * Login hook that disallows breaking or placing blocks, 
+     * except by using code that students have uploaded.
+     * 
+     * This turns out to be easier than enabling flight in adventure mode.
+     */
+    @HookHandler
+    public void onLogin(ConnectionHook hook) {
+        //hook.getPlayer().getCapabilities().setMayFly(true);
+        //logger.debug(String.format("player %s can fly? %s", hook.getPlayer().getName(), hook.getPlayer().getCapabilities().mayFly()));
+        hook.getPlayer().setCanBuild(false);
+        logger.debug(String.format("player %s can build? %s", hook.getPlayer().getName(), hook.getPlayer().canBuild()));
+    }
+    
+    /**
      * Hook called when scripts are uploaded to the server
      * 
      * @param hook
      */
     @HookHandler
     public void uploadJSON(KCTUploadHook hook) {
-        logger.debug("Hook called!");
+        logger.trace("Hook called!");
 
         //add scripts to manager and db
         Collection<KCTScript> list = hook.getScripts();
@@ -186,27 +202,45 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
      * @param sender
      * @param args
      */
-    @Command(aliases = { "scripts", "sc" },
+    @Command(aliases = { "scripts", "sc", "ls" },
             description = "List KCTScripts",
             permissions = { "" },
-            toolTip = "/sc")
+            toolTip = "/ls")
     public void listScripts(MessageReceiver sender, String[] args) {
-        logger.info(String.format("name of sender is: %s", sender.getName().toLowerCase()));
-        sender.message(String.format("name of sender is: %s", sender.getName().toLowerCase()));
-        for (String name : scripts.getAllScripts().keySet()) {
-            logger.info(name);
-            sender.message(name);
-        }
-        Map<String,KCTScript> map=scripts.getAllScriptsForPlayer(sender.getName().toLowerCase());
-        if (map==null) {
-            map=scripts.getAllScriptsForPlayer(sender.getName());
-        }
-        if (map==null) {
-            sender.message(String.format("We cannot find any scripts for %s", sender.getName()));
-        }
-        for (Entry<String,KCTScript> entry : map.entrySet()) {
-            logger.info(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
-            sender.message(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
+        logger.debug(String.format("name of sender is: %s", sender.getName().toLowerCase()));
+        sender.message(String.format("%s is listing turtle scripts (programs)", sender.getName().toLowerCase()));
+        if (args.length>1) {
+            String playerName=args[1].toLowerCase();
+            if (playerName.equalsIgnoreCase("all")) {
+                // List all scripts for all players
+                Map<String,Map<String,KCTScript>> allScriptMap=scripts.getAllScripts();
+                for (Entry<String,Map<String,KCTScript>> entry : allScriptMap.entrySet()) {
+                    playerName=entry.getKey();
+                    for (Entry<String,KCTScript> entry2 : entry.getValue().entrySet()) {
+                        sender.message(String.format("%s has the script %s", playerName, entry2.getKey()));
+                    }
+                }
+            } else {
+                // List only scripts for the given player
+                Map<String,KCTScript> map=scripts.getAllScriptsForPlayer(playerName);
+                for (Entry<String,KCTScript> entry : map.entrySet()) {
+                    sender.message(String.format("%s has script %s"), playerName, entry.getKey());
+                }
+            }
+        } else {
+            Map<String,KCTScript> map=scripts.getAllScriptsForPlayer(sender.getName().toLowerCase());
+            if (map==null) {
+                // hacky way to use a case-insensitive key in a map
+                // in the future, be sure to make all keys lower-case
+                map=scripts.getAllScriptsForPlayer(sender.getName());
+            }
+            if (map==null) {
+                sender.message(String.format("We cannot find any scripts for %s", sender.getName()));
+            }
+            for (Entry<String,KCTScript> entry : map.entrySet()) {
+                logger.debug(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
+                sender.message(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
+            }
         }
     }
 

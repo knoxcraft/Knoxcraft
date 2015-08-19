@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -26,15 +24,11 @@ import net.canarymod.database.exceptions.DatabaseReadException;
 import net.canarymod.logger.Logman;
 
 //@WebFilter("/RequestLoggingFilter")
-public class KCTScriptFilter implements Filter
+public class KCTScriptFilter extends DefaultFilter
 {
     private Logman logger=Logman.getLogman(KCTScriptFilter.class.getName());
 
     public KCTScriptFilter() {
-    }
-
-    @Override
-    public void destroy() {
     }
 
     @Override
@@ -88,12 +82,6 @@ public class KCTScriptFilter implements Filter
             logger.error("cannot read DB", e);
         }
         chain.doFilter(request, response);
-    }
-
-    @Override
-    public void init(FilterConfig arg0) throws ServletException {
-        // TODO Auto-generated method stub
-
     }
 
 }

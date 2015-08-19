@@ -5,6 +5,8 @@ import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
 import java.util.Scanner;
 
+import javax.servlet.MultipartConfigElement;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -54,10 +56,10 @@ public class JettyServer
         // configure the upload servlet for multipart
         // this has to be done in code rather than web.xml or an annotation
         // so that we can use java.io.tmpdir to support multiple OSes
-        //ServletHolder multipartHolder = new ServletHolder(KCTUploadServlet.class);
-        //multipartHolder.getRegistration().setMultipartConfig(new MultipartConfigElement(
-        //        System.getProperty("java.io.tmpdir"), 30*MB, 10*MB, 6*MB));
-        //wcon.addServlet(multipartHolder, "/kctupload");
+        ServletHolder multipartHolder = new ServletHolder(KCTUploadServlet.class);
+        multipartHolder.getRegistration().setMultipartConfig(new MultipartConfigElement(
+                System.getProperty("java.io.tmpdir"), 30*MB, 10*MB, 6*MB));
+        wcon.addServlet(multipartHolder, "/kctupload");
         
         // set default servlet (needed for jsps)
         ServletHolder holderDefault = new ServletHolder("default",DefaultServlet.class);

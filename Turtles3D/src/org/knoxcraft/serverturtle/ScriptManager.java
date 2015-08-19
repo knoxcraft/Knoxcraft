@@ -24,7 +24,7 @@ public class ScriptManager {
      * @return map of player's scripts
      */
     public Map<String, KCTScript> getAllScriptsForPlayer(String playerName) {
-        return map.get(playerName);
+        return map.get(playerName.toLowerCase());
     }
     
     /**
@@ -64,6 +64,6 @@ public class ScriptManager {
      * @return the script
      */
     public KCTScript getScript(String playerName, String scriptName)  {
-        return map.get(playerName).get(scriptName);
+        return map.get(playerName.toLowerCase()).get(scriptName);
     }    
 }

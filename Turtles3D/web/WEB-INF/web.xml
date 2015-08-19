@@ -40,11 +40,14 @@
 	</servlet>
 	
 	
-
+	<!-- 
+	This has to be done in code so that we can look up java.io.tmpdir 
+	to try to be Windows compatible.
 	<servlet-mapping>
 		<servlet-name>KCTUploadServlet</servlet-name>
 		<url-pattern>/kctupload</url-pattern>
 	</servlet-mapping>
+	 -->
 	<servlet-mapping>
 		<servlet-name>LoginServlet</servlet-name>
 		<url-pattern>/login</url-pattern>
