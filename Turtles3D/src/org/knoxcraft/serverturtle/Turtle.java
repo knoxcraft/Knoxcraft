@@ -193,7 +193,22 @@ public class Turtle {
      */
     public void turtleSetBlockType(String blockType)
     {
-        bt = BlockType.fromString(blockType);      
+        // TODO: BlockType.fromString() has a bug in it, but I can't get
+        // CanaryMod and CanaryLib to both compile in order to fix it. So
+        // I'm adding a workaround.
+        try {
+            if (blockType.contains(":")) {
+                String[] idAndData=blockType.split(":");
+                int id=Integer.parseInt(idAndData[0]);
+                int data=Integer.parseInt(idAndData[1]);
+                bt = BlockType.fromIdAndData(id, data);
+            } else {
+                bt = BlockType.fromId(Integer.parseInt(blockType));
+            }
+        } catch (NumberFormatException e) {
+            logger.error(String.format("Cannot parse blockType %s; not changing the blockType", blockType));
+        }
+        logger.debug(String.format("block type: %s from %s", bt, blockType));
     }
 
     /**
@@ -243,7 +258,7 @@ public class Turtle {
                     oldBlocks.push(br);
                 }
 
-                //place new block              
+                //place new block    
                 world.setBlockAt(gamePos, bt);
             }
         }

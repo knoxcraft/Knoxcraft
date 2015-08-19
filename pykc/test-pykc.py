@@ -1,8 +1,15 @@
 from pykc import Turtle, BlockType as bt
 
-t = Turtle('Francois')
+t = Turtle('francois')
 t.forward(10)
-t.turnRight(2)
-t.setBlock(bt.air)
+t.turnRight(90)
+t.setBlock(bt.BlueWool)
+t.forward(10)
+t.turnRight(90)
+t.setBlock(bt.GreenWool)
+t.forward(10)
+t.turnRight(90)
+t.setBlock(bt.Dirt)
+t.forward(10)
 #print(t.toJson())
 t.upload('127.0.0.1:8888', 'Spacdog')

@@ -205,7 +205,11 @@ public abstract class Turtle3DBase
       */
     public void setBlock(BlockType type) {
          checkTurtle();
-         KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type.getId()));
+         String id=String.valueOf(type.getId());
+         if (type.getData()!=0) {
+             id+=":"+type.getData();
+         }
+         KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, id));
          script.addCommand(cmd);
      }
      

@@ -198,8 +198,11 @@ public class Turtle3D
       * @param type The block type
       */
     public void setBlock(BlockType type) {
-         KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type.getId()));
-         script.addCommand(cmd);
+        String id=String.valueOf(type.getId());
+        if (type.getData()!=0) {
+            id+=":"+type.getData();
+        }
+        KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, id));         script.addCommand(cmd);
      }
      
      /**
