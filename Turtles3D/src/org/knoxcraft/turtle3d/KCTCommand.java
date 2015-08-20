@@ -39,6 +39,7 @@ public class KCTCommand
     public static final String Z = "z";
     public static final String DIST = "dist";
     public static final String BLOCKTYPE = "blockType";
+    public static final String BLOCKDATA = "blockData";
     
     public static final String CMD = "cmd";
     public static final String CMDKEY = "\"cmd\"";

@@ -23,12 +23,17 @@ public class KCTScript
    }
    */
     
+    public String getPlayerName() {
+        return playerName;
+    }
+
     private String scriptName;
     private List<KCTCommand> commands;
     // TODO: Add support for turtle scripts that store the source code that generated the list of commands
     // instructors may want to see this
     private String sourceCode;
-    private String language; 
+    private String language;
+    private String playerName;
     
     /////////////////////////////////////////////////////////////////////////////////////
     
@@ -94,5 +99,9 @@ public class KCTScript
     
     public void setScriptName(String scriptName) {
         this.scriptName = scriptName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName=playerName;
     }
 }

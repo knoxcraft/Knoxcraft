@@ -6,10 +6,6 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-import net.canarymod.Canary;
-import net.canarymod.logger.Logman;
-import net.canarymod.plugin.Plugin;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -18,6 +14,10 @@ import org.knoxcraft.javacompiler.ByteArrayClassLoader;
 import org.knoxcraft.javacompiler.CompilationResult;
 import org.knoxcraft.javacompiler.CompilerDiagnostic;
 import org.knoxcraft.javacompiler.InMemoryJavaCompiler;
+
+import net.canarymod.Canary;
+import net.canarymod.logger.Logman;
+import net.canarymod.plugin.Plugin;
 
 public class TurtleCompiler
 {

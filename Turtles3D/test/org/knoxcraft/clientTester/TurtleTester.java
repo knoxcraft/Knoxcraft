@@ -1,6 +1,6 @@
 package org.knoxcraft.clientTester;
 
-import org.knoxcraft.http.server.HttpUploadServer;
+import org.knoxcraft.netty.server.HttpUploadServer;
 import org.knoxcraft.serverturtle.Turtle;
 
 import net.canarymod.Canary;

@@ -15,13 +15,23 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.knoxcraft.http.server;
+package org.knoxcraft.netty.server;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import static org.knoxcraft.turtle3d.JSONUtil.quoteString;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.knoxcraft.hooks.KCTUploadHook;
+import org.knoxcraft.turtle3d.KCTScript;
+import org.knoxcraft.turtle3d.TurtleCompiler;
+import org.knoxcraft.turtle3d.TurtleCompilerException;
+import org.knoxcraft.turtle3d.TurtleException;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -46,17 +56,6 @@ import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
 import io.netty.util.CharsetUtil;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.knoxcraft.hooks.KCTUploadHook;
-import org.knoxcraft.turtle3d.KCTScript;
-import org.knoxcraft.turtle3d.TurtleCompiler;
-import org.knoxcraft.turtle3d.TurtleCompilerException;
-import org.knoxcraft.turtle3d.TurtleException;
-
 import net.canarymod.Canary;
 import net.canarymod.logger.Logman;
 

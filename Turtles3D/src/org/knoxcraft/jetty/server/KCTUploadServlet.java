@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,23 +18,23 @@ import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.TurtleCompiler;
 import org.knoxcraft.turtle3d.TurtleCompilerException;
 import org.knoxcraft.turtle3d.TurtleException;
+
 import net.canarymod.Canary;
 import net.canarymod.logger.Logman;
 
-@MultipartConfig
 public class KCTUploadServlet extends HttpServlet
 {
+    
     private final Logman logger;
-    public KCTUploadServlet(Logman logger){
-        this.logger=logger;
+    public KCTUploadServlet(){
+        this.logger=Logman.getLogman(KCTUploadServlet.class.getName());
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {
-        // TODO: post the menu
-        response.setContentType("text/plain");
-        response.getWriter().println("Hello world");
+        // redirect to kctupload.jsp
+        response.sendRedirect("kctupload.jsp");
     }
     
     private static String readFromInputStream(InputStream in) {

@@ -1,4 +1,4 @@
-package org.knoxcraft.http.server;
+package org.knoxcraft.netty.server;
 
 public class CanaryServer
 {

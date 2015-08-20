@@ -1,6 +1,23 @@
 package org.knoxcraft.turtle3d;
 
-import static org.knoxcraft.turtle3d.KCTCommand.*;
+import static org.knoxcraft.turtle3d.KCTCommand.BACKWARD;
+import static org.knoxcraft.turtle3d.KCTCommand.BLOCKPLACEMODE;
+import static org.knoxcraft.turtle3d.KCTCommand.BLOCKTYPE;
+import static org.knoxcraft.turtle3d.KCTCommand.DEGREES;
+import static org.knoxcraft.turtle3d.KCTCommand.DIR;
+import static org.knoxcraft.turtle3d.KCTCommand.DIST;
+import static org.knoxcraft.turtle3d.KCTCommand.DOWN;
+import static org.knoxcraft.turtle3d.KCTCommand.FORWARD;
+import static org.knoxcraft.turtle3d.KCTCommand.PLACEBLOCKS;
+import static org.knoxcraft.turtle3d.KCTCommand.SETBLOCK;
+import static org.knoxcraft.turtle3d.KCTCommand.SETDIRECTION;
+import static org.knoxcraft.turtle3d.KCTCommand.SETPOSITION;
+import static org.knoxcraft.turtle3d.KCTCommand.TURNLEFT;
+import static org.knoxcraft.turtle3d.KCTCommand.TURNRIGHT;
+import static org.knoxcraft.turtle3d.KCTCommand.UP;
+import static org.knoxcraft.turtle3d.KCTCommand.X;
+import static org.knoxcraft.turtle3d.KCTCommand.Y;
+import static org.knoxcraft.turtle3d.KCTCommand.Z;
 
 import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
@@ -188,7 +205,11 @@ public abstract class Turtle3DBase
       */
     public void setBlock(BlockType type) {
          checkTurtle();
-         KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, type.getId()));
+         String id=String.valueOf(type.getId());
+         if (type.getData()!=0) {
+             id+=":"+type.getData();
+         }
+         KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, id));
          script.addCommand(cmd);
      }
      

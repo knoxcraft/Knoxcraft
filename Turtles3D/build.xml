@@ -18,10 +18,29 @@
 	
 	<target name="turtles3d" depends="depends" description="package the Turtles3D plugin">
 		<copy file="config/Canary.inf" tofile="${bin}/Canary.inf" overwrite="true"/>
-		<jar destfile="${dest}/Turtles3D.jar" update="true">
-			<fileset file="${bin}/**"/>
-			<zipfileset includes="**" src="${servlet.jar}"/>
-			<zipfileset includes="**" src="${jetty.jar}"/>
+		<!-- Turn all of our jarfiles into one big jarfile
+		The zipgroupfileset task doesn't have the ability to filter out the META-INF folders
+		-->
+		<jar jarfile="${bin}/external-libs.jar">
+			<zipgroupfileset dir="lib/">
+				<include name="**/*.jar"/>
+				<exclude name="CanaryMod*jar"/>
+			</zipgroupfileset>
+		</jar>
+		<!-- sleep so that the timestamps don't seem to be in the future -->
+		<sleep seconds="1"/>
+		<!-- Now create the jarfile, filtering out the META-INF folder from our big
+		jarfile full of the external jarfiles 
+		-->
+		<jar destfile="${dest}/Turtles3D.jar" update="false">
+			<fileset dir="${bin}">
+				<include name="**"/>
+				<exclude name="external-libs.jar"/>
+			</fileset>
+			<zipfileset src="${bin}/external-libs.jar">
+				<exclude name="META-INF/**"/>
+			</zipfileset>
+			<fileset dir="." includes="web/**"/>
 		</jar>
 	</target>
 	<target name="kct-java-api" depends="depends" description="">
