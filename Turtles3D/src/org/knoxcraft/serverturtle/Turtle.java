@@ -539,6 +539,26 @@ public class Turtle {
             }
             turtleMove(dist); 
 
+        } else if (commandName.equals(KCTCommand.RIGHT)) {
+            int dist;
+            if (!m.containsKey(KCTCommand.DIST)){ 
+                dist = 1; //default
+            }else{
+                dist = toInt(m.get(KCTCommand.DIST));
+            }
+            turtleTurn(false, 90);
+            turtleMove(dist);
+            turtleTurn(true, 90);
+        } else if (commandName.equals(KCTCommand.LEFT)) {
+            int dist;
+            if (!m.containsKey(KCTCommand.DIST)){ 
+                dist = 1; //default
+            }else{
+                dist = toInt(m.get(KCTCommand.DIST));
+            }
+            turtleTurn(true, 90);
+            turtleMove(dist);
+            turtleTurn(false, 90);
         }else if (commandName.equals(KCTCommand.TURNRIGHT)) {
             // turn right
             int ang;

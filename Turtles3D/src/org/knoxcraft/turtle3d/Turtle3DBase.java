@@ -1,23 +1,6 @@
 package org.knoxcraft.turtle3d;
 
-import static org.knoxcraft.turtle3d.KCTCommand.BACKWARD;
-import static org.knoxcraft.turtle3d.KCTCommand.BLOCKPLACEMODE;
-import static org.knoxcraft.turtle3d.KCTCommand.BLOCKTYPE;
-import static org.knoxcraft.turtle3d.KCTCommand.DEGREES;
-import static org.knoxcraft.turtle3d.KCTCommand.DIR;
-import static org.knoxcraft.turtle3d.KCTCommand.DIST;
-import static org.knoxcraft.turtle3d.KCTCommand.DOWN;
-import static org.knoxcraft.turtle3d.KCTCommand.FORWARD;
-import static org.knoxcraft.turtle3d.KCTCommand.PLACEBLOCKS;
-import static org.knoxcraft.turtle3d.KCTCommand.SETBLOCK;
-import static org.knoxcraft.turtle3d.KCTCommand.SETDIRECTION;
-import static org.knoxcraft.turtle3d.KCTCommand.SETPOSITION;
-import static org.knoxcraft.turtle3d.KCTCommand.TURNLEFT;
-import static org.knoxcraft.turtle3d.KCTCommand.TURNRIGHT;
-import static org.knoxcraft.turtle3d.KCTCommand.UP;
-import static org.knoxcraft.turtle3d.KCTCommand.X;
-import static org.knoxcraft.turtle3d.KCTCommand.Y;
-import static org.knoxcraft.turtle3d.KCTCommand.Z;
+import static org.knoxcraft.turtle3d.KCTCommand.*;
 
 import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
@@ -106,6 +89,32 @@ public abstract class Turtle3DBase
     public void forward(int distance) {
         checkTurtle();
         KCTCommand cmd=new KCTCommand(FORWARD, JSONUtil.makeArgMap(DIST, distance));
+        script.addCommand(cmd);
+    }
+    
+    /**
+     * Move the turtle to the right the given distance.
+     * This would be called "strafe right" in most FPS games; in other words, 
+     * this will not cause the turtle to turn to the right.
+     * 
+     * @param distance
+     */
+    public void right(int distance) {
+        checkTurtle();
+        KCTCommand cmd=new KCTCommand(RIGHT, JSONUtil.makeArgMap(DIST, distance));
+        script.addCommand(cmd);
+    }
+    
+    /**
+     * Move the turtle to the left the given distance.
+     * This would be called "strafe left" in most FPS games; in other words, 
+     * this will not cause the turtle to turn to the left.
+     * 
+     * @param distance
+     */
+    public void left(int distance) {
+        checkTurtle();
+        KCTCommand cmd=new KCTCommand(LEFT, JSONUtil.makeArgMap(DIST, distance));
         script.addCommand(cmd);
     }
     
