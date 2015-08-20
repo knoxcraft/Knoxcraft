@@ -42,6 +42,10 @@ class Turtle:
 		self.commands.append(Command('forward', {'dist' : numBlocks}))
 	def backward(self, numBlocks):
 		self.commands.append(Command('backward', {'dist' : numBlocks}))
+	def right(self, numBlocks):
+		self.commands.append(Command('right', {'dist' : numBlocks}))
+	def left(self, numBlocks):
+		self.commands.append(Command('left', {'dist' : numBlocks}))
 	def up(self, numBlocks):
 		self.commands.append(Command('up', {'dist' : numBlocks}))
 	def down(self, numBlocks):

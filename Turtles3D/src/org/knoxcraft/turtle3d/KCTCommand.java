@@ -39,7 +39,6 @@ public class KCTCommand
     public static final String Z = "z";
     public static final String DIST = "dist";
     public static final String BLOCKTYPE = "blockType";
-    public static final String BLOCKDATA = "blockData";
     
     public static final String CMD = "cmd";
     public static final String CMDKEY = "\"cmd\"";
@@ -53,6 +52,8 @@ public class KCTCommand
     public static final String SETDIRECTION = "setDirection";
     public static final String SETPOSITION = "setPosition";
     public static final String SETBLOCK = "setBlock";
+    public static final String RIGHT = "right";
+    public static final String LEFT = "left";
     
     protected String commandName;
     protected Map<String, Object> arguments;
