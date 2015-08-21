@@ -50,9 +50,9 @@ public class TurtleCompiler
         if (javaSource.contains(TURTLE3D_BASE)) {
             // If we see a reference to Turtle3DBase, we should try to parse that first
             String json=getJSONTurtle3DBase(className, javaSource);
-            logger.debug("json has been returned: "+json);
+            logger.trace("json has been returned: "+json);
             KCTScript script=parseFromJson(json);
-            logger.debug("json after parsing to KCTScript: "+script.toJSONString());
+            logger.trace("json after parsing to KCTScript: "+script.toJSONString());
             script.setLanguage(JAVA);
             script.setSourceCode(javaSource);
             return script;
@@ -81,20 +81,20 @@ public class TurtleCompiler
         JSONParser parser=new JSONParser();
         
         try {
-            logger.info(jsonText);
+            logger.trace(jsonText);
             JSONObject json=(JSONObject)parser.parse(jsonText);
 
             String scriptname=(String)json.get("scriptname");
 
             KCTScript script=new KCTScript(scriptname);
 
-            logger.debug(String.format("%s\n", scriptname));
+            logger.trace(String.format("%s\n", scriptname));
 
             JSONArray lang= (JSONArray) json.get("commands");
             for (int i=0; i<lang.size(); i++) {
                 JSONObject cmd=(JSONObject)lang.get(i);
                 script.addCommand(cmd);
-                logger.debug(String.format("script %s has command %s", script.getScriptName(), cmd.get(KCTCommand.CMD)));
+                logger.trace(String.format("script %s has command %s", script.getScriptName(), cmd.get(KCTCommand.CMD)));
             }
             return script;
         } catch (ParseException e) {
@@ -126,7 +126,7 @@ public class TurtleCompiler
         // at least I think this is what does that...
         Plugin plugin=Canary.pluginManager().getPlugin(TURTLE_PLUGIN);
         String extraClasspath=new File(plugin.getPath()).toURI().toString();
-        logger.info(String.format("Extra classpath: %s", extraClasspath));
+        logger.debug(String.format("Extra classpath: %s", extraClasspath));
         compiler.setExtraClasspath(extraClasspath);
         compiler.addSourceFile(className, source);
         //String driverName="Driver"+System.currentTimeMillis();
@@ -195,7 +195,7 @@ public class TurtleCompiler
         // at least I think this is what does that...
         Plugin plugin=Canary.pluginManager().getPlugin(TURTLE_PLUGIN);
         String extraClasspath=new File(plugin.getPath()).toURI().toString();
-        logger.info(String.format("Extra classpath: %s", extraClasspath));
+        logger.debug(String.format("Extra classpath: %s", extraClasspath));
         compiler.setExtraClasspath(extraClasspath);
         compiler.addSourceFile(className, source);
         //String driverName="Driver"+System.currentTimeMillis();

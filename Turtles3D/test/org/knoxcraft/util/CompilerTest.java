@@ -1,3 +1,4 @@
+package org.knoxcraft.util;
 import javax.tools.JavaCompiler;
 
 public class CompilerTest {
