@@ -26,8 +26,13 @@ class Command:
 		for k,v in self.args.items():
 			if type(v) == str:
 				v='"%s"' % v
-			elif type(v) == int or type(v) == long:
+			elif type(v) == int:
 				v='%d' % v
+			elif v == True:
+				v='true'
+			elif v == False:
+				v='false'
+
 			argList.append('"%s" : %s' % (k, v))
 		argStr=', '.join(argList)
 		return '{"cmd" : "%s", "args" : {%s}}' % (self.command, argStr)
@@ -59,18 +64,8 @@ class Turtle:
 	def setDirection(self, direction):
 		self.commands.append(Command('setDirection', {'direction' : direction}))
 	def blockPlace(self, place):
-		self.commands.append(Command('blockPlace', {'dist' : place}))
+		self.commands.append(Command('placeBlocks', {'blockPlaceMode' : place}))
 	def setBlock(self, blockType):
-		'''
-		# this is a really hacky way to handle blocks with both id and data
-		# such as RedWool (id 35, data 14)
-		# But it was very quick to implement
-		if '-' in blockType:
-			(id, data) = blockType.split('-')
-			self.commands.append(Command('setBlock', {'blockType' : blockType}))
-		else:
-			self.commands.append(Command('setBlock', {'blockType' : int(blockType)}))
-		'''
 		self.commands.append(Command('setBlock', {'blockType' : blockType}))
 
 	def toJson(self):

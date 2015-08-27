@@ -28,6 +28,7 @@ import net.canarymod.database.exceptions.DatabaseReadException;
 import net.canarymod.database.exceptions.DatabaseWriteException;
 import net.canarymod.hook.HookHandler;
 import net.canarymod.hook.player.ConnectionHook;
+import net.canarymod.hook.world.WeatherChangeHook;
 import net.canarymod.logger.Logman;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
@@ -73,6 +74,11 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         try {
             getLogman().info("Registering Knoxcraft Turtles plugin");
             Canary.hooks().registerListener(this, this);
+            
+            // TODO: these seem to have no effect; figure out why!
+            boolean b1=Canary.getServer().consoleCommand("weather clear 1000000");
+            boolean b2=Canary.getServer().consoleCommand("gamerule doDaylightCycle false");
+            logger.trace(String.format("Did weather work? %s did daylight work? %s", b1, b2));
             
             jettyServer=new JettyServer();
             jettyServer.enable(logger);
@@ -157,10 +163,24 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
      */
     @HookHandler
     public void onLogin(ConnectionHook hook) {
-        //hook.getPlayer().getCapabilities().setMayFly(true);
-        //logger.debug(String.format("player %s can fly? %s", hook.getPlayer().getName(), hook.getPlayer().getCapabilities().mayFly()));
         hook.getPlayer().setCanBuild(false);
         logger.debug(String.format("player %s can build? %s", hook.getPlayer().getName(), hook.getPlayer().canBuild()));
+    }
+    
+    /**
+     * TODO: Fix this hook. This doesn't seem to get called. I would like to shut rain off every time it starts raining.
+     * 
+     * @param hook
+     */
+    @HookHandler
+    public void onWeatherChange(WeatherChangeHook hook) {
+        World w=hook.getWorld();
+        logger.info(String.format("Weather change hook called, is raining? %s", w.isRaining()));
+        if (w.isRaining()) {
+            logger.info(String.format("Set raining to false"));
+            w.setRaining(false);
+            //w.setRainTime(0);
+        }
     }
     
     /**
@@ -171,7 +191,6 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
     @HookHandler
     public void uploadJSON(KCTUploadHook hook) {
         logger.trace("Hook called!");
-
         //add scripts to manager and db
         Collection<KCTScript> list = hook.getScripts();
         for (KCTScript script : list)  {

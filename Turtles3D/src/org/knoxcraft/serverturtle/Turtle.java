@@ -484,6 +484,7 @@ public class Turtle {
         //This currently only works correctly for 45 deg intervals.  It may be okay to leave it that way.
 
         int turns = deg/45;  //desired number of eighth turns
+        turns = turns % 8;
 
         if (left)  {  //turning left
             dirInt -= turns;
@@ -491,7 +492,8 @@ public class Turtle {
             dirInt += turns;
         }
 
-        dirInt = dirInt % 8;
+        // have to make sure we don't end up with a negative direction
+        dirInt = (dirInt+8) % 8;
 
         //update direction and return
         d = Direction.getFromIntValue(dirInt);
