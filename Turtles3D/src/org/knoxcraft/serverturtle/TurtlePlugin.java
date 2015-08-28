@@ -373,7 +373,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
                     // underwater for example. 
                     BlockRecord b=blocks.pop();
                     World world = sender.asPlayer().getWorld();
-                    world.setBlockAt(b.getBlock().getPosition(), BlockType.Air);
+                    world.setBlockAt(b.getBlock().getPosition(), b.getBlock()); //Whats in buffer
                     //blocks.pop().revert();
                 }
             }
