@@ -7,9 +7,15 @@ import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.TurtleCommandException;
 
+import net.canarymod.Canary;
+import net.canarymod.api.entity.Entity;
+import net.canarymod.api.entity.EntityType;
+import net.canarymod.api.entity.living.EntityLiving;
+import net.canarymod.api.factory.EntityFactory;
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.position.Direction;
+import net.canarymod.api.world.position.Location;
 import net.canarymod.api.world.position.Position;
 import net.canarymod.chat.MessageReceiver;
 import net.canarymod.logger.Logman;
@@ -35,6 +41,7 @@ public class Turtle {
     private MessageReceiver sender;  //player to send messages to
     private Stack<BlockRecord> oldBlocks;  //original pos/type of all bricks laid by this turtle for undoing
     private Logman logger;
+    private Entity sprite;
 
     ///////////////////////////////////////////////////////////////////////////////
     /**
@@ -73,8 +80,19 @@ public class Turtle {
         //Update game position
         gamePos = new Position(); 
         updateGamePos();
+        
+        //Create sprite
+        sprite = spawnEntityLiving(sender.asPlayer().getLocation(), net.canarymod.api.entity.EntityType.WOLF);
     }       
-
+    //copied coded
+    public static EntityLiving spawnEntityLiving(Location loc, EntityType type) 
+    {
+    	EntityFactory factory = Canary.factory().getEntityFactory();
+    	EntityLiving thing = factory.newEntityLiving(type, loc);
+    	thing.spawn();
+    	return thing;
+    }
+    //End copied code
     /**
      * Output a message to the player console.
      * 
@@ -234,7 +252,7 @@ public class Turtle {
     public void turtleMove(int dist)
     {
         boolean fd = false;  //flipped direction (for moving backward) 
-
+        
         //check if distance is negative (going backward)
         if (dist < 0){  
             //if so, reverse turtle direction
@@ -248,7 +266,7 @@ public class Turtle {
             //update turtle position
             relPos = calculateMove(relPos, dir, false, false);
             updateGamePos();
-
+            sprite.teleportTo(relPos);
             //Place block if block placement mode on
             if (bp) {
 

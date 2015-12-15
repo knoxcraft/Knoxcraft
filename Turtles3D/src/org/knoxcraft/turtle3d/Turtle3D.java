@@ -209,7 +209,8 @@ public class Turtle3D
         if (type.getData()!=0) {
             id+=":"+type.getData();
         }
-        KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, id));         script.addCommand(cmd);
+        KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, id)); 
+        script.addCommand(cmd);
      }
      
      /**
