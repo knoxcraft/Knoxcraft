@@ -8,9 +8,12 @@ import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.TurtleCommandException;
 
 import net.canarymod.Canary;
+import net.canarymod.api.ai.AIBase;
+import net.canarymod.api.ai.AIManager;
 import net.canarymod.api.entity.Entity;
 import net.canarymod.api.entity.EntityType;
 import net.canarymod.api.entity.living.EntityLiving;
+import net.canarymod.api.entity.living.animal.CanaryWolf;
 import net.canarymod.api.factory.EntityFactory;
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
@@ -88,8 +91,22 @@ public class Turtle {
     public static EntityLiving spawnEntityLiving(Location loc, EntityType type) 
     {
     	EntityFactory factory = Canary.factory().getEntityFactory();
+    	
     	EntityLiving thing = factory.newEntityLiving(type, loc);
     	thing.spawn();
+    	AIManager aiman=thing.getAITaskManager();
+    	boolean done=false;
+    	while (!done) {
+    	    AIBase task=aiman.getTask(AIBase.class);
+    	    if (task!=null) {
+    	        System.out.printf("class is %s\n", task.getClass());
+    	    } else {
+    	        break;
+    	    }
+    	    done=!aiman.removeTask(AIBase.class);
+    	    System.out.println("removing task!");
+    	}
+    	
     	return thing;
     }
     //End copied code
@@ -603,7 +620,7 @@ public class Turtle {
             // place blocks on/off 
             //only changes mode if arg map contains valid arg
             if (m.containsKey(KCTCommand.BLOCKPLACEMODE)){ 
-                boolean mode = (boolean)m.get(KCTCommand.BLOCKPLACEMODE);
+                boolean mode = (Boolean)m.get(KCTCommand.BLOCKPLACEMODE);
                 turtleSetBlockPlace(mode);
             }
 
