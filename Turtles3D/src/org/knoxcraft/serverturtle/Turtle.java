@@ -85,7 +85,7 @@ public class Turtle {
         updateGamePos();
         
         //Create sprite
-        sprite = spawnEntityLiving(sender.asPlayer().getLocation(), net.canarymod.api.entity.EntityType.WOLF);
+        sprite = spawnEntityLiving(sender.asPlayer().getLocation(), net.canarymod.api.entity.EntityType.GENERIC_ENTITY);
     }       
     //copied coded
     public static EntityLiving spawnEntityLiving(Location loc, EntityType type) 
