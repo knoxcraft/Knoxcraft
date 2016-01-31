@@ -32,6 +32,7 @@ import net.canarymod.hook.world.WeatherChangeHook;
 import net.canarymod.logger.Logman;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
+import net.minecraft.entity.passive.EntityWolf;
 
 public class TurtlePlugin extends Plugin implements CommandListener, PluginListener {
 
@@ -291,7 +292,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         //Create turtle
 //        Turtle turtle = new Turtle(logger);
 //        turtle.turtleInit(sender);
-        Sprite sprite = new Sprite(null, logger);
+        Sprite sprite = new Sprite(new EntityWolf((net.minecraft.world.World) sender.asPlayer().getWorld()), logger);
         sprite.sInit(sender);
         //Get script from map
         KCTScript script = null;
