@@ -289,9 +289,10 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         }
 
         //Create turtle
-        Turtle turtle = new Turtle(logger);
-        turtle.turtleInit(sender);
-
+//        Turtle turtle = new Turtle(logger);
+//        turtle.turtleInit(sender);
+        Sprite sprite = new Sprite(null, logger);
+        sprite.sInit(sender);
         //Get script from map
         KCTScript script = null;
         try  {     
@@ -309,15 +310,16 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
                 return;
             }
         }  catch (Exception e)  {
-            turtle.turtleConsole("Script failed to load!");
+            //turtle.turtleConsole("Script failed to load!");
+        	sprite.sConsole("Script failed to load!");
             logger.error("Script failed to load", e);
         }
 
         //Execute script    
         try  {
-            turtle.executeScript(script);
+            sprite.execute(script);
         }  catch (Exception e)  {
-            turtle.turtleConsole("Script failed to execute!");
+            sprite.sConsole("Script failed to execute!");
             logger.error("Script failed to execute", e);
         }
 
@@ -328,9 +330,9 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
                 undoBuffers.put(senderName, new Stack<Stack<BlockRecord>>());
             }    
             //add to buffer
-            undoBuffers.get(senderName).push(turtle.getOldBlocks());            
+            undoBuffers.get(senderName).push(sprite.getOldBlocks());            
         }  catch (Exception e)  {
-            turtle.turtleConsole("Failed to add to undo buffer!");
+            sprite.sConsole("Failed to add to undo buffer!");
             logger.error("Faile to add to undo buffer", e);
         }
     }
@@ -369,8 +371,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
 
                 //replace original blocks
                 while(!blocks.empty())  {
-                    // FIXME Currently, we just use the coordinates to replace the block with air, so it won't work 
-                    // underwater for example. 
+                    
                     BlockRecord b=blocks.pop();
                     World world = sender.asPlayer().getWorld();
                     world.setBlockAt(b.getBlock().getPosition(), b.getBlock()); //Whats in buffer
