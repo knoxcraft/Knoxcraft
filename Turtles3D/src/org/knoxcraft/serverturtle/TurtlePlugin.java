@@ -292,7 +292,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         //Create turtle
 //        Turtle turtle = new Turtle(logger);
 //        turtle.turtleInit(sender);
-        Sprite sprite = new Sprite(new EntityWolf((net.minecraft.world.World) sender.asPlayer().getWorld()), logger);
+        Sprite sprite = new Sprite(new EntityWolf((net.minecraft.world.World) sender.asPlayer().getWorld()), logger); //??? Is this good? #TODO
         sprite.sInit(sender);
         //Get script from map
         KCTScript script = null;
