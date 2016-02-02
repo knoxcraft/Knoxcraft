@@ -18,7 +18,6 @@ import org.knoxcraft.turtle3d.TurtleException;
 
 import net.canarymod.Canary;
 import net.canarymod.api.world.World;
-import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.chat.MessageReceiver;
 import net.canarymod.commandsys.Command;
 import net.canarymod.commandsys.CommandListener;
