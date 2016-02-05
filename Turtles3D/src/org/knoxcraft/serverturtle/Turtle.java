@@ -13,7 +13,6 @@ import net.canarymod.api.ai.AIManager;
 import net.canarymod.api.entity.Entity;
 import net.canarymod.api.entity.EntityType;
 import net.canarymod.api.entity.living.EntityLiving;
-import net.canarymod.api.entity.living.animal.CanaryWolf;
 import net.canarymod.api.factory.EntityFactory;
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
@@ -93,7 +92,8 @@ public class Turtle {
     	EntityFactory factory = Canary.factory().getEntityFactory();
     	
     	EntityLiving thing = factory.newEntityLiving(type, loc);
-    	thing.spawn();
+    	boolean spawnOK=thing.spawn();
+    	
     	AIManager aiman=thing.getAITaskManager();
     	boolean done=false;
     	while (!done) {

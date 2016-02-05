@@ -17,7 +17,17 @@ import org.knoxcraft.turtle3d.TurtleCompiler;
 import org.knoxcraft.turtle3d.TurtleException;
 
 import net.canarymod.Canary;
+import net.canarymod.api.ai.AIBase;
+import net.canarymod.api.ai.AIManager;
+import net.canarymod.api.entity.EntityType;
+import net.canarymod.api.entity.living.animal.CanaryRabbit;
+import net.canarymod.api.entity.living.animal.CanaryWolf;
+import net.canarymod.api.entity.living.animal.EntityAnimal;
+import net.canarymod.api.entity.living.humanoid.Player;
 import net.canarymod.api.world.World;
+import net.canarymod.api.world.position.Location;
+import net.canarymod.api.world.position.Position;
+import net.canarymod.api.world.position.Vector3D;
 import net.canarymod.chat.MessageReceiver;
 import net.canarymod.commandsys.Command;
 import net.canarymod.commandsys.CommandListener;
@@ -261,7 +271,70 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             }
         }
     }
+    
+    static void removeAITasks(EntityAnimal e) {
+        AIManager aiman=e.getAITaskManager();
+        boolean done=false;
+        while (!done) {
+            AIBase task=aiman.getTask(AIBase.class);
+            if (task==null) {
+                break;
+            }
+            logger.trace("removing task with class %s\n", task.getClass());
+            //done=!aiman.removeTask(AIBase.class);
+            //System.out.println("removing task!");
+        }
+    }
+    
+    /**
+     * Run a script using a Sprite.
+     * 
+     * @param sender
+     * @param args
+     */
+    @Command(
+            aliases = { "go" },
+            description = "Invoke a script using a sprite",
+            permissions = { "" },
+            toolTip = "/go <scriptName> [playerName]")
+    public void go(MessageReceiver sender, String[] args) {
+        logger.info("go invoked");
+        if (args.length<2)  {  //not enough arguments
+            sender.message("Not enough arguments.");
+            return;
+        }
 
+        String scriptName = args[1]; //get desired script name
+        String senderName = sender.getName().toLowerCase();
+
+        String playerName = senderName; //executing own script (default)        
+        if (args.length==3)  {  //executing someone else's script
+            playerName = args[2];
+        }
+        
+        //Get script from map
+        logger.trace(String.format("%s is looking for %s", playerName, scriptName));
+        KCTScript script = lookupScript(sender, scriptName, playerName);
+        
+        Player player=sender.asPlayer();
+        //Vector3D dir=player.getForwardVector();
+        World world=player.getWorld();
+        
+        Location location=new Location(world, player.getPosition());
+        CanaryRabbit canaryRabbit=(CanaryRabbit)Canary.factory().getEntityFactory().newEntityLiving(EntityType.RABBIT, location);
+
+        logger.trace("can it spawn? "+canaryRabbit.canSpawn());
+        MagicBunny bunny=new MagicBunny(canaryRabbit);
+        TheoreticalTurtle turtle=new TheoreticalTurtle(sender, bunny, script, logger);
+        bunny.getAITaskManager().addTask(Integer.MAX_VALUE, new KCTAITask(turtle, undoBuffers));
+        
+        logger.trace("bunny can spawn? "+bunny.canSpawn());
+        boolean bunnySpawn=bunny.spawn();
+        logger.trace("bunny spawn "+bunnySpawn);
+        
+        
+    }
+    
     /**
      * Invoke a script.
      * 
@@ -291,29 +364,39 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         //Create turtle
 //        Turtle turtle = new Turtle(logger);
 //        turtle.turtleInit(sender);
-        Sprite sprite = new Sprite(new EntityWolf((net.minecraft.world.World) sender.asPlayer().getWorld()), logger); //??? Is this good? #TODO
-        sprite.sInit(sender);
+        //Sprite sprite = new Sprite(new EntityWolf((net.minecraft.world.World) sender.asPlayer().getWorld()), logger); //??? Is this good? #TODO
+        // TODO: use a CanaryWolf instead of an EntityWolf
+        
+        CanaryWolf canaryWolf=(CanaryWolf)Canary.factory().getEntityFactory().newEntity(EntityType.WOLF, sender.asPlayer().getWorld());
+        EntityWolf entityWolf=canaryWolf.getHandle();
+        
+        Sprite sprite = new Sprite(entityWolf, logger,sender);
+        //sprite.sInit(sender);
         //Get script from map
-        KCTScript script = null;
-        try  {     
-            logger.trace(String.format("%s is looking for %s", playerName, scriptName));
-            for (String p : scripts.getAllScripts().keySet()) {
-                logger.trace("Player name: "+p);
-                for (String s : scripts.getAllScriptsForPlayer(p).keySet()) {
-                    logger.trace(String.format("Player name %s has script named %s", p, s));
-                }
-            }
-            script = scripts.getScript(playerName, scriptName);
-            if (script==null) {
-                logger.warn(String.format("player %s cannot find script %s", playerName, scriptName));
-                sender.asPlayer().message(String.format("%s, you have no script named %s", playerName, scriptName));
-                return;
-            }
-        }  catch (Exception e)  {
-            //turtle.turtleConsole("Script failed to load!");
-        	sprite.sConsole("Script failed to load!");
-            logger.error("Script failed to load", e);
-        }
+        logger.trace(String.format("%s is looking for %s", playerName, scriptName));
+        KCTScript script = lookupScript(sender, scriptName, playerName);
+        
+        
+        //KCTScript script = null;
+        //try  {     
+//            for (String p : scripts.getAllScripts().keySet()) {
+//                logger.trace("Player name: "+p);
+//                for (String s : scripts.getAllScriptsForPlayer(p).keySet()) {
+//                    logger.trace(String.format("Player name %s has script named %s", p, s));
+//                }
+//            }
+//            KCTScript script = scripts.getScript(playerName, scriptName);
+//            if (script==null) {
+//                logger.warn(String.format("player %s cannot find script %s", playerName, scriptName));
+//                sender.asPlayer().message(String.format("%s, you have no script named %s", playerName, scriptName));
+//                return;
+//            }
+//        }  catch (Exception e)  {
+//            //turtle.turtleConsole("Script failed to load!");
+//        	//sprite.sConsole("Script failed to load!");
+//            sender.message("Script failed to load!");
+//            logger.error("Script failed to load", e);
+//        }
 
         //Execute script    
         try  {
@@ -335,6 +418,23 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             sprite.sConsole("Failed to add to undo buffer!");
             logger.error("Faile to add to undo buffer", e);
         }
+    }
+
+    /**
+     * @param sender
+     * @param scriptName
+     * @param playerName
+     * @return
+     */
+    private KCTScript lookupScript(MessageReceiver sender, String scriptName,String playerName)
+    {
+        KCTScript script = scripts.getScript(playerName, scriptName);
+        if (script==null) {
+            logger.warn(String.format("player %s cannot find script %s", playerName, scriptName));
+            sender.asPlayer().message(String.format("%s, you have no script named %s", playerName, scriptName));
+            return null;
+        }
+        return script;
     }
 
     /**
