@@ -1,0 +1,120 @@
+<!-- Blockly editor for Knoxcraft.  Uses Google's Blockly code, accessible from https://developers.google.com/blockly/installation/overview -->
+<!DOCTYPE html>
+<html>
+	<HEAD> 
+		<!--<link type="text/css" rel="stylesheet" href="style.css"> -->
+		<title>Knoxcraft Blockly Editor</title>    
+		<!--<script src="C:/Users/Emily/Documents/CS Research/Minecraft/GitHub/blockly/blockly_compressed.js"></script>
+		<script src="C:/Users/Emily/Documents/CS Research/Minecraft/GitHub/blockly/blocks_compressed.js"></script>
+		<script src="C:/Users/Emily/Documents/CS Research/Minecraft/GitHub/blockly/msg/js/en.js"></script>--> 
+		
+		<!--Include Blockly files-- adjust these paths as necessary-->
+		<script src="blockly_compressed.js"></script>
+		<script src="blocks_compressed.js"></script>
+		<script src="msg/js/en.js"></script>
+		<script src="blocks/turtle.js"></script>
+		<script src="generators/turtle.js"></script>
+		
+		<style>
+			html, body {
+			  height: 100%;
+			  margin: 0;
+			}
+			body {
+			  background-color: #fff;
+			  font-family: sans-serif;
+			  overflow: hidden;
+			}
+			h1 {
+			  font-weight: normal;
+			  font-size: 140%;
+			}
+			table {
+			  height: 100%;
+			  width: 100%;
+			}
+			#blocklyArea {
+			  height: 99%;
+			  background: #fc9;
+			  text-align: center;
+			}
+		</style>
+	</HEAD>
+	
+	<BODY> 	
+	
+		<!--Page layout-->
+		<table>
+		<tr>
+		  <td>
+			<h1>Knoxcraft with Blockly!</h1>
+			<p>Create your Knoxcraft Turtle scripts below.  For an example, see (this webpage we haven't made yet).</p>
+		  </td>
+		</tr>
+		<tr>
+			<td>
+			(This will be a submit button)
+			</td>
+		</tr>
+		<tr>
+		  <td id="blocklyArea">
+			Blockly will be positioned here.
+		  </td>
+		</tr>
+	  </table>
+	  
+	  <div id="blocklyDiv" style="position: absolute"></div>
+	  
+	  <!--Define the toolbox-->
+	  <xml id="toolbox" style="display: none">
+		  <category name="Control">
+			<block type="controls_if"></block>
+			<block type="controls_whileUntil"></block>
+		  </category>
+		  <category name="Logic">
+			<block type="logic_compare"></block>
+			<block type="logic_operation"></block>
+			<block type="logic_boolean"></block>
+		  </category>
+		  <category name="Variables" custom="VARIABLE"></category>
+		  <category name="Functions" custom="PROCEDURE"></category>
+		  <category name="Turtle Commands">
+			<block type="turtle_init"></block>
+			<block type="turtle_move"></block>
+			<block type="turtle_turn"></block>
+			<block type="turtle_setblockplace"></block>
+			<block type="turtle_setblocktype2"></block>
+			<block type="turtle_setblocktype"></block>
+			<block type="turtle_setpos"></block>
+			<block type="turtle_setdir"></block>
+		  </category>
+		</xml>
+		
+		<!--Blockly injection script-->
+		<script>
+		  var blocklyArea = document.getElementById('blocklyArea');
+		  var blocklyDiv = document.getElementById('blocklyDiv');
+		  var workspace = Blockly.inject(blocklyDiv,
+			  {toolbox: document.getElementById('toolbox')});
+		  var onresize = function(e) {
+			// Compute the absolute coordinates and dimensions of blocklyArea.
+			var element = blocklyArea;
+			var x = 0;
+			var y = 0;
+			do {
+			  x += element.offsetLeft;
+			  y += element.offsetTop;
+			  element = element.offsetParent;
+			} while (element);
+			// Position blocklyDiv over blocklyArea.
+			blocklyDiv.style.left = x + 'px';
+			blocklyDiv.style.top = y + 'px';
+			blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
+			blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+		  };
+		  window.addEventListener('resize', onresize, false);
+		  onresize();
+		</script>
+		
+	</BODY>
+</html>
