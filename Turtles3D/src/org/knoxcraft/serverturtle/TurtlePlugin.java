@@ -6,7 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Stack;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.knoxcraft.database.KCTScriptAccess;
 import org.knoxcraft.hooks.KCTUploadHook;
@@ -35,6 +37,7 @@ import net.canarymod.database.exceptions.DatabaseReadException;
 import net.canarymod.database.exceptions.DatabaseWriteException;
 import net.canarymod.hook.HookHandler;
 import net.canarymod.hook.player.ConnectionHook;
+import net.canarymod.hook.player.DisconnectionHook;
 import net.canarymod.hook.world.WeatherChangeHook;
 import net.canarymod.logger.Logman;
 import net.canarymod.plugin.Plugin;
@@ -48,6 +51,8 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
     public static Logman logger;
     private ScriptManager scripts;
     private HashMap<String, Stack<Stack<BlockRecord>>> undoBuffers;  //PlayerName->buffer
+    
+    private Map<String, WorkerThread> workerMap=new HashMap<String,WorkerThread>();
 
     //////////////////////////////////////////////////////////////////////////////////
 
@@ -58,6 +63,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         TurtlePlugin.logger = getLogman();
         scripts = new ScriptManager();
         undoBuffers = new HashMap<String, Stack<Stack<BlockRecord>>>();
+        
     }
 
     /**
@@ -160,6 +166,37 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             logger.error("cannot read DB", e);
         }
     }
+    
+    class WorkerThread extends Thread {
+        private Queue<KCTScript> workQueue=new LinkedBlockingQueue<KCTScript>();
+        private Player player;
+        
+        WorkerThread(Player player) {
+            this.player=player;
+        }
+        
+        void addWorkToQueue(KCTScript script) {
+            workQueue.offer(script);
+        }
+        private boolean done=false;
+        
+        public void run() {
+            while (!done) {
+                KCTScript script=workQueue.poll();
+                if (script==null) {
+                    continue;
+                }
+                World w=player.getWorld();
+                // TODO: do the stuff
+                getLogman().info("%s is trying to do %s", player.getName(), script.getScriptName());
+            }
+            getLogman().info("%s worker thread exiting", player.getName());
+        }
+
+        public void setDone() {
+            done=true;
+        }
+    }
 
     //HOOK HANDLERS
 
@@ -173,6 +210,21 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
     public void onLogin(ConnectionHook hook) {
         hook.getPlayer().setCanBuild(false);
         logger.debug(String.format("player %s can build? %s", hook.getPlayer().getName(), hook.getPlayer().canBuild()));
+        String playerName=hook.getPlayer().getName();
+        
+        if (!workerMap.containsKey(playerName) || !workerMap.get(playerName).isAlive()) {
+            WorkerThread t=new WorkerThread(hook.getPlayer());
+            workerMap.put(playerName, t);
+            t.start();
+        }
+    }
+    
+    @HookHandler
+    public void onLogout(DisconnectionHook hook) {
+        if (workerMap.containsKey(hook.getPlayer().getName())) {
+            WorkerThread t=workerMap.get(hook.getPlayer().getName());
+            t.setDone();
+        }
     }
     
     /**
@@ -284,6 +336,43 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         }
     }
     
+    
+    
+    
+    
+    /**
+     * Run a script using a Sprite.
+     * 
+     * @param sender
+     * @param args
+     */
+    @Command(
+            aliases = { "q" },
+            description = "Enqueue work",
+            permissions = { "" },
+            toolTip = "/q <scriptName> [playerName]")
+    public void enqueue(MessageReceiver sender, String[] args) {
+        logger.info("q invoked");
+        if (args.length<2)  {  //not enough arguments
+            sender.message("Not enough arguments.");
+            return;
+        }
+
+        String scriptName = args[1]; //get desired script name
+        String senderName = sender.getName().toLowerCase();
+
+        String playerName = senderName; //executing own script (default)        
+        if (args.length==3)  {  //executing someone else's script
+            playerName = args[2];
+        }
+        
+        //Get script from map
+        logger.trace(String.format("%s is looking for %s", playerName, scriptName));
+        KCTScript script = lookupScript(sender, scriptName, playerName);
+        
+        workerMap.get(playerName).addWorkToQueue(script);
+    }
+    
     /**
      * Run a script using a Sprite.
      * 
@@ -322,7 +411,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         CanaryRabbit canaryRabbit=(CanaryRabbit)Canary.factory().getEntityFactory().newEntityLiving(EntityType.RABBIT, location);
 
         logger.trace("can it spawn? "+canaryRabbit.canSpawn());
-        MagicBunny bunny=new MagicBunny(canaryRabbit);
+        MagicBunny bunny=new MagicBunny(canaryRabbit, logger);
         TheoreticalTurtle turtle=new TheoreticalTurtle(sender, bunny, script, logger);
         bunny.getAITaskManager().addTask(Integer.MAX_VALUE, new KCTAITask(turtle, undoBuffers));
         

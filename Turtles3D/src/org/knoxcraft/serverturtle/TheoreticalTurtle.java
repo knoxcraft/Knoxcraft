@@ -1,6 +1,7 @@
 package org.knoxcraft.serverturtle;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -38,13 +39,13 @@ public class TheoreticalTurtle
     
     private KCTScript script;
     private Logman logger;
-    private EntityLiving entityLiving;
+    private MagicBunny magicBunny;
     private List<KCTCommand> commandList;
     private int commandIndex=0;
 
-    public TheoreticalTurtle(MessageReceiver sender, EntityLiving entityLiving, KCTScript script, Logman logger) {
+    public TheoreticalTurtle(MessageReceiver sender, MagicBunny magicBunny, KCTScript script, Logman logger) {
         this.sender=sender;
-        this.entityLiving=entityLiving;
+        this.magicBunny=magicBunny;
         this.logger=logger;
         this.script=script;
         this.world=sender.asPlayer().getWorld();
@@ -62,17 +63,24 @@ public class TheoreticalTurtle
         relPos = new Position(0,0,0);
     }
 
+    public MagicBunny getMagicBunny() {
+        return magicBunny;
+    }
+    
     public boolean hasMoreCommand() {
         return commandIndex < commandList.size();
     }
 
-    public void executeNextCommands(int num) throws TurtleCommandException {
+    public List<KCTCommand> executeNextCommands(int num) throws TurtleCommandException {
         int max=commandIndex+num;
+        List<KCTCommand> result=new LinkedList<KCTCommand>();
         while (commandIndex<max && commandIndex<commandList.size()) {
             KCTCommand command=commandList.get(commandIndex);
             commandExecute(command);
+            result.add(command);
             commandIndex++;
         }
+        return result;
     }
 
 
@@ -407,7 +415,7 @@ public class TheoreticalTurtle
             }
             //Update Location
 
-            entityLiving.teleportTo(relPos);
+            magicBunny.teleportTo(relPos);
             //Place block if block placement mode on
 
         }
@@ -477,10 +485,10 @@ public class TheoreticalTurtle
                 //Nothing
             }
             relPos = updatePos(relPos, updateDir(d, 0), up, down);
-            entityLiving.teleportTo(relPos);//Doesn't change dir for sprite
+            magicBunny.teleportTo(relPos);//Doesn't change dir for sprite
         } else {//Only change direction
             dir = updateDir(d, dist);
-            entityLiving.lookAt(relPos.getX(),relPos.getY(), relPos.getZ()); //Update Sprite
+            magicBunny.lookAt(relPos.getX(),relPos.getY(), relPos.getZ()); //Update Sprite
         }
     }
     /**
@@ -598,7 +606,7 @@ public class TheoreticalTurtle
      * Destroy the entityLiving (sprite)
      */
     public void destroy() {
-        entityLiving.destroy();
+        magicBunny.destroy();
     }
 
     public Logman getLogger() {

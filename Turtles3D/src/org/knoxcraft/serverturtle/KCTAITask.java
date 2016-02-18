@@ -1,8 +1,10 @@
 package org.knoxcraft.serverturtle;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
+import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.TurtleCommandException;
 
 import net.canarymod.api.ai.AIBase;
@@ -83,17 +85,21 @@ public class KCTAITask implements AIBase
     public void updateTask() {
         if (turtle.hasMoreCommand()) {
             try {
-                turtle.executeNextCommands(1);
-                logger.info("executing one command");
-                Thread.sleep(100);
+                List<KCTCommand> result=turtle.executeNextCommands(1);
+                for (KCTCommand c : result) {
+                    logger.info("executing one command: "+c.getCommandName());
+                }
+                //Thread.sleep(100);
             } catch (TurtleCommandException e) {
                 logger.error(e.getMessage());
                 logger.error("Unable to execute Sprite program "+turtle.getScript().getScriptName());
                 turtle.sConsole("Unable to execute Sprite program "+turtle.getScript().getScriptName());
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+//            } catch (InterruptedException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
             }
         }
+        // flush all AI tasks but the current one
+        turtle.getMagicBunny().flushAITasks(this);
     }
 }
