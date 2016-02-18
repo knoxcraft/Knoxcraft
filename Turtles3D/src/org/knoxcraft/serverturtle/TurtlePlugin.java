@@ -176,21 +176,25 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         }
         
         void addWorkToQueue(KCTScript script) {
+            getLogman().info(String.format("Putting script named %s into queue for %s", script.getScriptName(), script.getPlayerName()));
             workQueue.offer(script);
         }
         private boolean done=false;
         
         public void run() {
+            getLogman().debug(String.format("worker thread for %s starting!", player.getName()));
             while (!done) {
                 KCTScript script=workQueue.poll();
                 if (script==null) {
                     continue;
                 }
-                World w=player.getWorld();
-                // TODO: do the stuff
-                getLogman().info("%s is trying to do %s", player.getName(), script.getScriptName());
+                getLogman().trace(String.format("worker thread for %s just got script named %s", player.getName(), script.getScriptName()));
+                Turtle t=new Turtle(getLogman());
+                t.turtleInit(player);
+                //TODO: make this a loop through KCTCommands
+                t.executeScript(script);
             }
-            getLogman().info("%s worker thread exiting", player.getName());
+            getLogman().debug("%s worker thread exiting", player.getName());
         }
 
         public void setDone() {
@@ -210,9 +214,10 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
     public void onLogin(ConnectionHook hook) {
         hook.getPlayer().setCanBuild(false);
         logger.debug(String.format("player %s can build? %s", hook.getPlayer().getName(), hook.getPlayer().canBuild()));
-        String playerName=hook.getPlayer().getName();
+        String playerName=hook.getPlayer().getName().toLowerCase();
         
         if (!workerMap.containsKey(playerName) || !workerMap.get(playerName).isAlive()) {
+            getLogman().info(String.format("%s creating a worker thread and starting it", playerName));
             WorkerThread t=new WorkerThread(hook.getPlayer());
             workerMap.put(playerName, t);
             t.start();
@@ -369,6 +374,10 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         //Get script from map
         logger.trace(String.format("%s is looking for %s", playerName, scriptName));
         KCTScript script = lookupScript(sender, scriptName, playerName);
+        
+        for (Entry<String,WorkerThread> entry : workerMap.entrySet()) {
+            getLogman().info(String.format("%s => a thread", entry.getKey()));
+        }
         
         workerMap.get(playerName).addWorkToQueue(script);
     }

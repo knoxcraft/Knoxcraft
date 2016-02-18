@@ -10,9 +10,9 @@ import org.knoxcraft.turtle3d.TurtleCommandException;
 import net.canarymod.Canary;
 import net.canarymod.api.ai.AIBase;
 import net.canarymod.api.ai.AIManager;
-import net.canarymod.api.entity.Entity;
 import net.canarymod.api.entity.EntityType;
 import net.canarymod.api.entity.living.EntityLiving;
+import net.canarymod.api.entity.living.humanoid.Player;
 import net.canarymod.api.factory.EntityFactory;
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
@@ -40,10 +40,10 @@ public class Turtle {
     private boolean bp = true;  //Block Place on/off
     private BlockType bt = BlockType.Stone;  //default turtle block type 
     private World world;  //World in which all actions occur
-    private MessageReceiver sender;  //player to send messages to
+    private Player player;
     private Stack<BlockRecord> oldBlocks;  //original pos/type of all bricks laid by this turtle for undoing
     private Logman logger;
-    private Entity sprite;
+    //private Entity sprite;
 
     ///////////////////////////////////////////////////////////////////////////////
     /**
@@ -55,26 +55,17 @@ public class Turtle {
         this.logger=logger;
     }
 
-    /**
-     * Initialize the turtle.  Called when executing a script (or turning command line turtle on) 
-     * 
-     * @param sender
-     */
-    public void turtleInit(MessageReceiver sender)  {
-        //initialize undo buffer
+    public void turtleInit(Player player) {
+        this.player=player;
         oldBlocks = new Stack<BlockRecord>();
-
-        //record sender
-        this.sender = sender;
-
         //GET WORLD
-        world = sender.asPlayer().getWorld();
+        world = player.getWorld();
 
         //Set up positions
 
         //Get origin Position and Direction
-        originPos = sender.asPlayer().getPosition();
-        dir = sender.asPlayer().getCardinalDirection();
+        originPos = player.getPosition();
+        dir = player.getCardinalDirection();
 
         //Make the Relative Position
         relPos = new Position(0,0,0);
@@ -82,9 +73,16 @@ public class Turtle {
         //Update game position
         gamePos = new Position(); 
         updateGamePos();
-        
-        //Create sprite
-        sprite = spawnEntityLiving(sender.asPlayer().getLocation(), net.canarymod.api.entity.EntityType.GENERIC_ENTITY);
+    }
+    
+    /**
+     * Initialize the turtle.  Called when executing a script (or turning command line turtle on) 
+     * 
+     * @param sender
+     */
+    public void turtleInit(MessageReceiver sender)  {
+        //initialize undo buffer
+        turtleInit(sender.asPlayer());
     }       
     //copied coded
     public static EntityLiving spawnEntityLiving(Location loc, EntityType type) 
@@ -118,7 +116,7 @@ public class Turtle {
      */
     public void turtleConsole(String msg)
     {
-        sender.message(msg); 
+        player.message(msg); 
     }  
 
     /**
@@ -283,7 +281,7 @@ public class Turtle {
             //update turtle position
             relPos = calculateMove(relPos, dir, false, false);
             updateGamePos();
-            sprite.teleportTo(relPos);
+            //sprite.teleportTo(relPos);
             //Place block if block placement mode on
             if (bp) {
 
