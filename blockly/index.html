@@ -8,6 +8,7 @@
 		<!--Include Blockly files-- adjust these paths as necessary-->
 		<script src="blockly_compressed.js"></script>
 		<script src="blocks_compressed.js"></script>
+		<script src="javascript_compressed.js"></script>
 		<script src="msg/js/en.js"></script>
 		<script src="blocks/turtle.js"></script>
 		<script src="generators/javascript/turtle.js"></script>
@@ -56,6 +57,11 @@
 		<tr>
 		  <td id="blocklyArea">
 			Blockly will be positioned here.
+		  </td>
+		</tr>
+		<tr>
+		  <td id="codeArea">
+			<button onclick="showCode()">Show JavaScript</button>
 		  </td>
 		</tr>
 	  </table>
@@ -143,7 +149,19 @@
 		  };
 		  window.addEventListener('resize', onresize, false);
 		  onresize();
+		  		  
+		  function showCode() {
+			// Generate JavaScript code and display it.
+			//alert('it works!');
+			Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+			//alert('loop trap');			
+			var code = Blockly.JavaScript.workspaceToCode(workspace);
+			//alert('generated');
+			alert(code);
+		  }
 		</script>
+		
+		
 		
 	</BODY>
 </html>
