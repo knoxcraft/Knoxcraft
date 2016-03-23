@@ -168,10 +168,15 @@
 			  Blockly.JavaScript.addReservedWords('json');
 			  var code = Blockly.JavaScript.workspaceToCode(workspace);
 			  Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
-			  try {
-				eval(code);
-			  } catch (e) {
-				alert(e);
+			  //make sure they used an init block
+			  if (!code.startsWith('var json'))  {
+				alert('You need to use the \'create a turtle\' block!');
+			  }  else  {			  
+				try {
+					eval(code);
+				} catch (e) {
+					alert(e);
+				}
 			  }
 		  }
 		</script>		
