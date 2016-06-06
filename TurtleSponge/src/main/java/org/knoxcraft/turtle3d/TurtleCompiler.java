@@ -14,6 +14,9 @@ import org.knoxcraft.javacompiler.ByteArrayClassLoader;
 import org.knoxcraft.javacompiler.CompilationResult;
 import org.knoxcraft.javacompiler.CompilerDiagnostic;
 import org.knoxcraft.javacompiler.InMemoryJavaCompiler;
+import org.slf4j.Logger;
+
+import com.google.inject.Inject;
 
 import net.canarymod.Canary;
 import net.canarymod.logger.Logman;
@@ -27,10 +30,11 @@ public class TurtleCompiler
     public static final String JAVA="java";
     public static final String PYTHON="python";
     public static final String BLOCKLY="blockly";
-    public static Logman logger;
 
-    public TurtleCompiler(Logman logger) {
-        TurtleCompiler.logger=logger;
+    @Inject
+    private Logger logger;
+
+    public TurtleCompiler() {
     }
 
     /**
@@ -159,7 +163,7 @@ public class TurtleCompiler
         // for the bytearrayclassloader as the classloader that loaded TurtleCompiler
         // Probably anything in the package with TurtlePlugin would work, actually
         ByteArrayClassLoader classLoader=new ByteArrayClassLoader(this.getClass().getClassLoader(), compiler.getFileManager().getClasses());
-        ByteArrayClassLoader.logger=logger;
+        //ByteArrayClassLoader.logger=logger;
         try {
             logger.trace("Trying to load "+driverName);
             Class<?> c=classLoader.loadClass(driverName);
@@ -181,7 +185,7 @@ public class TurtleCompiler
     }
 
     String getJSONTurtle3D(String className, String source) 
-            throws TurtleException
+    throws TurtleException
     {
         InMemoryJavaCompiler compiler=null;
         try {
@@ -222,7 +226,7 @@ public class TurtleCompiler
         logger.debug("Successfully compiled driver!");
 
         ByteArrayClassLoader classLoader=new ByteArrayClassLoader(this.getClass().getClassLoader(), compiler.getFileManager().getClasses());
-        ByteArrayClassLoader.logger=logger;
+        //ByteArrayClassLoader.logger=logger;
         try {
             logger.trace("Trying to load "+driverName);
             Class<?> c=classLoader.loadClass(driverName);

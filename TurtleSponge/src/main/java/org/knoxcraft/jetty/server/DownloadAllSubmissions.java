@@ -17,15 +17,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.knoxcraft.database.KCTScriptAccess;
+import org.slf4j.Logger;
+
+import com.google.inject.Inject;
 
 import net.canarymod.database.DataAccess;
 import net.canarymod.database.Database;
 import net.canarymod.database.exceptions.DatabaseReadException;
-import net.canarymod.logger.Logman;
 
 public class DownloadAllSubmissions extends HttpServlet
 {
-    private static Logman logger=Logman.getLogman(DownloadAllSubmissions.class.getName());
+    @Inject
+    private Logger logger;
     
     public DownloadAllSubmissions() {
     }
