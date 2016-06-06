@@ -15,6 +15,15 @@ import org.knoxcraft.netty.server.HttpUploadServer;
 import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.TurtleCompiler;
 import org.knoxcraft.turtle3d.TurtleException;
+import org.slf4j.Logger;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppedEvent;
+import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
+import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
+
+import com.google.inject.Inject;
 
 import net.canarymod.Canary;
 import net.canarymod.api.world.World;
@@ -29,17 +38,20 @@ import net.canarymod.database.exceptions.DatabaseWriteException;
 import net.canarymod.hook.HookHandler;
 import net.canarymod.hook.player.ConnectionHook;
 import net.canarymod.hook.world.WeatherChangeHook;
-import net.canarymod.logger.Logman;
-import net.canarymod.plugin.Plugin;
-import net.canarymod.plugin.PluginListener;
 
-public class TurtlePlugin extends Plugin implements CommandListener, PluginListener {
 
-    private HttpUploadServer httpServer;
+@Plugin(id = "org.knoxcraft.serverTurtle.TurtlePlugin",
+name = "TurtlePlugin",
+version = "0.2")
+public class TurtlePlugin {
+
     private JettyServer jettyServer;
-    public static Logman logger;
+    @Inject
+    private Logger logger;
     private ScriptManager scripts;
     private HashMap<String, Stack<Stack<BlockRecord>>> undoBuffers;  //PlayerName->buffer
+    @Inject
+    private PluginContainer container;
 
     //////////////////////////////////////////////////////////////////////////////////
 
@@ -47,7 +59,6 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
      * Constructor.
      */
     public TurtlePlugin() {
-        TurtlePlugin.logger = getLogman();
         scripts = new ScriptManager();
         undoBuffers = new HashMap<String, Stack<Stack<BlockRecord>>>();
     }
@@ -55,55 +66,47 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
     /**
      * Called when plugin is disabled.
      */
-    @Override
-    public void disable() {
-        if (httpServer!=null) {
-            httpServer.disable();
-        }
+    @Listener
+    public void onServerStop(GameStoppedServerEvent event) {
         if (jettyServer!=null) {
-            jettyServer.disable();
+            jettyServer.shutdown();
         }
     }
 
-    /**
-     * Called when plugin is enabled. 
-     * @return
-     */
-    @Override
-    public boolean enable() {
+
+    @Listener
+    public void onServerStart(GameStartedServerEvent event) {
+        // Hey! The server has started!
+        // Try instantiating your logger in here.
+        // (There's a guide for that)
+        logger.info("Registering Knoxcraft Turtles plugin");
+
+        //Canary.hooks().registerListener(this, this);
+        // TODO: these seem to have no effect; figure out why!
+        //boolean b1=Canary.getServer().consoleCommand("weather clear 1000000");
+        //boolean b2=Canary.getServer().consoleCommand("gamerule doDaylightCycle false");
+        //logger.trace(String.format("Did weather work? %s did daylight work? %s", b1, b2));
+
         try {
-            getLogman().info("Registering Knoxcraft Turtles plugin");
-            Canary.hooks().registerListener(this, this);
-            
-            // TODO: these seem to have no effect; figure out why!
-            boolean b1=Canary.getServer().consoleCommand("weather clear 1000000");
-            boolean b2=Canary.getServer().consoleCommand("gamerule doDaylightCycle false");
-            logger.trace(String.format("Did weather work? %s did daylight work? %s", b1, b2));
-            
             jettyServer=new JettyServer();
-            jettyServer.enable(logger);
-            
-            //httpServer=new HttpUploadServer();
-            //httpServer.enable(getLogman());
-            
-            getLogman().info("Enabling "+getName() + " Version " + getVersion()); 
-            getLogman().info("Authored by "+getAuthor());
-            Canary.commands().registerCommands(this, this, false);
-
-            lookupFromDB();
-
-            return true;
+            jettyServer.enable();
         } catch (Exception e){
             if (jettyServer!=null) {
-                jettyServer.disable();
-            }
-            if (httpServer!=null) {
-                httpServer.disable();
+                jettyServer.shutdown();
             }
             logger.error("Cannot initialize TurtlePlugin", e);
-            return false;
         }
-    }
+
+        //httpServer=new HttpUploadServer();
+        //httpServer.enable(getLogman());
+
+        logger.info("Enabling "+getName() + " Version " + getVersion()); 
+        logger.info("Authored by "+getAuthor());
+        //Canary.commands().registerCommands(this, this, false);
+
+        lookupFromDB();
+    }    
+
 
     /**
      * Load the latest version of each script from the DB for each player on this world
@@ -166,7 +169,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
         hook.getPlayer().setCanBuild(false);
         logger.debug(String.format("player %s can build? %s", hook.getPlayer().getName(), hook.getPlayer().canBuild()));
     }
-    
+
     /**
      * TODO: Fix this hook. This doesn't seem to get called. I would like to shut rain off every time it starts raining.
      * 
@@ -182,7 +185,7 @@ public class TurtlePlugin extends Plugin implements CommandListener, PluginListe
             //w.setRainTime(0);
         }
     }
-    
+
     /**
      * Hook called when scripts are uploaded to the server
      * 

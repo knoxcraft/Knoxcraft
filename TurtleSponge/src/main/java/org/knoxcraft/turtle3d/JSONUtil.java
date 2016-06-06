@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.spongepowered.api.util.Direction;
+
 import net.canarymod.api.world.blocks.BlockType;
-import net.canarymod.api.world.position.Direction;
+
 
 public class JSONUtil
 {

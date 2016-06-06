@@ -18,10 +18,6 @@ import org.slf4j.Logger;
 
 import com.google.inject.Inject;
 
-import net.canarymod.Canary;
-import net.canarymod.logger.Logman;
-import net.canarymod.plugin.Plugin;
-
 public class TurtleCompiler
 {
     public static final String TURTLE_PLUGIN = "org.knoxcraft.serverturtle.TurtlePlugin";
@@ -128,6 +124,8 @@ public class TurtleCompiler
         }
         // Apparently we need to add extra classpath containing the Turtle code
         // at least I think this is what does that...
+        
+        // FIXME this isn't howt his works in Sponge
         Plugin plugin=Canary.pluginManager().getPlugin(TURTLE_PLUGIN);
         String extraClasspath=new File(plugin.getPath()).toURI().toString();
         logger.debug(String.format("Extra classpath: %s", extraClasspath));
@@ -197,6 +195,8 @@ public class TurtleCompiler
         }
         // Apparently we need to add extra classpath containing the Turtle code
         // at least I think this is what does that...
+        
+        // FIXME Plugins work differently in Sponge
         Plugin plugin=Canary.pluginManager().getPlugin(TURTLE_PLUGIN);
         String extraClasspath=new File(plugin.getPath()).toURI().toString();
         logger.debug(String.format("Extra classpath: %s", extraClasspath));
