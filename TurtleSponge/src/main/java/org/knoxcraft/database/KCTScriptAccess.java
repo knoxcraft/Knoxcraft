@@ -5,16 +5,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+
+import com.google.inject.Inject;
+
 import net.canarymod.database.Column;
 import net.canarymod.database.Column.DataType;
 import net.canarymod.database.DataAccess;
 import net.canarymod.database.Database;
 import net.canarymod.database.exceptions.DatabaseReadException;
-import net.canarymod.logger.Logman;
 
 public class KCTScriptAccess extends DataAccess
 {
-    public static Logman logger=Logman.getLogman(KCTScriptAccess.class.getName());
+    @Inject
+    private Logger log;
     
     // XXX should we read KCTSCRIPT_TABLE_NAME out of a configuration file?
     public static final String KCTSCRIPT_TABLE_NAME="kctscript";

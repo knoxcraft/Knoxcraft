@@ -69,7 +69,7 @@ public class JettyServer
         server.start();
     }
     
-    public void disable()
+    public void shutdown()
     {
         try {
             server.stop();
@@ -89,7 +89,7 @@ public class JettyServer
         scan.nextLine();
         scan.close();
         System.out.println("Exiting");
-        server.disable();
+        server.shutdown();
         
     }
 }

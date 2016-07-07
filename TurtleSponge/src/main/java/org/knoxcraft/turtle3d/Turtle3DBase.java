@@ -2,8 +2,10 @@ package org.knoxcraft.turtle3d;
 
 import static org.knoxcraft.turtle3d.KCTCommand.*;
 
+import org.spongepowered.api.util.Direction;
+
 import net.canarymod.api.world.blocks.BlockType;
-import net.canarymod.api.world.position.Direction;
+
 
 /**
  * Base class to be extended by students. Students override the run() method 
@@ -256,6 +258,7 @@ public abstract class Turtle3DBase
       */
     public void setDirection(Direction direction) {
          checkTurtle();
+         // FIXME: encode/decode direction to/from int
          KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));
          script.addCommand(cmd);
      }
