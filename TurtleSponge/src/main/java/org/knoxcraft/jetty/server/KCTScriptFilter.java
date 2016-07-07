@@ -63,7 +63,7 @@ public class KCTScriptFilter extends DefaultFilter
             
             Map<String,KCTScript> allScripts=new HashMap<>();
             
-            TurtleCompiler turtleCompiler=new TurtleCompiler(logger);
+            TurtleCompiler turtleCompiler=new TurtleCompiler();
             for (Entry<String,KCTScriptAccess> entry : mostRecentScripts.entrySet()) {
                 try {
                     KCTScriptAccess scriptAccess=entry.getValue();

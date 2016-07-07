@@ -6,8 +6,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.spongepowered.api.util.Direction;
+
 import net.canarymod.api.world.blocks.BlockType;
-import net.canarymod.api.world.position.Direction;
+
 
 /**
  * Class for procedural-style programming. Students must create instances using the
@@ -254,7 +256,8 @@ public class Turtle3D
       * @param direction The direction
       */
     public void setDirection(Direction direction) {
-         KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));
-         script.addCommand(cmd);
+        // FIXME: need methods to encode/decode direction to an int
+        KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));
+        script.addCommand(cmd);
      }
 }
