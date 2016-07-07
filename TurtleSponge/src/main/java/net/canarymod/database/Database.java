@@ -1,13 +1,5 @@
 package net.canarymod.database;
 
-import net.canarymod.config.Configuration;
-import net.canarymod.database.exceptions.DatabaseException;
-import net.canarymod.database.exceptions.DatabaseReadException;
-import net.canarymod.database.exceptions.DatabaseWriteException;
-import net.canarymod.database.mysql.MySQLDatabase;
-import net.canarymod.database.sqlite.SQLiteDatabase;
-import net.canarymod.database.xml.XmlDatabase;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +7,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 import com.google.inject.Inject;
+
+import net.canarymod.database.exceptions.DatabaseException;
+import net.canarymod.database.exceptions.DatabaseReadException;
+import net.canarymod.database.exceptions.DatabaseWriteException;
+import net.canarymod.database.mysql.MySQLDatabase;
+import net.canarymod.database.sqlite.SQLiteDatabase;
+import net.canarymod.database.xml.XmlDatabase;
 
 
 /**
@@ -26,7 +25,7 @@ public abstract class Database {
     // FIXME: figure out the way to read configuration information in Sponge
     
     @Inject
-    private Logger logger;
+    private static Logger log;
     
     /**
      * The datasource type

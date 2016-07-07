@@ -1,15 +1,30 @@
 package org.knoxcraft.turtle3d;
 
-import static org.knoxcraft.turtle3d.KCTCommand.*;
+import static org.knoxcraft.turtle3d.KCTCommand.BACKWARD;
+import static org.knoxcraft.turtle3d.KCTCommand.BLOCKPLACEMODE;
+import static org.knoxcraft.turtle3d.KCTCommand.BLOCKTYPE;
+import static org.knoxcraft.turtle3d.KCTCommand.DEGREES;
+import static org.knoxcraft.turtle3d.KCTCommand.DIST;
+import static org.knoxcraft.turtle3d.KCTCommand.DOWN;
+import static org.knoxcraft.turtle3d.KCTCommand.FORWARD;
+import static org.knoxcraft.turtle3d.KCTCommand.LEFT;
+import static org.knoxcraft.turtle3d.KCTCommand.PLACEBLOCKS;
+import static org.knoxcraft.turtle3d.KCTCommand.RIGHT;
+import static org.knoxcraft.turtle3d.KCTCommand.SETBLOCK;
+import static org.knoxcraft.turtle3d.KCTCommand.SETPOSITION;
+import static org.knoxcraft.turtle3d.KCTCommand.TURNLEFT;
+import static org.knoxcraft.turtle3d.KCTCommand.TURNRIGHT;
+import static org.knoxcraft.turtle3d.KCTCommand.UP;
+import static org.knoxcraft.turtle3d.KCTCommand.X;
+import static org.knoxcraft.turtle3d.KCTCommand.Y;
+import static org.knoxcraft.turtle3d.KCTCommand.Z;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.Direction;
-
-import net.canarymod.api.world.blocks.BlockType;
-
 
 /**
  * Class for procedural-style programming. Students must create instances using the
@@ -208,9 +223,10 @@ public class Turtle3D
       */
     public void setBlock(BlockType type) {
         String id=String.valueOf(type.getId());
-        if (type.getData()!=0) {
-            id+=":"+type.getData();
-        }
+        // FIXME
+//        if (type.getData()!=0) {
+//            id+=":"+type.getData();
+//        }
         KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, id));         script.addCommand(cmd);
      }
      
@@ -257,7 +273,8 @@ public class Turtle3D
       */
     public void setDirection(Direction direction) {
         // FIXME: need methods to encode/decode direction to an int
-        KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));
-        script.addCommand(cmd);
+        // FIXME: translate to sponge
+//        KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));
+//        script.addCommand(cmd);
      }
 }

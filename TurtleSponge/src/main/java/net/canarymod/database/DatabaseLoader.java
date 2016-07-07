@@ -1,16 +1,13 @@
 package net.canarymod.database;
 
-import net.canarymod.CanaryClassLoader;
-import net.canarymod.database.exceptions.DatabaseException;
-import net.visualillusionsent.utils.PropertiesFile;
-import net.visualillusionsent.utils.UtilityException;
-
 import java.io.File;
 import java.net.MalformedURLException;
 
 import org.slf4j.Logger;
 
 import com.google.inject.Inject;
+
+import net.canarymod.database.exceptions.DatabaseException;
 
 
 /**

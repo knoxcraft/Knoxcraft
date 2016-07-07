@@ -1,9 +1,5 @@
 package net.canarymod.database;
 
-import net.canarymod.database.exceptions.DatabaseAccessException;
-import net.canarymod.database.exceptions.DatabaseTableInconsistencyException;
-import net.canarymod.database.exceptions.DatabaseWriteException;
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,6 +12,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 
 import com.google.inject.Inject;
+
+import net.canarymod.database.exceptions.DatabaseAccessException;
+import net.canarymod.database.exceptions.DatabaseTableInconsistencyException;
+import net.canarymod.database.exceptions.DatabaseWriteException;
 
 /**
  * Handle the layout and creation of tables

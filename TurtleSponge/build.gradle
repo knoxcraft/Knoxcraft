@@ -4,7 +4,7 @@ apply plugin: 'eclipse'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-version = '0.0.1'
+version = '0.2'
 
 repositories {
     mavenCentral()
@@ -14,9 +14,15 @@ repositories {
     }
 }
 
+configurations {
+    provided
+    compile.extendsFrom provided
+}
+
 dependencies {
-    compile "org.spongepowered:spongeapi:4.1.0"
-    compile "javax.servlet:servlet-api:3.1"
+    provided "org.spongepowered:spongeapi:4.1.0"
+
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
     compile 'commons-io:commons-io:2.4'
     compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.0.M0'
     compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.0.M0'
@@ -27,13 +33,36 @@ dependencies {
     testCompile 'junit:junit:4.8.2'
 }
 
-jar {
-    baseName = 'knoxcraft'
-    version =  '0.1'
+sourceSets {
+    main {
+        java {
+            exclude 'net/canarymod/database/**'
+            exclude 'org/knoxcraft/database/**'
+        }
+    }
 }
 
-task copyTask(type: Copy, dependsOn: 'jar') {
+jar {
+    // TODO: read names from project
+    baseName = 'knoxcraft'
+    version =  '0.2'
+    // Leave out the java servlet code, since jetty should have this (I think)
+    dependsOn configurations.runtime
+    from {
+        (configurations.runtime - configurations.provided).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    } {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
+}
+
+
+
+task copyTask(type: Copy, dependsOn: 'jar', overwrite: true) {
     // Copy a single file
-    from 'build/libs/knoxsponge-0.1.jar'
+    from "build/libs/knoxcraft-${version}.jar"
     into '/Users/jspacco/projects/Knoxcraft/forge/mods'
 }
