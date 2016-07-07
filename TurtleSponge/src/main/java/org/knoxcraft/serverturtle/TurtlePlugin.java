@@ -11,43 +11,39 @@ import java.util.Stack;
 import org.knoxcraft.database.KCTScriptAccess;
 import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
-import org.knoxcraft.netty.server.HttpUploadServer;
 import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.TurtleCompiler;
 import org.knoxcraft.turtle3d.TurtleException;
 import org.slf4j.Logger;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppedEvent;
 import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent.Login;
+import org.spongepowered.api.event.world.ChangeWorldWeatherEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.weather.Weather;
 
 import com.google.inject.Inject;
 
-import net.canarymod.Canary;
-import net.canarymod.api.world.World;
-import net.canarymod.api.world.blocks.BlockType;
-import net.canarymod.chat.MessageReceiver;
-import net.canarymod.commandsys.Command;
-import net.canarymod.commandsys.CommandListener;
 import net.canarymod.database.DataAccess;
 import net.canarymod.database.Database;
 import net.canarymod.database.exceptions.DatabaseReadException;
 import net.canarymod.database.exceptions.DatabaseWriteException;
-import net.canarymod.hook.HookHandler;
-import net.canarymod.hook.player.ConnectionHook;
-import net.canarymod.hook.world.WeatherChangeHook;
 
 
 @Plugin(id = "org.knoxcraft.serverTurtle.TurtlePlugin",
-name = "TurtlePlugin",
-version = "0.2")
+    name = "TurtlePlugin",
+    version = "0.2",
+    description = "Knoxcraft Turtles Plugin for Minecraft")
 public class TurtlePlugin {
 
     private JettyServer jettyServer;
     @Inject
-    private Logger logger;
+    private Logger log;
     private ScriptManager scripts;
     private HashMap<String, Stack<Stack<BlockRecord>>> undoBuffers;  //PlayerName->buffer
     @Inject
@@ -79,7 +75,7 @@ public class TurtlePlugin {
         // Hey! The server has started!
         // Try instantiating your logger in here.
         // (There's a guide for that)
-        logger.info("Registering Knoxcraft Turtles plugin");
+        log.info("Registering Knoxcraft Turtles plugin");
 
         //Canary.hooks().registerListener(this, this);
         // TODO: these seem to have no effect; figure out why!
@@ -94,14 +90,13 @@ public class TurtlePlugin {
             if (jettyServer!=null) {
                 jettyServer.shutdown();
             }
-            logger.error("Cannot initialize TurtlePlugin", e);
+            log.error("Cannot initialize TurtlePlugin: JettyServer failed to start", e);
         }
 
         //httpServer=new HttpUploadServer();
         //httpServer.enable(getLogman());
-
-        logger.info("Enabling "+getName() + " Version " + getVersion()); 
-        logger.info("Authored by "+getAuthor());
+        log.info("Enabling "+container.getName() + " Version " + container.getVersion()); 
+        log.info("Authored by "+container.getAuthors());
         //Canary.commands().registerCommands(this, this, false);
 
         lookupFromDB();
@@ -132,10 +127,10 @@ public class TurtlePlugin {
                         mostRecentScripts.put(key,scriptAccess);
                     }
                 }
-                logger.trace(String.format("from DB: player %s has script %s at time %d%n", 
+                log.trace(String.format("from DB: player %s has script %s at time %d%n", 
                         scriptAccess.playerName, scriptAccess.scriptName, scriptAccess.timestamp));
             }
-            TurtleCompiler turtleCompiler=new TurtleCompiler(logger);
+            TurtleCompiler turtleCompiler=new TurtleCompiler();
             for (KCTScriptAccess scriptAccess : mostRecentScripts.values()) {
                 try {
                     KCTScript script=turtleCompiler.parseFromJson(scriptAccess.json);
@@ -145,45 +140,54 @@ public class TurtlePlugin {
                     script.setPlayerName(scriptAccess.playerName);
 
                     scripts.putScript(scriptAccess.playerName, script);
-                    logger.info(String.format("Loaded script %s for player %s", 
+                    log.info(String.format("Loaded script %s for player %s", 
                             scriptAccess.scriptName, scriptAccess.playerName));
                 } catch (TurtleException e){
-                    logger.error("Internal Server error", e);
+                    log.error("Internal Server error", e);
                 }
             }
         } catch (DatabaseReadException e) {
-            logger.error("cannot read DB", e);
+            log.error("cannot read DB", e);
         }
     }
 
-    //HOOK HANDLERS
-
+    //Listeners
+    
     /**
-     * Login hook that disallows breaking or placing blocks, 
-     * except by using code that students have uploaded.
-     * 
-     * This turns out to be easier than enabling flight in adventure mode.
+     * @param loginEvent
      */
-    @HookHandler
-    public void onLogin(ConnectionHook hook) {
-        hook.getPlayer().setCanBuild(false);
-        logger.debug(String.format("player %s can build? %s", hook.getPlayer().getName(), hook.getPlayer().canBuild()));
+    @Listener
+    public void onLogin(Login loginEvent) {
+        // TODO: verify that this hook related to logging in
+        // TODO prevent breaking blocks, by figuring out equivalent of setCanBuild(false);
+        log.debug(String.format("player "+loginEvent.getTargetUser().getName()));
     }
+
+//    /**
+//     * Login hook that disallows breaking or placing blocks, 
+//     * except by using code that students have uploaded.
+//     * 
+//     * This turns out to be easier than enabling flight in adventure mode.
+//     */
+//    @HookHandler
+//    public void onLogin(ConnectionHook hook) {
+//        hook.getPlayer().setCanBuild(false);
+//        log.debug(String.format("player %s can build? %s", hook.getPlayer().getName(), hook.getPlayer().canBuild()));
+//    }
 
     /**
      * TODO: Fix this hook. This doesn't seem to get called. I would like to shut rain off every time it starts raining.
      * 
      * @param hook
      */
-    @HookHandler
-    public void onWeatherChange(WeatherChangeHook hook) {
-        World w=hook.getWorld();
-        logger.info(String.format("Weather change hook called, is raining? %s", w.isRaining()));
-        if (w.isRaining()) {
-            logger.info(String.format("Set raining to false"));
-            w.setRaining(false);
-            //w.setRainTime(0);
-        }
+    @Listener
+    public void onWeatherChange(ChangeWorldWeatherEvent weatherChange) {
+        log.info(String.format("Weather listener called"));
+//        if (w.isRaining()) {
+//            log.info(String.format("Set raining to false"));
+//            w.setRaining(false);
+//            //w.setRainTime(0);
+//        }
     }
 
     /**
@@ -193,7 +197,7 @@ public class TurtlePlugin {
      */
     @HookHandler
     public void uploadJSON(KCTUploadHook hook) {
-        logger.trace("Hook called!");
+        log.trace("Hook called!");
         //add scripts to manager and db
         Collection<KCTScript> list = hook.getScripts();
         for (KCTScript script : list)  {
@@ -210,7 +214,7 @@ public class TurtlePlugin {
             try {
                 Database.get().insert(data);
             } catch (DatabaseWriteException e) {
-                logger.error(e);
+                log.error(e);
             }
         }
     }  
@@ -228,7 +232,7 @@ public class TurtlePlugin {
             permissions = { "" },
             toolTip = "/ls")
     public void listScripts(MessageReceiver sender, String[] args) {
-        logger.debug(String.format("name of sender is: %s", sender.getName().toLowerCase()));
+        log.debug(String.format("name of sender is: %s", sender.getName().toLowerCase()));
         sender.message(String.format("%s is listing turtle scripts (programs)", sender.getName().toLowerCase()));
         if (args.length>1) {
             String playerName=args[1].toLowerCase();
@@ -259,7 +263,7 @@ public class TurtlePlugin {
                 sender.message(String.format("We cannot find any scripts for %s", sender.getName()));
             }
             for (Entry<String,KCTScript> entry : map.entrySet()) {
-                logger.debug(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
+                log.debug(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
                 sender.message(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage()));
             }
         }
@@ -292,28 +296,28 @@ public class TurtlePlugin {
         }
 
         //Create turtle
-        Turtle turtle = new Turtle(logger);
+        Turtle turtle = new Turtle(log);
         turtle.turtleInit(sender);
 
         //Get script from map
         KCTScript script = null;
         try  {     
-            logger.trace(String.format("%s is looking for %s", playerName, scriptName));
+            log.trace(String.format("%s is looking for %s", playerName, scriptName));
             for (String p : scripts.getAllScripts().keySet()) {
-                logger.trace("Player name: "+p);
+                log.trace("Player name: "+p);
                 for (String s : scripts.getAllScriptsForPlayer(p).keySet()) {
-                    logger.trace(String.format("Player name %s has script named %s", p, s));
+                    log.trace(String.format("Player name %s has script named %s", p, s));
                 }
             }
             script = scripts.getScript(playerName, scriptName);
             if (script==null) {
-                logger.warn(String.format("player %s cannot find script %s", playerName, scriptName));
+                log.warn(String.format("player %s cannot find script %s", playerName, scriptName));
                 sender.asPlayer().message(String.format("%s, you have no script named %s", playerName, scriptName));
                 return;
             }
         }  catch (Exception e)  {
             turtle.turtleConsole("Script failed to load!");
-            logger.error("Script failed to load", e);
+            log.error("Script failed to load", e);
         }
 
         //Execute script    
@@ -321,7 +325,7 @@ public class TurtlePlugin {
             turtle.executeScript(script);
         }  catch (Exception e)  {
             turtle.turtleConsole("Script failed to execute!");
-            logger.error("Script failed to execute", e);
+            log.error("Script failed to execute", e);
         }
 
         //add script's blocks to undo buffer
@@ -334,7 +338,7 @@ public class TurtlePlugin {
             undoBuffers.get(senderName).push(turtle.getOldBlocks());            
         }  catch (Exception e)  {
             turtle.turtleConsole("Failed to add to undo buffer!");
-            logger.error("Faile to add to undo buffer", e);
+            log.error("Faile to add to undo buffer", e);
         }
     }
 

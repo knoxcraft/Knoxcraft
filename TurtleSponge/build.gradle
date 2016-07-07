@@ -4,7 +4,7 @@ apply plugin: 'eclipse'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-version = '1.1'
+version = '0.0.1'
 
 repositories {
     mavenCentral()
@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    compile "org.spongepowered:spongeapi:4.0.0"
+    compile "org.spongepowered:spongeapi:4.1.0"
     compile "javax.servlet:servlet-api:3.1"
     compile 'commons-io:commons-io:2.4'
     compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.0.M0'
@@ -25,4 +25,15 @@ dependencies {
     compile group: 'com.mchange', name: 'c3p0', version: '0.9.5.2'
     compile group: 'org.jdom', name: 'jdom2', version: '2.0.6'
     testCompile 'junit:junit:4.8.2'
+}
+
+jar {
+    baseName = 'knoxcraft'
+    version =  '0.1'
+}
+
+task copyTask(type: Copy, dependsOn: 'jar') {
+    // Copy a single file
+    from 'build/libs/knoxsponge-0.1.jar'
+    into '/Users/jspacco/projects/Knoxcraft/forge/mods'
 }

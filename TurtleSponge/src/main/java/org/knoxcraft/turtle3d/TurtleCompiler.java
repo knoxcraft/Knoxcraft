@@ -28,7 +28,7 @@ public class TurtleCompiler
     public static final String BLOCKLY="blockly";
 
     @Inject
-    private Logger logger;
+    private Logger log;
 
     public TurtleCompiler() {
     }
@@ -50,18 +50,18 @@ public class TurtleCompiler
         if (javaSource.contains(TURTLE3D_BASE)) {
             // If we see a reference to Turtle3DBase, we should try to parse that first
             String json=getJSONTurtle3DBase(className, javaSource);
-            logger.trace("json has been returned: "+json);
+            log.trace("json has been returned: "+json);
             KCTScript script=parseFromJson(json);
-            logger.trace("json after parsing to KCTScript: "+script.toJSONString());
+            log.trace("json after parsing to KCTScript: "+script.toJSONString());
             script.setLanguage(JAVA);
             script.setSourceCode(javaSource);
             return script;
         } else {
             // Otherwise, assume it's Turtle3D and hope for the best!
             String json=getJSONTurtle3D(className, javaSource);
-            logger.debug("json has been returned: "+json);
+            log.debug("json has been returned: "+json);
             KCTScript script=parseFromJson(json);
-            logger.debug("json after parsing to KCTScript: "+script.toJSONString());
+            log.debug("json after parsing to KCTScript: "+script.toJSONString());
             script.setLanguage(JAVA);
             script.setSourceCode(javaSource);
             return script;
@@ -81,20 +81,20 @@ public class TurtleCompiler
         JSONParser parser=new JSONParser();
         
         try {
-            logger.trace(jsonText);
+            log.trace(jsonText);
             JSONObject json=(JSONObject)parser.parse(jsonText);
 
             String scriptname=(String)json.get("scriptname");
 
             KCTScript script=new KCTScript(scriptname);
 
-            logger.trace(String.format("%s\n", scriptname));
+            log.trace(String.format("%s\n", scriptname));
 
             JSONArray lang= (JSONArray) json.get("commands");
             for (int i=0; i<lang.size(); i++) {
                 JSONObject cmd=(JSONObject)lang.get(i);
                 script.addCommand(cmd);
-                logger.trace(String.format("script %s has command %s", script.getScriptName(), cmd.get(KCTCommand.CMD)));
+                log.trace(String.format("script %s has command %s", script.getScriptName(), cmd.get(KCTCommand.CMD)));
             }
             return script;
         } catch (ParseException e) {
@@ -128,7 +128,7 @@ public class TurtleCompiler
         // FIXME this isn't howt his works in Sponge
         Plugin plugin=Canary.pluginManager().getPlugin(TURTLE_PLUGIN);
         String extraClasspath=new File(plugin.getPath()).toURI().toString();
-        logger.debug(String.format("Extra classpath: %s", extraClasspath));
+        log.debug(String.format("Extra classpath: %s", extraClasspath));
         compiler.setExtraClasspath(extraClasspath);
         compiler.addSourceFile(className, source);
         //String driverName="Driver"+System.currentTimeMillis();
@@ -143,7 +143,7 @@ public class TurtleCompiler
                         "    return t.getJSON();\n"+
                         "  }\n"+
                         "}", TURTLE3D_BASE, driverName, className);
-        logger.debug("About to compile: \n"+driver);
+        log.debug("About to compile: \n"+driver);
         compiler.addSourceFile(driverName, driver);
         boolean compileSuccess=compiler.compile();
         if (!compileSuccess) {
@@ -155,7 +155,7 @@ public class TurtleCompiler
             }
             throw new TurtleCompilerException("Unable to compile: "+s.toString());
         }
-        logger.debug("Successfully compiled driver!");
+        log.debug("Successfully compiled driver!");
 
         // XXX Not sure why, but it is necessary to set the default classloader
         // for the bytearrayclassloader as the classloader that loaded TurtleCompiler
@@ -163,7 +163,7 @@ public class TurtleCompiler
         ByteArrayClassLoader classLoader=new ByteArrayClassLoader(this.getClass().getClassLoader(), compiler.getFileManager().getClasses());
         //ByteArrayClassLoader.logger=logger;
         try {
-            logger.trace("Trying to load "+driverName);
+            log.trace("Trying to load "+driverName);
             Class<?> c=classLoader.loadClass(driverName);
 
             Method m=c.getMethod("run");
@@ -171,13 +171,13 @@ public class TurtleCompiler
             t.start();
             return t.check(3000);
         } catch (TimeoutException e) {
-            logger.error("Turtle code timed out; infinite loop?", e);
+            log.error("Turtle code timed out; infinite loop?", e);
             throw new TurtleException(e);
         } catch (ReflectiveOperationException e){
-            logger.error("Unexpected reflection error compiling", e);
+            log.error("Unexpected reflection error compiling", e);
             throw new TurtleException(e);
         } catch (Exception e){
-            logger.error("Unexpected exception compiling", e);
+            log.error("Unexpected exception compiling", e);
             throw new TurtleException(e);
         }
     }
@@ -199,7 +199,7 @@ public class TurtleCompiler
         // FIXME Plugins work differently in Sponge
         Plugin plugin=Canary.pluginManager().getPlugin(TURTLE_PLUGIN);
         String extraClasspath=new File(plugin.getPath()).toURI().toString();
-        logger.debug(String.format("Extra classpath: %s", extraClasspath));
+        log.debug(String.format("Extra classpath: %s", extraClasspath));
         compiler.setExtraClasspath(extraClasspath);
         compiler.addSourceFile(className, source);
         //String driverName="Driver"+System.currentTimeMillis();
@@ -211,7 +211,7 @@ public class TurtleCompiler
                         + "    %s.main(new String[] {});\n"
                         + "  }\n"
                         + "}\n", TURTLE3D_BASE, className);
-        logger.debug("About to compile: \n"+driver);
+        log.debug("About to compile: \n"+driver);
         compiler.addSourceFile(driverName, driver);
         boolean compileSuccess=compiler.compile();
         if (!compileSuccess) {
@@ -223,12 +223,12 @@ public class TurtleCompiler
             }
             throw new TurtleCompilerException("Unable to compile: "+s.toString());
         }
-        logger.debug("Successfully compiled driver!");
+        log.debug("Successfully compiled driver!");
 
         ByteArrayClassLoader classLoader=new ByteArrayClassLoader(this.getClass().getClassLoader(), compiler.getFileManager().getClasses());
         //ByteArrayClassLoader.logger=logger;
         try {
-            logger.trace("Trying to load "+driverName);
+            log.trace("Trying to load "+driverName);
             Class<?> c=classLoader.loadClass(driverName);
 
             // weird trick to get vararg methods such as main
@@ -245,20 +245,20 @@ public class TurtleCompiler
             Map<String,Turtle3D> map=turtleMap.get(t);
             if (map != null)  {
                 for (String turtleName : map.keySet()) {           
-                    logger.warn("turtleName: "+turtleName);
+                    log.warn("turtleName: "+turtleName);
                     Turtle3D turtle=map.get(turtleName);
                     return turtle.getScript().toJSONString();
                 }
             }
             throw new TurtleException("Unable to find any KnoxCraft Turtle code to return");
         } catch (TimeoutException e) {
-            logger.error("timeout in student turtle code", e);
+            log.error("timeout in student turtle code", e);
             throw new TurtleException(e);
         } catch (ReflectiveOperationException e){
-            logger.error("Unexpected reflection error compiling", e);
+            log.error("Unexpected reflection error compiling", e);
             throw new TurtleException(e);
         } catch (Exception e){
-            logger.error("Unexpected exception compiling", e);
+            log.error("Unexpected exception compiling", e);
             throw new TurtleException(e);
         }
     }
