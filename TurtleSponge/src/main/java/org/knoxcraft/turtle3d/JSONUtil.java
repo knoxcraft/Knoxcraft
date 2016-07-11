@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.Direction;
-
-import net.canarymod.api.world.blocks.BlockType;
 
 
 public class JSONUtil

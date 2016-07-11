@@ -1,14 +1,32 @@
 package org.knoxcraft.turtle3d;
 
-import static org.knoxcraft.turtle3d.KCTCommand.*;
+import static org.knoxcraft.turtle3d.KCTCommand.BACKWARD;
+import static org.knoxcraft.turtle3d.KCTCommand.BLOCKPLACEMODE;
+import static org.knoxcraft.turtle3d.KCTCommand.BLOCKTYPE;
+import static org.knoxcraft.turtle3d.KCTCommand.DEGREES;
+import static org.knoxcraft.turtle3d.KCTCommand.DIR;
+import static org.knoxcraft.turtle3d.KCTCommand.DIST;
+import static org.knoxcraft.turtle3d.KCTCommand.DOWN;
+import static org.knoxcraft.turtle3d.KCTCommand.FORWARD;
+import static org.knoxcraft.turtle3d.KCTCommand.LEFT;
+import static org.knoxcraft.turtle3d.KCTCommand.PLACEBLOCKS;
+import static org.knoxcraft.turtle3d.KCTCommand.RIGHT;
+import static org.knoxcraft.turtle3d.KCTCommand.SETBLOCK;
+import static org.knoxcraft.turtle3d.KCTCommand.SETDIRECTION;
+import static org.knoxcraft.turtle3d.KCTCommand.SETPOSITION;
+import static org.knoxcraft.turtle3d.KCTCommand.TURNLEFT;
+import static org.knoxcraft.turtle3d.KCTCommand.TURNRIGHT;
+import static org.knoxcraft.turtle3d.KCTCommand.UP;
+import static org.knoxcraft.turtle3d.KCTCommand.X;
+import static org.knoxcraft.turtle3d.KCTCommand.Y;
+import static org.knoxcraft.turtle3d.KCTCommand.Z;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.Direction;
-
-import net.canarymod.api.world.blocks.BlockType;
 
 
 /**
