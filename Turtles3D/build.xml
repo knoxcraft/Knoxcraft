@@ -29,6 +29,17 @@
 		</jar>
 		<!-- sleep so that the timestamps don't seem to be in the future -->
 		<sleep seconds="1"/>
+		<!--
+		Now copy everything over from Emily's Blockly code
+		-->
+		<mkdir dir="temp"/>
+		<copy todir="temp">
+			<fileset dir="." includes="web/**"/>
+		</copy>
+		<copy todir="temp/web">
+			<fileset dir="../blockly"/>
+		</copy>
+		
 		<!-- Now create the jarfile, filtering out the META-INF folder from our big
 		jarfile full of the external jarfiles 
 		-->
@@ -40,7 +51,7 @@
 			<zipfileset src="${bin}/external-libs.jar">
 				<exclude name="META-INF/**"/>
 			</zipfileset>
-			<fileset dir="." includes="web/**"/>
+			<fileset dir="temp" includes="**"/>
 		</jar>
 	</target>
 	<target name="kct-java-api" depends="depends" description="">
