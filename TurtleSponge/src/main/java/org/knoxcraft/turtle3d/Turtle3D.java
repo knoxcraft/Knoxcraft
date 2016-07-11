@@ -225,10 +225,11 @@ public class Turtle3D
       * @param type The block type
       */
     public void setBlock(BlockType type) {
-        String id=String.valueOf(type.getId());
-        if (type.getData()!=0) {
-            id+=":"+type.getData();
-        }
+        String id= type.getName();
+        //we will be filling this with our own code eventually with soemthing like Minecraft:WOOL:light_blue
+//        if (type.getData()!=0) {
+//            id+=":"+type.getData();
+//        }
         KCTCommand cmd=new KCTCommand(SETBLOCK, JSONUtil.makeArgMap(BLOCKTYPE, id));         script.addCommand(cmd);
      }
      
@@ -275,7 +276,7 @@ public class Turtle3D
       */
     public void setDirection(Direction direction) {
         // FIXME: need methods to encode/decode direction to an int
-        KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));
+        KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.));
         script.addCommand(cmd);
      }
 }
