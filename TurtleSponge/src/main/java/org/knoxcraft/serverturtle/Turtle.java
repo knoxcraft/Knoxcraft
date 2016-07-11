@@ -43,6 +43,8 @@ public class Turtle {
      * @param logger
      */
     public Turtle() {
+        BlockType t;
+        //BlockTypes.
     }
 
 //    /**

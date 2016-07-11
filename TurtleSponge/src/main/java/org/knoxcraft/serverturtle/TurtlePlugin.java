@@ -106,22 +106,6 @@ public class TurtlePlugin {
     }
     
     private void setupCommands() {
-        CommandSpec hello=CommandSpec.builder()
-                .description(Text.of("Hello world command"))
-                .permission("org.knoxcraft.sponge.testplugin")
-                .executor(new CommandExecutor() {
-                    @Override
-                    public CommandResult execute(CommandSource src,CommandContext args)
-                    throws CommandException
-                    {
-                        src.sendMessage(Text.of("Hello there my dear friend"));
-                        log.info("SRC: "+src.toString());
-                        log.info("args: "+args.toString());
-                        return CommandResult.success();
-                    }
-                }).build();
-        Sponge.getCommandManager().register(this, hello, "helloworld", "hello");
-        
         // List all the scripts
         CommandSpec listScripts=CommandSpec.builder()
                 .description(Text.of("List Knoxcraft Turtle Scripts"))
