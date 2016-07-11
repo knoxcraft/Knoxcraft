@@ -84,10 +84,10 @@ public class TurtlePlugin {
 
         try {
             jettyServer=new JettyServer();
-            jettyServer.enable();
+            //jettyServer.enable();
         } catch (Exception e){
             if (jettyServer!=null) {
-                jettyServer.shutdown();
+             //   jettyServer.shutdown();
             }
             log.error("Cannot initialize TurtlePlugin: JettyServer failed to start", e);
         }
@@ -105,6 +105,8 @@ public class TurtlePlugin {
         setupCommands();
     }
     
+    
+    //TODO LOG STATEMENTS to show commands work, and check if arguments make sense 
     private void setupCommands() {
         // List all the scripts
         CommandSpec listScripts=CommandSpec.builder()
@@ -115,7 +117,7 @@ public class TurtlePlugin {
                 .executor(new CommandExecutor() {
                     @Override
                     public CommandResult execute(CommandSource src,CommandContext args)
-                    throws CommandException
+                    throws CommandException	
                     {
                         log.debug(String.format("name of sender is: %s", src.getName().toLowerCase()));
                         src.sendMessage(Text.of(String.format("%s is listing turtle scripts (programs)", src.getName().toLowerCase())));
@@ -154,6 +156,7 @@ public class TurtlePlugin {
                                 src.sendMessage(Text.of(String.format("%s => %s", entry.getKey(), entry.getValue().getLanguage())));
                             }
                         }
+                        
                         return CommandResult.success();
                     }
                 }).build();
@@ -179,13 +182,24 @@ public class TurtlePlugin {
                         String scriptName=optScriptName.get();
                         String playerName = src.getName().toLowerCase();
                         
+                        log.info("playername ==" + playerName);
                         Optional<String> optPlayerName=args.getOne(PLAYER_NAME);
                         if (optPlayerName.isPresent()) {
                             playerName=optPlayerName.get();
                         }
                         
                         log.debug(String.format("%s invokes script %s from player %s", src.getName(), scriptName, playerName));
-
+                        ///////
+                        log.info("scripts == null" + (scripts == null));
+                        log.info("playerName ==" + playerName);
+                        log.info("scriptName== " + scriptName);
+                        KCTScript script = scripts.getScript(playerName, scriptName);
+                        if (script==null) {
+                            log.warn(String.format("player %s cannot find script %s", playerName, scriptName));
+                            src.sendMessage(Text.of(String.format("%s, you have no script named %s", playerName, scriptName)));
+                            return CommandResult.success();
+                        }
+                        
                         /*
                         //Create turtle
                         Turtle turtle = new Turtle();
@@ -290,8 +304,11 @@ public class TurtlePlugin {
                         
                         return CommandResult.success();
                     }
+                    
                 }).build();
+        Sponge.getCommandManager().register(this, undo, "undo", "un");
     }
+    
     
     
     /**
