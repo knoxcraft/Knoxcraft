@@ -4,6 +4,7 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
              http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
+<!-- 
 	<servlet>
 		<servlet-name>jsp</servlet-name>
 		<servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
@@ -20,6 +21,25 @@
 			<param-value>true</param-value>
 		</init-param>
 	</servlet>
+ -->
+	<servlet id="jsp">
+    	<servlet-name>jsp</servlet-name>
+    	<servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
+    	<init-param>
+        	<param-name>logVerbosityLevel</param-name>
+        	<param-value>DEBUG</param-value>
+    	</init-param>
+    	<init-param>
+        	<param-name>fork</param-name>
+        	<param-value>>false</param-value>
+    	</init-param>
+    	<init-param>
+        	<param-name>keepgenerated</param-name>
+        	<param-value>>true</param-value>
+    	</init-param>
+	    <load-on-startup>0</load-on-startup>
+	</servlet>
+	
 	<servlet>
 		<servlet-name>KCTUploadServlet</servlet-name>
 		<servlet-class>org.knoxcraft.jetty.server.KCTUploadServlet</servlet-class>
@@ -60,6 +80,13 @@
 	<servlet-mapping>
 		<servlet-name>jsp</servlet-name>
 		<url-pattern>*.jsp</url-pattern>
+		<url-pattern>*.jspf</url-pattern>
+		<url-pattern>*.jspx</url-pattern>
+		<url-pattern>*.xsp</url-pattern>
+		<url-pattern>*.JSP</url-pattern>
+		<url-pattern>*.JSPF</url-pattern>
+		<url-pattern>*.JSPX</url-pattern>
+		<url-pattern>*.XSP</url-pattern>
 	</servlet-mapping>
 
 	<filter>
@@ -87,8 +114,8 @@
 	
 	
 	<jsp-config>
-		<!--  none of these mappings work and I don't know why
-		I have to hard-code the /WEB-INF/tlds/ address in the taglib statement of each jsp
+		<!--  With Jetty 9.4, we have to use the taglib uri as a URI
+			and we need to import it this way. Not sure why we can't pick different names.
 		 -->
 		<taglib>
 			<taglib-uri>http://java.sun.com/jsp/jstl/core</taglib-uri>
@@ -109,10 +136,6 @@
 		<taglib>
 			<taglib-uri>http://java.sun.com/jsp/jstl/x</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/x.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>http://java.sun.com/jsp/jstl/scriptfree</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/scriptfree.tld</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>http://java.sun.com/jsp/jstl/scriptfree</taglib-uri>

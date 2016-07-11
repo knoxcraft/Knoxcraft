@@ -1,8 +1,8 @@
 package net.canarymod.database;
 
-import com.google.common.collect.Maps;
-
 import java.util.HashMap;
+
+import com.google.common.collect.Maps;
 
 /**
  * Helper class so we can easily identify the driver type further down the code

@@ -1,19 +1,5 @@
 package net.canarymod.database.mysql;
 
-import net.canarymod.database.Column;
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.JdbcConnectionManager;
-import net.canarymod.database.SQLType;
-import net.canarymod.database.StringUtil;
-import net.canarymod.database.exceptions.DatabaseAccessException;
-import net.canarymod.database.exceptions.DatabaseReadException;
-import net.canarymod.database.exceptions.DatabaseTableInconsistencyException;
-import net.canarymod.database.exceptions.DatabaseWriteException;
-import org.slf4j.Logger;
-
-import com.google.inject.Inject;
-
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -26,6 +12,21 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+
+import com.google.inject.Inject;
+
+import net.canarymod.database.Column;
+import net.canarymod.database.DataAccess;
+import net.canarymod.database.Database;
+import net.canarymod.database.JdbcConnectionManager;
+import net.canarymod.database.SQLType;
+import net.canarymod.database.StringUtil;
+import net.canarymod.database.exceptions.DatabaseAccessException;
+import net.canarymod.database.exceptions.DatabaseReadException;
+import net.canarymod.database.exceptions.DatabaseTableInconsistencyException;
+import net.canarymod.database.exceptions.DatabaseWriteException;
 
 /**
  * Represents access to a MySQL database

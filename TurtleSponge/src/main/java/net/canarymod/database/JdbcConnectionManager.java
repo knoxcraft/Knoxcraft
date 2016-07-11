@@ -1,17 +1,16 @@
 package net.canarymod.database;
 
-import com.google.inject.Inject;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import net.canarymod.config.Configuration;
-import net.canarymod.config.DatabaseConfiguration;
-import net.canarymod.database.exceptions.DatabaseAccessException;
-
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.slf4j.Logger;
+
+import com.google.inject.Inject;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
+import net.canarymod.database.exceptions.DatabaseAccessException;
 
 /**
  * Represents a connection (pool) manager for all sorts of JDBC connections.

@@ -1,6 +1,6 @@
-<%@ taglib uri="/WEB-INF/tlds/kct.tld" prefix="kct" %>
-<%@ taglib uri="/WEB-INF/tlds/c.tld" prefix="c" %>
-<%@ taglib uri="/WEB-INF/tlds/fn.tld" prefix="fn" %>
+<%--<%@ taglib uri="/WEB-INF/tlds/kct.tld" prefix="kct" %>  --%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <html>
 <%--<head><kct:headStuff title="Code Upload Form"></kct:headStuff></head> --%>

@@ -1,10 +1,11 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'war'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-version = '0.0.1'
+version = '0.2'
 
 repositories {
     mavenCentral()
@@ -14,26 +15,72 @@ repositories {
     }
 }
 
+configurations {
+    provided
+    compile.extendsFrom provided
+}
+
 dependencies {
-    compile "org.spongepowered:spongeapi:4.1.0"
-    compile "javax.servlet:servlet-api:3.1"
-    compile 'commons-io:commons-io:2.4'
+    provided "org.spongepowered:spongeapi:4.1.0"
+    
+    // not sure why I need to include javax.servlet-api; thought Jetty would have this?
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
+    
     compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.0.M0'
     compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.0.M0'
     compile group: 'org.eclipse.jetty', name: 'jetty-webapp', version: '9.4.0.M0'
+    compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '9.4.0.M0'
+    compile group: 'org.eclipse.jetty', name: 'jetty-jmx', version: '9.4.0.M0'
+    compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.0.M0'
+    compile group: 'org.eclipse.jetty', name: 'jetty-jaas', version: '9.4.0.M0'
+    compile group: 'org.eclipse.jetty.websocket', name: 'websocket-server', version: '9.4.0.M0'
+    compile group: 'org.eclipse.jetty.websocket', name: 'websocket-api', version: '9.4.0.M0'
+    compile group: 'org.eclipse.jetty.websocket', name: 'websocket-client', version: '9.4.0.M0'
+    compile group: 'org.eclipse.jetty.websocket', name: 'websocket-common', version: '9.4.0.M0'
+    
+    
+    compile 'commons-io:commons-io:2.4'
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     compile group: 'com.mchange', name: 'c3p0', version: '0.9.5.2'
     compile group: 'org.jdom', name: 'jdom2', version: '2.0.6'
     testCompile 'junit:junit:4.8.2'
 }
 
-jar {
-    baseName = 'knoxcraft'
-    version =  '0.1'
+sourceSets {
+    main {
+        java {
+            exclude 'net/canarymod/database/**'
+            exclude 'org/knoxcraft/database/**'
+        }
+    }
 }
 
-task copyTask(type: Copy, dependsOn: 'jar') {
+jar {
+    // TODO: read names from project
+    baseName = 'knoxcraft'
+    version =  '0.2'
+    // Leave out the sponge code, since the sponge plugin will have this
+    dependsOn configurations.runtime
+    from {
+        (configurations.runtime - configurations.provided).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    } {
+        // not sure what else should be excluded
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
+    from('src/main') {
+        include 'web/**'
+    }
+}
+
+
+
+task copyTask(type: Copy, dependsOn: 'jar', overwrite: true) {
     // Copy a single file
     from 'build/libs/knoxsponge-0.1.jar'
     into '/Users/matthewmoe/documents/projects/forge/mods'
+
 }
