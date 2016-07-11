@@ -35,5 +35,5 @@ jar {
 task copyTask(type: Copy, dependsOn: 'jar') {
     // Copy a single file
     from 'build/libs/knoxsponge-0.1.jar'
-    into '/Users/jspacco/projects/Knoxcraft/forge/mods'
+    into '/Users/matthewmoe/documents/projects/forge/mods'
 }
