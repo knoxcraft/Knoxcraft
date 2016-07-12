@@ -110,8 +110,5 @@ public class KCTCommand
                 quoteString(commandName));
     }
     
-    public static KCTCommand forward(int distance){
-    	Map<String, object> 
-    }
-    
+   
 }
