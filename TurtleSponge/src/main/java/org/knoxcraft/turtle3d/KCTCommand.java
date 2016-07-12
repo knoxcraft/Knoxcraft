@@ -109,6 +109,12 @@ public class KCTCommand
                 CMDKEY,  
                 quoteString(commandName));
     }
-    
-   
+
+    public static KCTCommand forward(int distance) {
+        Map<String, Object> map=new HashMap<String, Object>();
+        map.put(DIST, distance);
+        KCTCommand result=new KCTCommand(FORWARD, map);
+        return result;
+    }
+
 }

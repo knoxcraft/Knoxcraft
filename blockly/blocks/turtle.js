@@ -1,6 +1,7 @@
 /**
 *  Blocks for Knoxcraft Turtles.
 */
+var helpURL = 'https://sites.google.com/a/knox.edu/knoxcraft/student-guide-blockly#help';
 
 /**
 *  Initialize the turtle.  
@@ -15,7 +16,7 @@ Blockly.Blocks['turtle_init'] = {
     this.appendStatementInput("script");
     this.setColour(260);
     this.setTooltip('Create a turtle and define its script.');
-    this.setHelpUrl('https://sites.google.com/a/knox.edu/knoxcraft/student-guide-blockly');
+	this.setHelpUrl(helpURL);
   }
 };
 
@@ -36,7 +37,7 @@ Blockly.Blocks['turtle_move'] = {
     this.setNextStatement(true);
     this.setColour(260);
     this.setTooltip('Move the turtle forward, backward, left, right, up, or down.');
-    this.setHelpUrl('https://sites.google.com/a/knox.edu/knoxcraft/student-guide-blockly');
+    this.setHelpUrl(helpURL);
   }
 };
 
@@ -57,7 +58,7 @@ Blockly.Blocks['turtle_turn'] = {
     this.setNextStatement(true);
     this.setColour(260);
     this.setTooltip('Turn the turtle left or right.  Note that Knoxcraft rounds to multiples of 45 degrees.');
-    this.setHelpUrl('https://sites.google.com/a/knox.edu/knoxcraft/student-guide-blockly');
+    this.setHelpUrl(helpURL);
   }
 };
 
@@ -75,7 +76,7 @@ Blockly.Blocks['turtle_setblockplace'] = {
     this.setNextStatement(true);
     this.setColour(260);
     this.setTooltip('Turn block placement mode on and off.');
-    this.setHelpUrl('https://sites.google.com/a/knox.edu/knoxcraft/student-guide-blockly');
+    this.setHelpUrl(helpURL);
   }
 };
 
@@ -93,7 +94,7 @@ Blockly.Blocks['turtle_setblocktype'] = {
     this.setNextStatement(true);
     this.setColour(260);
     this.setTooltip('If you know the name or id number of the Minecraft block type you want, use this block.');
-    this.setHelpUrl('https://sites.google.com/a/knox.edu/knoxcraft/student-guide-blockly');
+    this.setHelpUrl(helpURL);
   }
 };
 
@@ -540,7 +541,7 @@ Blockly.Blocks['turtle_setblocktype2'] = {
     this.setNextStatement(true);
     this.setColour(260);
     this.setTooltip('Choose a Minecraft block type from the list.');
-    this.setHelpUrl('https://sites.google.com/a/knox.edu/knoxcraft/student-guide-blockly');
+    this.setHelpUrl(helpURL);
   }
 };
 
@@ -562,7 +563,7 @@ Blockly.Blocks['turtle_setpos'] = {
     this.setNextStatement(true);
     this.setColour(260);
     this.setTooltip('Set the turtle\'s position relative to its initial position.');
-    this.setHelpUrl('https://sites.google.com/a/knox.edu/knoxcraft/student-guide-blockly');
+    this.setHelpUrl(helpURL);
   }
 };
 
@@ -580,6 +581,6 @@ Blockly.Blocks['turtle_setdir'] = {
     this.setNextStatement(true);
     this.setColour(260);
     this.setTooltip('Set the turtle\'s heading.');
-    this.setHelpUrl('https://sites.google.com/a/knox.edu/knoxcraft/student-guide-blockly');
+    this.setHelpUrl(helpURL);
   }
 };

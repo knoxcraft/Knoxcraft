@@ -5,6 +5,7 @@ import java.util.Stack;
 import org.slf4j.Logger;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.World;
@@ -29,7 +30,8 @@ public class Turtle {
 
     //OTHER VARIABLES
     private boolean bp = true;  //Block Place on/off
-    private BlockType bt = BlockTypes.STONE;  //default turtle block type
+
+    private BlockType bt = BlockTypes.STONE;  //default turtle block type 
     private World world;  //World in which all actions occur
     private MessageReceiver sender;  //player to send messages to
     private Stack<BlockRecord> oldBlocks;  //original pos/type of all bricks laid by this turtle for undoing

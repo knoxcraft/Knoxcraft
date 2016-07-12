@@ -37,7 +37,7 @@ public class TurtleTester extends Plugin implements CommandListener, PluginListe
         logger.warn("TurtleTester.disable() invoked");
         httpServer.disable();
     }
-
+    
     /**
      * Called when plugin is enabled. 
      * 
