@@ -19,6 +19,7 @@ import org.knoxcraft.turtle3d.TurtleCompiler;
 import org.knoxcraft.turtle3d.TurtleCompilerException;
 import org.knoxcraft.turtle3d.TurtleException;
 import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
 
 import com.google.inject.Inject;
 
@@ -96,8 +97,8 @@ public class KCTUploadServlet extends HttpServlet
                         + "the type of client used for the upload (i.e. bluej, web, pykc, etc)");
             }
             
-            KCTUploadHook hook = new KCTUploadHook();
-            hook.setPlayerName(playerName);
+            KCTUploadHook event = new KCTUploadHook();
+            event.setPlayerName(playerName);
             StringBuilder res=new StringBuilder();
             
             TurtleCompiler turtleCompiler=new TurtleCompiler();
@@ -118,7 +119,7 @@ public class KCTUploadServlet extends HttpServlet
                             + "named %s, in programming language %s\n", 
                             script.getScriptName(), script.getLanguage()));
                     success++;
-                    hook.addScript(script);
+                    event.addScript(script);
                 } else if (files.containsKey("jsonfile") && files.containsKey("sourcefile")) {
                     UploadedFile sourceUpload=files.get("sourcefile");
                     UploadedFile jsonUpload=files.get("jsonfile");
@@ -129,7 +130,7 @@ public class KCTUploadServlet extends HttpServlet
                             + "named %s, in programming language %s\n", 
                             script.getScriptName(), script.getLanguage()));
                     success++;
-                    hook.addScript(script);
+                    event.addScript(script);
                 } else {
                     throw new TurtleException("You must upload BOTH json and the corresponding source code "
                             + " (either as files or pasted into the text areas of the web form)");
@@ -144,7 +145,7 @@ public class KCTUploadServlet extends HttpServlet
                         logger.trace(String.format("Trying to upload and compile file %s\n", uploadedFile.filename));
                         KCTScript script=turtleCompiler.compileJavaTurtleCode(uploadedFile.filename, uploadedFile.body);
                         logger.trace("Returned KCTScript (it's JSON is): "+script.toJSONString());
-                        hook.addScript(script);
+                        event.addScript(script);
                         res.append(String.format("Successfully uploaded file %s and compiled KnoxCraft Turtle program "
                                 + "named %s in programming language %s\n\n", 
                                 uploadedFile.filename, script.getScriptName(), script.getLanguage()));
@@ -174,7 +175,8 @@ public class KCTUploadServlet extends HttpServlet
                 res.append(String.format("\nFailed to upload %d KnoxCraft Turtles programs\n", failure));
             }
             //FIXME convert to Sponge
-            Canary.hooks().callHook(hook);
+            Sponge.getEventManager().post(event);
+            logger.info(String.format("Upload event triggered by %s", event.getPlayerName()));
             writeResponse(response, res.toString(), client);
         } catch (TurtleException e) {
             // TODO: is this the best way to handle TurtleException?

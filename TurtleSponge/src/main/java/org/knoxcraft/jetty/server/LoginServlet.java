@@ -1,13 +1,6 @@
 package org.knoxcraft.jetty.server;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import com.google.inject.Inject;
-import org.slf4j.Logger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -15,11 +8,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.knoxcraft.database.AdminAccess;
+import org.slf4j.Logger;
 
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseReadException;
+import com.google.inject.Inject;
 
 public class LoginServlet extends HttpServlet
 {
@@ -51,7 +42,9 @@ public class LoginServlet extends HttpServlet
         String playerName=(String)request.getParameter(PLAYER_NAME);
         String password=(String)request.getParameter(PASSWORD);
         
+        // FIXME: translate to Sponge
         // Lookup 
+        /*
         List<DataAccess> results=new LinkedList<DataAccess>();
         AdminAccess adminAccess=new AdminAccess();
         Map<String,Object> filters=new HashMap<String,Object>();
@@ -71,5 +64,6 @@ public class LoginServlet extends HttpServlet
         } catch (DatabaseReadException e) {
             logger.error("cannot read DB", e);
         }
+        */
     }
 }

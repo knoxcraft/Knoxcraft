@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
 import org.json.simple.JSONArray;
@@ -15,6 +16,8 @@ import org.knoxcraft.javacompiler.CompilationResult;
 import org.knoxcraft.javacompiler.CompilerDiagnostic;
 import org.knoxcraft.javacompiler.InMemoryJavaCompiler;
 import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.plugin.PluginContainer;
 
 import com.google.inject.Inject;
 
@@ -125,9 +128,15 @@ public class TurtleCompiler
         // Apparently we need to add extra classpath containing the Turtle code
         // at least I think this is what does that...
         
-        // FIXME this isn't howt his works in Sponge
-        Plugin plugin=Canary.pluginManager().getPlugin(TURTLE_PLUGIN);
-        String extraClasspath=new File(plugin.getPath()).toURI().toString();
+        
+        Optional<PluginContainer> optPlugin=Sponge.getPluginManager().getPlugin(TURTLE_PLUGIN);
+        if (!optPlugin.isPresent()) {
+            log.error(String.format("can't find plugin %s", TURTLE_PLUGIN));
+        }
+        PluginContainer plugin=optPlugin.get();
+        // FIXME this isn't how this works in Sponge
+        //String extraClasspath=new File(plugin.getPath()).toURI().toString();
+        String extraClasspath=new File(".").toString();
         log.debug(String.format("Extra classpath: %s", extraClasspath));
         compiler.setExtraClasspath(extraClasspath);
         compiler.addSourceFile(className, source);
@@ -196,9 +205,14 @@ public class TurtleCompiler
         // Apparently we need to add extra classpath containing the Turtle code
         // at least I think this is what does that...
         
-        // FIXME Plugins work differently in Sponge
-        Plugin plugin=Canary.pluginManager().getPlugin(TURTLE_PLUGIN);
-        String extraClasspath=new File(plugin.getPath()).toURI().toString();
+        Optional<PluginContainer> optPlugin=Sponge.getPluginManager().getPlugin(TURTLE_PLUGIN);
+        if (!optPlugin.isPresent()) {
+            log.error(String.format("can't find plugin %s", TURTLE_PLUGIN));
+        }
+        PluginContainer plugin=optPlugin.get();
+        // FIXME this isn't how this works in Sponge
+        //String extraClasspath=new File(plugin.getPath()).toURI().toString();
+        String extraClasspath=new File(".").toString();
         log.debug(String.format("Extra classpath: %s", extraClasspath));
         compiler.setExtraClasspath(extraClasspath);
         compiler.addSourceFile(className, source);

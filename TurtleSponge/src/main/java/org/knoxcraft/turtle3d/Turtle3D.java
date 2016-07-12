@@ -28,7 +28,6 @@ import java.util.Map;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.Direction;
 
-
 /**
  * Class for procedural-style programming. Students must create instances using the
  * createTurtle() factory method rather than with a constructor. This is for technical
@@ -276,7 +275,8 @@ public class Turtle3D
       */
     public void setDirection(Direction direction) {
         // FIXME: need methods to encode/decode direction to an int
-        KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.));
-        script.addCommand(cmd);
+        // FIXME: translate to sponge
+//        KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));
+//        script.addCommand(cmd);
      }
 }

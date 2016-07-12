@@ -1,28 +1,5 @@
 package net.canarymod.database.xml;
 
-import com.google.common.collect.Maps;
-import com.google.common.io.Files;
-import com.google.inject.Inject;
-import com.mchange.v1.lang.BooleanUtils;
-import net.canarymod.database.Column;
-import net.canarymod.database.Column.DataType;
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseAccessException;
-import net.canarymod.database.exceptions.DatabaseReadException;
-import net.canarymod.database.exceptions.DatabaseTableInconsistencyException;
-import net.canarymod.database.exceptions.DatabaseWriteException;
-import org.jdom2.Content;
-import org.jdom2.DataConversionException;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.JDOMParseException;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -36,6 +13,31 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import org.jdom2.Content;
+import org.jdom2.DataConversionException;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.JDOMParseException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.slf4j.Logger;
+
+import com.google.common.collect.Maps;
+import com.google.common.io.Files;
+import com.google.inject.Inject;
+import com.mchange.v1.lang.BooleanUtils;
+
+import net.canarymod.database.Column;
+import net.canarymod.database.Column.DataType;
+import net.canarymod.database.DataAccess;
+import net.canarymod.database.Database;
+import net.canarymod.database.exceptions.DatabaseAccessException;
+import net.canarymod.database.exceptions.DatabaseReadException;
+import net.canarymod.database.exceptions.DatabaseTableInconsistencyException;
+import net.canarymod.database.exceptions.DatabaseWriteException;
 
 /**
  * Represent access to an XML database

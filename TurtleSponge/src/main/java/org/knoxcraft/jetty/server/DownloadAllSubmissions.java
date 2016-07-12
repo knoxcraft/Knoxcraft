@@ -1,29 +1,15 @@
 package org.knoxcraft.jetty.server;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
-import org.knoxcraft.database.KCTScriptAccess;
 import org.slf4j.Logger;
 
 import com.google.inject.Inject;
-
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseReadException;
 
 public class DownloadAllSubmissions extends HttpServlet
 {
@@ -37,6 +23,8 @@ public class DownloadAllSubmissions extends HttpServlet
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws ServletException, IOException
     {
+        // FIXME: translate to Sponge
+        /*
         try {
             OutputStream out=response.getOutputStream();
             ZipOutputStream zip=new ZipOutputStream(out);
@@ -66,10 +54,12 @@ public class DownloadAllSubmissions extends HttpServlet
             }
             zip.flush();
             zip.close();
+            
         } catch (DatabaseReadException e) {
             logger.error("Cannot read DB", e);
         } catch (IOException e){
             logger.error("Zip error", e);
         }
+        */
     }
 }

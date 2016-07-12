@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!-- ====================================================================== 
+     Mar 29, 2015 12:02:35 PM                                                        
+
+     project    
+     description
+                   
+     jspacco                                                                
+     ====================================================================== -->
+
+<project name="project" default="build">
+    <description>
+		description
+    </description>
+	
+	<property file="build.properties"/>
+	<!-- <property name="aux.location" value="../Turtles2BlueJ/bin"/> -->
+	
+	<target name="turtles3d" depends="depends" description="package the Turtles3D plugin">
+		<copy file="config/Canary.inf" tofile="${bin}/Canary.inf" overwrite="true"/>
+		<!-- Turn all of our jarfiles into one big jarfile
+		The zipgroupfileset task doesn't have the ability to filter out the META-INF folders
+		-->
+		<jar jarfile="${bin}/external-libs.jar">
+			<zipgroupfileset dir="lib/">
+				<include name="**/*.jar"/>
+				<exclude name="CanaryMod*jar"/>
+			</zipgroupfileset>
+		</jar>
+		<!-- sleep so that the timestamps don't seem to be in the future -->
+		<sleep seconds="1"/>
+		<!--
+		Now copy everything over from Emily's Blockly code
+		-->
+		<mkdir dir="temp"/>
+		<copy todir="temp">
+			<fileset dir="." includes="web/**"/>
+		</copy>
+		<copy todir="temp/web">
+			<fileset dir="../blockly"/>
+		</copy>
+		
+		<!-- Now create the jarfile, filtering out the META-INF folder from our big
+		jarfile full of the external jarfiles 
+		-->
+		<jar destfile="${dest}/Turtles3D.jar" update="false">
+			<fileset dir="${bin}">
+				<include name="**"/>
+				<exclude name="external-libs.jar"/>
+			</fileset>
+			<zipfileset src="${bin}/external-libs.jar">
+				<exclude name="META-INF/**"/>
+			</zipfileset>
+			<fileset dir="temp" includes="**"/>
+		</jar>
+	</target>
+	<target name="kct-java-api" depends="depends" description="">
+		<unzip src="lib/CanaryMod-1.2.0.jar" dest="bin">
+			<patternset>
+				<include name="net/canarymod/api/world/blocks/BlockType.class"/>
+				<include name="net/canarymod/api/world/position/Direction.class"/>
+			</patternset>
+		</unzip>
+		<jar destfile="${dest}/kct-java.jar" update="true">
+			<fileset dir="bin">
+				<include name="**/Turtle3DBase.class"/>
+				<include name="**/Turtle3D.class"/>
+				<include name="**/KCTCommand.class"/>
+				<include name="**/KCTScript.class"/>
+				<include name="**/JSONUtil.class"/>
+				<include name="net/canarymod/api/world/blocks/BlockType.class"/>
+				<include name="net/canarymod/api/world/position/Direction.class"/>
+			</fileset>
+		</jar>
+	</target>
+	<target name="install-kct-java" depends="kct-java-api">
+		<mkdir dir="${kct.java.install.location}"/>
+		<copy file="${dest}/kct-java.jar" tofile="${kct.java.install.location}/kct-java.jar" overwrite="true"/>
+	</target>
+	
+	<!-- Unsure we need this; makes more sense to put Jetty with the plugin than with Canary
+	<target name="canary-jar">
+		<jar destfile="${dest}/CanaryMod-Jetty-1.2.0.jar">
+			<zipfileset includes="**" src="lib/${canary.jar}"/>
+			<zipfileset includes="**" src="lib/${servlet.jar}"/>
+			<zipfileset includes="**" src="lib/${jetty.jar}"/>
+		    <manifest>
+		      <attribute name="Main-Class" value="net.canarymod.Main"/>
+		    </manifest>
+		</jar>
+	</target>
+	-->
+
+    <target name="build" depends="turtles3d" description="description"/>
+	
+	<target name="javadoc">
+		<unzip src="${cmodsrc}" dest="bin">
+			<patternset>
+				<include name="java/net/canarymod/api/world/blocks/BlockType.java"/>
+				<include name="java/net/canarymod/api/world/position/Direction.java"/>
+			</patternset>
+		</unzip>		
+		<javadoc destdir="docs">
+			<fileset dir="src">
+				<include name="**/Turtle3D*java"/>
+			</fileset>
+			<fileset dir="bin">
+				<include name="java/net/canarymod/api/world/blocks/BlockType.java"/>
+				<include name="java/net/canarymod/api/world/position/Direction.java"/>
+			</fileset>
+		</javadoc>
+		<delete>
+			<fileset dir="bin">
+				<include name="java/net/canarymod/api/world/blocks/BlockType.java"/>
+				<include name="java/net/canarymod/api/world/position/Direction.java"/>
+			</fileset>
+		</delete>
+	</target>
+	
+    <target name="depends">
+    	<mkdir dir="${dest}"/>
+    </target>
+	
+	<target name="install" depends="build">
+		<copy file="${dest}/Turtles3D.jar" todir="${install.location}"/>
+	</target>
+	
+	<target name="install-all" depends="install, install-kct-java"/>
+
+</project> 

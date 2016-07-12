@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.knoxcraft.turtle3d.KCTScript;
-
-import net.canarymod.hook.Hook;
+import org.spongepowered.api.event.Event;
+import org.spongepowered.api.event.cause.Cause;
 
 /**
  * 
@@ -14,7 +14,7 @@ import net.canarymod.hook.Hook;
  * @author jspacco
  *
  */
-public class KCTUploadHook extends Hook implements Iterable<KCTScript>
+public class KCTUploadHook implements Event, Iterable<KCTScript>
 {
     private String playerName;
     private Collection<KCTScript> turtleScripts;
@@ -38,5 +38,11 @@ public class KCTUploadHook extends Hook implements Iterable<KCTScript>
     }
     public Iterator<KCTScript> iterator() {
         return turtleScripts.iterator();
+    }
+
+    @Override
+    public Cause getCause() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

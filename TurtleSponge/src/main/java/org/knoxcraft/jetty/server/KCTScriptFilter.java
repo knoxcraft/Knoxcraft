@@ -1,11 +1,6 @@
 package org.knoxcraft.jetty.server;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -13,17 +8,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.knoxcraft.database.KCTScriptAccess;
-import org.knoxcraft.turtle3d.KCTScript;
-import org.knoxcraft.turtle3d.TurtleCompiler;
-import org.knoxcraft.turtle3d.TurtleException;
 import org.slf4j.Logger;
 
 import com.google.inject.Inject;
-
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseReadException;
 
 //@WebFilter("/RequestLoggingFilter")
 public class KCTScriptFilter extends DefaultFilter
@@ -39,6 +26,8 @@ public class KCTScriptFilter extends DefaultFilter
     throws IOException, ServletException 
     {
         HttpServletRequest req = (HttpServletRequest) request;
+        // FIXME: translate to Sponge
+        /*
         KCTScriptAccess data=new KCTScriptAccess();
         List<DataAccess> results=new LinkedList<DataAccess>();
         Map<String,KCTScriptAccess> mostRecentScripts=new HashMap<String,KCTScriptAccess>();
@@ -84,6 +73,7 @@ public class KCTScriptFilter extends DefaultFilter
         } catch (DatabaseReadException e) {
             logger.error("cannot read DB", e);
         }
+        */
         chain.doFilter(request, response);
     }
 
