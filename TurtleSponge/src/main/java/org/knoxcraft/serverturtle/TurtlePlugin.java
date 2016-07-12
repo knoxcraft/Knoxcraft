@@ -9,6 +9,7 @@ import java.util.Stack;
 
 import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
+import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTScript;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -194,11 +195,21 @@ public class TurtlePlugin {
                         log.info("playerName ==" + playerName);
                         log.info("scriptName== " + scriptName);
                         KCTScript script = scripts.getScript(playerName, scriptName);
+                        
+                        /*
+                         * TODO: uncomment once we're done testing
                         if (script==null) {
                             log.warn(String.format("player %s cannot find script %s", playerName, scriptName));
                             src.sendMessage(Text.of(String.format("%s, you have no script named %s", playerName, scriptName)));
                             return CommandResult.success();
                         }
+                        */
+                        
+                        // make the fake square
+                        script=makeFakeSquare();
+                        
+                        // TODO: follow commented out code to create a turtle and
+                        // test it
                         
                         /*
                         //Create turtle
@@ -309,7 +320,12 @@ public class TurtlePlugin {
         Sponge.getCommandManager().register(this, undo, "undo", "un");
     }
     
-    
+    private KCTScript makeFakeSquare() {
+        KCTScript script=new KCTScript("testscript");
+        // TODO flesh this out to test a number of other commands
+        script.addCommand(KCTCommand.forward(10));
+        return script;
+    }
     
     /**
      * Load the latest version of each script from the DB for each player on this world

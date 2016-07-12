@@ -76,11 +76,9 @@ jar {
     }
 }
 
-
-
 task copyTask(type: Copy, dependsOn: 'jar', overwrite: true) {
     // Copy a single file
     from 'build/libs/knoxsponge-0.1.jar'
-    into '/Users/matthewmoe/documents/projects/forge/mods'
-
+    into "$forgepath"
 }
+
