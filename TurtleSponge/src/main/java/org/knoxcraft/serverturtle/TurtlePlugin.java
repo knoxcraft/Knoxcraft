@@ -203,6 +203,7 @@ public class TurtlePlugin {
                         /*
                         //Create turtle
                         Turtle turtle = new Turtle();
+                        //sender from canary change to work with src!!!!!!!!!!!!!!!
                         turtle.turtleInit(sender);
 
                         //Get script from map
@@ -309,6 +310,64 @@ public class TurtlePlugin {
         Sponge.getCommandManager().register(this, undo, "undo", "un");
     }
     
+    private KCTScript makeSquareScript(){
+    	Turtle turtle = new Turtle();
+    	;
+    	
+    	return null;
+    	//look at this commented out section to help u write the script 
+    	 /*
+        //Create turtle
+        Turtle turtle = new Turtle();
+        //sender from canary change to work with src!!!!!!!!!!!!!!!
+        turtle.turtleInit(sender);
+
+        //Get script from map
+        KCTScript script = null;
+        try  {     
+            log.trace(String.format("%s is looking for %s", playerName, scriptName));
+            for (String p : scripts.getAllScripts().keySet()) {
+                log.trace("Player name: "+p);
+                for (String s : scripts.getAllScriptsForPlayer(p).keySet()) {
+                    log.trace(String.format("Player name %s has script named %s", p, s));
+                }
+            }
+            script = scripts.getScript(playerName, scriptName);
+            if (script==null) {
+                log.warn(String.format("player %s cannot find script %s", playerName, scriptName));
+                src.sendMessage(Text.of(String.format("%s, you have no script named %s", playerName, scriptName)));
+                // FIXME Should be CommandResult.success()?
+                return CommandResult.empty();
+            }
+        }  catch (Exception e)  {
+            turtle.turtleConsole("Script failed to load!");
+            log.error("Script failed to load", e);
+            // FIXME Should be CommandResult.success()?
+            return CommandResult.empty();
+        }
+
+        //Execute script    
+        try  {
+            turtle.executeScript(script);
+        }  catch (Exception e)  {
+            turtle.turtleConsole("Script failed to execute!");
+            log.error("Script failed to execute", e);
+        }
+
+        //add script's blocks to undo buffer
+        try  {            
+            //create buffer if doesn't exist
+            if (!undoBuffers.containsKey(senderName)) {  
+                undoBuffers.put(senderName, new Stack<Stack<BlockRecord>>());
+            }    
+            //add to buffer
+            undoBuffers.get(senderName).push(turtle.getOldBlocks());            
+        }  catch (Exception e)  {
+            turtle.turtleConsole("Failed to add to undo buffer!");
+            log.error("Faile to add to undo buffer", e);
+        }
+        */
+    }
     
     
     /**
