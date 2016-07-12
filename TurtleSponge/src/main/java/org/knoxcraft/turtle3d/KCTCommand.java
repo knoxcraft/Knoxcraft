@@ -109,4 +109,9 @@ public class KCTCommand
                 CMDKEY,  
                 quoteString(commandName));
     }
+    
+    public static KCTCommand forward(int distance){
+    	Map<String, object> 
+    }
+    
 }
