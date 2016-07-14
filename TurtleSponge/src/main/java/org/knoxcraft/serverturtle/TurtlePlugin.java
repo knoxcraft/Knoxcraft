@@ -32,12 +32,12 @@ import org.spongepowered.api.text.Text;
 import com.google.inject.Inject;
 
 
-@Plugin(id = "kct",
+@Plugin(id = TurtlePlugin.ID,
     name = "TurtlePlugin",
     version = "0.2",
     description = "Knoxcraft Turtles Plugin for Minecraft")
 public class TurtlePlugin {
-
+    public static final String ID="kct";
     private static final String PLAYER_NAME = "playerName";
     private static final String SCRIPT_NAME = "scriptName";
     private static final String NUM_UNDO = "numUndo";
@@ -101,6 +101,11 @@ public class TurtlePlugin {
 
         // TODO fix this method
         //lookupFromDB();
+        
+        TestClass t=new TestClass();
+        t.method();
+        
+        log.info("just tried to call a method");
 
         // set up commands
         setupCommands();

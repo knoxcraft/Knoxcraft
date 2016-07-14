@@ -5,7 +5,7 @@ apply plugin: 'war'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-version = '0.1'
+version = '0.2'
 
 repositories {
     mavenCentral()
@@ -58,7 +58,7 @@ sourceSets {
 jar {
     // TODO: read names from project
     baseName = 'knoxcraft'
-    version =  '0.1'
+    version =  '0.2'
     // Leave out the sponge code, since the sponge plugin will have this
     dependsOn configurations.runtime
     from {
