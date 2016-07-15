@@ -1,5 +1,6 @@
 package org.knoxcraft.turtle3d;
 
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.Direction.Division;
 
 import com.flowpowered.math.vector.Vector3d;
@@ -56,7 +57,7 @@ public enum TurtleDirection {
 			if (x == -1 && z == -1) //NorthWest(-1, 0, -1) = 7   
 				return 7;                                        
 		}                                    
-		                                                         
+		                                                       
 		return 8;                   //None(0, 0, 0) = 8                              
 	}
 	
