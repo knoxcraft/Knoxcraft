@@ -60,9 +60,4 @@ public enum TurtleDirection {
 		                                                       
 		return 8;                   //None(0, 0, 0) = 8                              
 	}
-	
-    private interface C {
-        double C8 = Math.cos(Math.PI / 8);
-        double S8 = Math.sin(Math.PI / 8);
-    }
 }
