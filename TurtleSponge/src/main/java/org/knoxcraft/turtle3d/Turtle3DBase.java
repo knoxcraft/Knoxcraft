@@ -21,8 +21,6 @@ import static org.knoxcraft.turtle3d.KCTCommand.X;
 import static org.knoxcraft.turtle3d.KCTCommand.Y;
 import static org.knoxcraft.turtle3d.KCTCommand.Z;
 
-import org.spongepowered.api.block.BlockType;
-
 /**
  * Base class to be extended by students. Students override the run() method 
  * and invoke all of the inherited methods.
@@ -230,10 +228,10 @@ public abstract class Turtle3DBase
       * 
       * @param type The block type
       */
-    public void setBlock(BlockType type) {
+    public void setBlock(KCTBlockTypes type) {
         // FIXME: translate to Sponge
          checkTurtle();
-         String id=String.valueOf(type.getId());
+         String id=String.valueOf(type.name());
 //         if (type.getData()!=0) {
 //             id+=":"+type.getData();
 //         }

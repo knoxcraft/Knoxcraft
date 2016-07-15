@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.spongepowered.api.block.BlockType;
-
 /**
  * Class for procedural-style programming. Students must create instances using the
  * createTurtle() factory method rather than with a constructor. This is for technical
@@ -222,8 +220,8 @@ public class Turtle3D
       * 
       * @param type The block type
       */
-    public void setBlock(BlockType type) {
-        String id= type.getName();
+    public void setBlock(KCTBlockTypes type) {
+        String id= type.name();
         //we will be filling this with our own code eventually with soemthing like Minecraft:WOOL:light_blue
 //        if (type.getData()!=0) {
 //            id+=":"+type.getData();
