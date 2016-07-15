@@ -33,36 +33,11 @@ public enum TurtleDirection {
 	    this.division = division;
 	}
 	
-	public int getIntValue() {
-		int x, y, z;
-		x = (int) direction.getX();
-		y = (int) direction.getY();
-		z = (int) direction.getZ();
-		
-		if (y == 0) {
-			if (x == 0 && z == -1)  //North(0, 0, -1) = 0     
-				return 0;            
-			if (x == 1 && z == -1)  //NorthEast(1, 0, -1) = 1                           
-				return 1;           
-			if (x == 1 && z == 0)   //East(1, 0, 0) = 2        
-				return 2;           
-			if (x == 1 && z == 1)   //SouthEast(1, 0, 1) = 3   
-				return 3;                                      
-			if (x == 0 && z == 1)   //South(0, 0, 1) = 4       
-				return 4;           
-			if (x == 1 && z == 1)   //SouthWest(-1, 0, 1) = 5  
-				return 5;                                      
-			if (x == -1 && z == 0)  //West(-1, 0, 0) = 6        
-				return 6;           
-			if (x == -1 && z == -1) //NorthWest(-1, 0, -1) = 7   
-				return 7;                                        
-		}                                    
-		                                                       
-		return 8;                   //None(0, 0, 0) = 8                              
+	public static TurtleDirection valueOf(int val) {
+	    return TurtleDirection.values()[val];
 	}
 	
-    private interface C {
-        double C8 = Math.cos(Math.PI / 8);
-        double S8 = Math.sin(Math.PI / 8);
-    }
+	public int getIntValue() {
+	    return ordinal();
+	}
 }
