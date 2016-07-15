@@ -21,9 +21,6 @@ import static org.knoxcraft.turtle3d.KCTCommand.X;
 import static org.knoxcraft.turtle3d.KCTCommand.Y;
 import static org.knoxcraft.turtle3d.KCTCommand.Z;
 
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.util.Direction;
-
 /**
  * Base class to be extended by students. Students override the run() method 
  * and invoke all of the inherited methods.
@@ -231,10 +228,10 @@ public abstract class Turtle3DBase
       * 
       * @param type The block type
       */
-    public void setBlock(BlockType type) {
+    public void setBlock(KCTBlockTypes type) {
         // FIXME: translate to Sponge
          checkTurtle();
-         String id=String.valueOf(type.getId());
+         String id=String.valueOf(type.name());
 //         if (type.getData()!=0) {
 //             id+=":"+type.getData();
 //         }
@@ -274,11 +271,11 @@ public abstract class Turtle3DBase
       * 
       * @param direction The direction
       */
-    public void setDirection(Direction direction) {
+    public void setDirection(TurtleDirection direction) {
          checkTurtle();
          // FIXME: encode/decode direction to/from int
          // FIXME: translate to Sponge
-//         KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));
-//         script.addCommand(cmd);
+         KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));
+         script.addCommand(cmd);
      }
 }

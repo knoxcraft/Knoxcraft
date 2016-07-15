@@ -25,9 +25,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.util.Direction;
-
 /**
  * Class for procedural-style programming. Students must create instances using the
  * createTurtle() factory method rather than with a constructor. This is for technical
@@ -223,8 +220,8 @@ public class Turtle3D
       * 
       * @param type The block type
       */
-    public void setBlock(BlockType type) {
-        String id= type.getName();
+    public void setBlock(KCTBlockTypes type) {
+        String id= type.name();
         //we will be filling this with our own code eventually with soemthing like Minecraft:WOOL:light_blue
 //        if (type.getData()!=0) {
 //            id+=":"+type.getData();
@@ -273,10 +270,17 @@ public class Turtle3D
       * 
       * @param direction The direction
       */
-    public void setDirection(Direction direction) {
+    public void setDirection(TurtleDirection direction) {
         // FIXME: need methods to encode/decode direction to an int
         // FIXME: translate to sponge
-//        KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));
-//        script.addCommand(cmd);
+    	
+    	//http://docs.visualillusionsent.net/CanaryLib/1.0-RC-3/src-html/net/canarymod/api/world/position/Direction.html#line.19
+    	//original canarymod source to reference for directions we are using.
+    	//We may have to make our own class for Direction as well as the BlockTypes class. 
+    	//For direction there are extra compass directions which are not useful to us unless we want to use them in the turtle class. 
+    	//Otherwise, we should just make a class that does not have those extra directions in it.
+    	
+        KCTCommand cmd=new KCTCommand(SETDIRECTION, JSONUtil.makeArgMap(DIR, direction.getIntValue()));
+        script.addCommand(cmd);
      }
 }
