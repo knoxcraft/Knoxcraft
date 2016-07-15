@@ -11,6 +11,7 @@ import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
 import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTScript;
+import org.knoxcraft.turtle3d.TurtleDirection;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -20,6 +21,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
@@ -28,7 +30,12 @@ import org.spongepowered.api.event.world.ChangeWorldWeatherEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 
 
@@ -191,9 +198,9 @@ public class TurtlePlugin {
                         
                         log.debug(String.format("%s invokes script %s from player %s", src.getName(), scriptName, playerName));
                         ///////
-                        log.info("scripts == null" + (scripts == null));
-                        log.info("playerName ==" + playerName);
-                        log.info("scriptName== " + scriptName);
+//                        log.info("scripts == null" + (scripts == null));
+//                        log.info("playerName ==" + playerName);
+//                        log.info("scriptName== " + scriptName);
                         KCTScript script = scripts.getScript(playerName, scriptName);
                         
                         /*
@@ -208,11 +215,44 @@ public class TurtlePlugin {
                         // make the fake square
                         script=makeFakeSquare();
                         
+                        SpongeTurtle turtle = new SpongeTurtle(log);
+                        
+                        //location of turtle = location of player
+                        if(src instanceof Player){
+                        	Player player = (Player) src;
+                            Location<World> loc=player.getLocation();
+                            Vector3i pos=loc.getBlockPosition();
+                        	turtle.setLoc(pos);
+                        	//get world from setter in spongeTurtle
+                        	World w = player.getWorld();
+                        	//rotation in degrees = direction 
+                        	Vector3d headRotation = player.getHeadRotation();
+                        	Vector3d rotation = player.getRotation();
+                        	log.info("headRotation=" + headRotation);
+                        	log.info("rotation=" + rotation);
+                        	TurtleDirection d = getTurtleDirection(rotation);
+                        	log.info("pos= " + pos);
+                        	turtle.setWorld(w);
+                        	turtle.setTurtleDirection(d);
+                        	turtle.executeScript(script);
+                        	
+                        	
+              
+                        	
+                        	
+                        	}
+                       
+                        
+                        // turtle.setLoc(src instanceof player);
+                    
+                        
+                        
                         // TODO: follow commented out code to create a turtle and
                         // test it
                         
                         /*
                         //Create turtle
+                        
                         Turtle turtle = new Turtle();
                         //sender from canary change to work with src!!!!!!!!!!!!!!!
                         turtle.turtleInit(sender);
@@ -325,7 +365,48 @@ public class TurtlePlugin {
         KCTScript script=new KCTScript("testscript");
         // TODO flesh this out to test a number of other commands
         script.addCommand(KCTCommand.forward(10));
+        script.addCommand(KCTCommand.turnLeft(5, 45));
+        script.addCommand(KCTCommand.backward(10));
+        script.addCommand(KCTCommand.turnRight(5, 45));
+        script.addCommand(KCTCommand.up(10));
+        script.addCommand(KCTCommand.forward(10));
+        script.addCommand(KCTCommand.down(10));
         return script;
+    }
+
+    
+    private TurtleDirection getTurtleDirection(Vector3d direction){
+    	
+    	double d = direction.getY()/360*8;
+    	int x = (int)Math.round(d);
+    	
+    	if (x==0 || x==8) {
+    		return TurtleDirection.NORTH;
+    	
+    	} else if (x==1) {
+    		return TurtleDirection.NORTHEAST;
+    	
+    	} else if (x==2) {
+    		return TurtleDirection.EAST;
+    	
+    	} else if (x==3) {
+    		return TurtleDirection.SOUTHEAST;
+    	
+    	} else if (x==4) {
+    		return TurtleDirection.SOUTH;
+    	
+    	} else if (x==5) {
+    		return TurtleDirection.SOUTHWEST;
+    	
+    	} else if (x==6) {
+    		return TurtleDirection.WEST;
+    	
+    	} else if (x==7) {
+    		return TurtleDirection.NORTHWEST;
+    	
+    	} else {
+    		throw new RuntimeException("Direction invalid = " + direction);
+    	}	
     }
     
     /**
