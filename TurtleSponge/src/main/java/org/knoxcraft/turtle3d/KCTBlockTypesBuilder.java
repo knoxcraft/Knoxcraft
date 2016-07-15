@@ -2,13 +2,15 @@ package org.knoxcraft.turtle3d;
 
 import java.util.HashMap;
 
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.CatalogTypes;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.BrickTypes;
 import org.spongepowered.api.data.type.DirtTypes;
 import org.spongepowered.api.data.type.DisguisedBlockTypes;
-import org.spongepowered.api.data.type.DoublePlantTypes;
 import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.data.type.PlantTypes;
 import org.spongepowered.api.data.type.SandTypes;
@@ -56,13 +58,42 @@ public final class KCTBlockTypesBuilder {
 	
 	private static final HashMap<KCTBlockTypes, Metadata> blocks = new HashMap<KCTBlockTypes, Metadata>();
 	
+	/**
+	 * Return the {@link BlockState} that corresponds to the given {@link KCTBlockType}.
+	 * Basically, this converts between our own internal <tt>enum</tt> and a Sponge
+	 * {@link BlockState}.
+	 * 
+	 * <b>NOTE:</b>
+	 * 
+	 * Using an initialize() method that gets called once, rather than a static initializer.
+     * The {@link BlockTypes} class dynamically creates placeholders where all methods throw
+     * UnsupportedOperationException. If you use any methods of a {@link BlockType} in a static
+     * initializer it will throw that UnsupportedOperationException. So we have to delay actually
+     * calling any methods on a {@link BlockType} until Sponge has actually initialized everything
+     * in {@link BlockTypes} with its real value.
+     * 
+     * Sponge does eventually fill in the real {@link BlockType} instances in {@link BlockTypes}, probably
+     * using some design pattern that is related to {@link CatalogTypes} and {@link CatalogType}.
+     * 
+     * We honestly don't understand how this process works, so we are just using the static 
+     * initialize() method because it gets called late enough that it doesn't generate an exception.
+     * We don't know why this works.
+	 * 
+	 * @param type
+	 * @return
+	 */
 	public static BlockState getBlockState(KCTBlockTypes type) {
 	    initialize();
 	    return blocks.get(type).getBlock();
 	}
 	private static boolean isInitialized=false;
 	
+	/**
+	 * See {@link #getBlockState(KCTBlockTypes)} for more details about why we have this method
+	 * instead of a static initializer.
+	 */
 	private static void initialize() {
+	    // Ensure that we only call initialize once!
 	    if (isInitialized){
 	        return;
 	    }
