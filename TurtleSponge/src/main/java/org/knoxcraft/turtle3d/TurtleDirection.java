@@ -40,4 +40,25 @@ public enum TurtleDirection {
 	public int getIntValue() {
 	    return ordinal();
 	}
+	
+	public TurtleDirection flip () {
+		int currentDir = this.getIntValue();
+		int newDir = (currentDir+4)%8;
+		return TurtleDirection.valueOf(newDir);
+	}
+	
+	public TurtleDirection turn(boolean left, int units) {
+		int currentDir = this.getIntValue();
+		if (left) {
+			int newDir = currentDir - units;
+			while (newDir < 0) {
+				newDir += 8;
+			}
+			return TurtleDirection.valueOf(newDir);
+		} else {
+			int newdir = currentDir + units;
+			newdir = newdir % 8;
+			return TurtleDirection.valueOf(newdir);
+		}
+	}
 }
