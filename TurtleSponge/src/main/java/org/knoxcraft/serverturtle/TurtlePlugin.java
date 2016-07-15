@@ -88,7 +88,7 @@ public class TurtlePlugin {
             //jettyServer.enable();
         } catch (Exception e){
             if (jettyServer!=null) {
-             //   jettyServer.shutdown();
+                //jettyServer.shutdown();
             }
             log.error("Cannot initialize TurtlePlugin: JettyServer failed to start", e);
         }
@@ -102,11 +102,6 @@ public class TurtlePlugin {
         // TODO fix this method
         //lookupFromDB();
         
-        TestClass t=new TestClass();
-        t.method();
-        
-        log.info("just tried to call a method");
-
         // set up commands
         setupCommands();
     }
