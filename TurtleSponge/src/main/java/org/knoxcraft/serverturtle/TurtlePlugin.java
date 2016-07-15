@@ -39,12 +39,12 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 
 
-@Plugin(id = "kct",
+@Plugin(id = TurtlePlugin.ID,
     name = "TurtlePlugin",
     version = "0.2",
     description = "Knoxcraft Turtles Plugin for Minecraft")
 public class TurtlePlugin {
-
+    public static final String ID="kct";
     private static final String PLAYER_NAME = "playerName";
     private static final String SCRIPT_NAME = "scriptName";
     private static final String NUM_UNDO = "numUndo";
@@ -108,6 +108,11 @@ public class TurtlePlugin {
 
         // TODO fix this method
         //lookupFromDB();
+        
+//        TestClass t=new TestClass();
+//        t.method();
+        
+        log.info("just tried to call a method");
 
         // set up commands
         setupCommands();
@@ -365,12 +370,9 @@ public class TurtlePlugin {
         KCTScript script=new KCTScript("testscript");
         // TODO flesh this out to test a number of other commands
         script.addCommand(KCTCommand.forward(10));
-        script.addCommand(KCTCommand.turnLeft(5, 45));
+        script.addCommand(KCTCommand.turnLeft(10, 90));
         script.addCommand(KCTCommand.backward(10));
-        script.addCommand(KCTCommand.turnRight(5, 45));
-        script.addCommand(KCTCommand.up(10));
-        script.addCommand(KCTCommand.forward(10));
-        script.addCommand(KCTCommand.down(10));
+        script.addCommand(KCTCommand.turnRight(10, 90));
         return script;
     }
 
