@@ -57,12 +57,18 @@ public final class KCTBlockTypesBuilder {
 	private static final HashMap<KCTBlockTypes, Metadata> blocks = new HashMap<KCTBlockTypes, Metadata>();
 	
 	public static BlockState getBlockState(KCTBlockTypes type) {
+	    initialize();
 	    return blocks.get(type).getBlock();
 	}
+	private static boolean isInitialized=false;
 	
-	static {
+	private static void initialize() {
+	    if (isInitialized){
+	        return;
+	    }
+	    isInitialized=true;
 		blocks.put(KCTBlockTypes.AIR, new Metadata(0, 0, "AIR", "AIR",
-				BlockTypes.AIR.getDefaultState()));
+				BlockState.builder().build()));
 
 		blocks.put(KCTBlockTypes.STONE, new Metadata(1, 0, "STONE", "STONE",
 				BlockTypes.STONE.getDefaultState()));
@@ -241,11 +247,12 @@ public final class KCTBlockTypesBuilder {
 		blocks.put(KCTBlockTypes.DEAD_SHRUB, new Metadata(31, 0, "DEAD_SHRUB", "TALLGRASS",
 				BlockTypes.TALLGRASS.getDefaultState()));
 
-		blocks.put(KCTBlockTypes.GRASS, new Metadata(31, 1, "GRASS", "TALLGRASS",
-				BlockTypes.TALLGRASS.getDefaultState().with(Keys.DOUBLE_PLANT_TYPE, DoublePlantTypes.GRASS).get()));
-
-		blocks.put(KCTBlockTypes.FERN, new Metadata(31, 2, "FERN", "TALLGRASS",
-				BlockTypes.TALLGRASS.getDefaultState().with(Keys.DOUBLE_PLANT_TYPE, DoublePlantTypes.FERN).get()));
+// FIXME: doesn't exist?
+//		blocks.put(KCTBlockTypes.GRASS, new Metadata(31, 1, "GRASS", "TALLGRASS",
+//				BlockTypes.TALLGRASS.getDefaultState().with(Keys.DOUBLE_PLANT_TYPE, DoublePlantTypes.GRASS).get()));
+//
+//		blocks.put(KCTBlockTypes.FERN, new Metadata(31, 2, "FERN", "TALLGRASS",
+//				BlockTypes.TALLGRASS.getDefaultState().with(Keys.DOUBLE_PLANT_TYPE, DoublePlantTypes.FERN).get()));
 
 		blocks.put(KCTBlockTypes.DEAD_BUSH, new Metadata(32, 0, "DEAD_BUSH", "DEADBUSH",
 				BlockTypes.DEADBUSH.getDefaultState()));

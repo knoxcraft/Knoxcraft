@@ -9,11 +9,16 @@ import java.util.Stack;
 
 import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
+import org.knoxcraft.turtle3d.KCTBlockTypes;
+import org.knoxcraft.turtle3d.KCTBlockTypesBuilder;
 import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.TurtleDirection;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -21,6 +26,9 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.DyeColors;
+import org.spongepowered.api.data.type.StoneTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
@@ -30,7 +38,6 @@ import org.spongepowered.api.event.world.ChangeWorldWeatherEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -116,6 +123,32 @@ public class TurtlePlugin {
     
     //TODO LOG STATEMENTS to show commands work, and check if arguments make sense 
     private void setupCommands() {
+        // test command
+        CommandSpec check=CommandSpec.builder()
+                .description(Text.of("test command"))
+                .permission("")
+                .executor(new CommandExecutor() {
+                    @Override
+                    public CommandResult execute(CommandSource src, CommandContext args)
+                    throws CommandException
+                    {
+                        if(src instanceof Player){
+                            Player player = (Player) src;
+                            Location<World> loc=player.getLocation();
+                            Vector3i pos=loc.getBlockPosition();
+                            World world=player.getWorld();
+                            int x=pos.getX();
+                            int y=pos.getY();
+                            int z=pos.getZ();
+                            //BlockState s=BlockTypes.STONE.getDefaultState().with(Keys.STONE_TYPE, StoneTypes.GRANITE).get();
+                            world.setBlock(x, y-1, z, KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.BLUE_WOOL));
+                            
+                        }
+                        return CommandResult.success();
+                    }
+                }).build();
+        Sponge.getCommandManager().register(this, check, "check");
+        
         // List all the scripts
         CommandSpec listScripts=CommandSpec.builder()
                 .description(Text.of("List Knoxcraft Turtle Scripts"))
