@@ -109,11 +109,74 @@ public class KCTCommand
                 CMDKEY,  
                 quoteString(commandName));
     }
-    
+
     public static KCTCommand forward(int distance) {
-        Map<String, Object> map=new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put(DIST, distance);
-        KCTCommand result=new KCTCommand(FORWARD, map);
+        KCTCommand result = new KCTCommand(FORWARD, map);
         return result;
     }
+    
+    public static KCTCommand backward(int distance){
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put(DIST, distance);
+    	KCTCommand result = new KCTCommand(BACKWARD, map);
+    	return result;
+    }
+    
+    public static KCTCommand turnRight(int distance, int degrees){
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put(DIST, distance);
+    	map.put(DEGREES, degrees);
+    	KCTCommand result = new KCTCommand(TURNRIGHT, map);
+    	return result;
+    }
+    
+    public static KCTCommand turnLeft(int distance, int degrees){
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put(DIST, distance);
+    	map.put(DEGREES, degrees);
+    	KCTCommand result = new KCTCommand(TURNLEFT, map);
+    	return result;
+    }
+    
+    public static KCTCommand up(int distance){
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put(DIST, distance);
+    	KCTCommand result = new KCTCommand(UP, map);
+    	return result;
+    }
+    
+    public static KCTCommand down(int distance){
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put(DIST, distance);
+    	KCTCommand result = new KCTCommand(DOWN, map);
+    	return result;
+    }
+    
+  /*
+    public static final String DIR = "dir";
+    public static final String DEGREES = "degrees";
+    public static final String PLACE = "place";
+    public static final String X = "x";
+    public static final String Y = "y";
+    public static final String Z = "z";
+    public static final String DIST = "dist";
+    public static final String BLOCKTYPE = "blockType";
+    
+    public static final String CMD = "cmd";
+    public static final String CMDKEY = "\"cmd\"";
+    public static final String ARGS= "args";
+    public static final String ARGSKEY = "\"args\"";
+    public static final String SCRIPTNAMEKEY = "\"scriptname\"";
+    public static final String COMMANDSKEY = "\"commands\"";
+
+    public static final String PLACEBLOCKS = "placeBlocks";
+    public static final String BLOCKPLACEMODE = "blockPlaceMode";
+    public static final String SETDIRECTION = "setDirection";
+    public static final String SETPOSITION = "setPosition";
+    public static final String SETBLOCK = "setBlock";
+    public static final String RIGHT = "right";
+    public static final String LEFT = "left";
+    */
 }

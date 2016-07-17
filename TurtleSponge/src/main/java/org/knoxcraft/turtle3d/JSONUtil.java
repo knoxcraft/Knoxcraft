@@ -4,12 +4,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.knoxcraft.serverturtle.TurtlePlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.Direction;
 
 
 public class JSONUtil
 {
+    private final Logger logger = LoggerFactory.getLogger(TurtlePlugin.ID);
+    
     // private constructor to prevent instantiation
     private JSONUtil() {}
     

@@ -2,7 +2,10 @@ package org.knoxcraft.turtle3d;
 
 import java.util.HashMap;
 
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.CatalogTypes;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.BrickTypes;
@@ -15,12 +18,13 @@ import org.spongepowered.api.data.type.PrismarineTypes;
 import org.spongepowered.api.data.type.QuartzTypes;
 import org.spongepowered.api.data.type.SandTypes;
 import org.spongepowered.api.data.type.SandstoneTypes;
+import org.spongepowered.api.data.type.ShrubTypes;
 import org.spongepowered.api.data.type.SlabTypes;
 import org.spongepowered.api.data.type.StoneTypes;
 import org.spongepowered.api.data.type.TreeTypes;
 import org.spongepowered.api.data.type.WallTypes;
 
-public class KCTBlockTypesBuilder {
+public final class KCTBlockTypesBuilder {
 	private static class Metadata {
 		private BlockState block;
 		private int numID; 
@@ -52,24 +56,58 @@ public class KCTBlockTypesBuilder {
 			return textID;
 		}
 		
-		public BlockState getBlockState() {
+		public BlockState getBlock() {
 			return block;
 		}
 	}
 	
 	private static final HashMap<KCTBlockTypes, Metadata> blocks = new HashMap<KCTBlockTypes, Metadata>();
 	
+	/**
+	 * Return the {@link BlockState} that corresponds to the given {@link KCTBlockType}.
+	 * Basically, this converts between our own internal <tt>enum</tt> and a Sponge
+	 * {@link BlockState}.
+	 * 
+	 * <b>NOTE:</b>
+	 * 
+	 * Using an initialize() method that gets called once, rather than a static initializer.
+     * The {@link BlockTypes} class dynamically creates placeholders where all methods throw
+     * UnsupportedOperationException. If you use any methods of a {@link BlockType} in a static
+     * initializer it will throw that UnsupportedOperationException. So we have to delay actually
+     * calling any methods on a {@link BlockType} until Sponge has actually initialized everything
+     * in {@link BlockTypes} with its real value.
+     * 
+     * Sponge does eventually fill in the real {@link BlockType} instances in {@link BlockTypes}, probably
+     * using some design pattern that is related to {@link CatalogTypes} and {@link CatalogType}.
+     * 
+     * We honestly don't understand how this process works, so we are just using the static 
+     * initialize() method because it gets called late enough that it doesn't generate an exception.
+     * We don't know why this works.
+	 * 
+	 * @param type
+	 * @return
+	 */
 	public static BlockState getBlockState(KCTBlockTypes type) {
-		return blocks.get(type).getBlockState();
+	    initialize();
+	    
+	    return blocks.get(type).getBlock();
 	}
 	
-	public static String getName(KCTBlockTypes type) {
-		return blocks.get(type).getName();
-	}
+	private static boolean isInitialized=false;
 	
-	static {
+	/**
+	 * See {@link #getBlockState(KCTBlockTypes)} for more details about why we have this method
+	 * instead of a static initializer.
+	 */
+	private static void initialize() {
+	    // Ensure that we only call initialize once!
+	    if (isInitialized){
+	        return;
+	    }
+	    isInitialized=true;
+	    
 		blocks.put(KCTBlockTypes.AIR, new Metadata(0, 0, "AIR", "AIR",
-				BlockTypes.AIR.getDefaultState()));
+				BlockState.builder().build()));
 
 		blocks.put(KCTBlockTypes.STONE, new Metadata(1, 0, "STONE", "STONE",
 				BlockTypes.STONE.getDefaultState()));
@@ -249,10 +287,10 @@ public class KCTBlockTypesBuilder {
 				BlockTypes.TALLGRASS.getDefaultState()));
 
 		blocks.put(KCTBlockTypes.GRASS_TALLGRASS, new Metadata(31, 1, "GRASS", "TALLGRASS",
-				BlockTypes.TALLGRASS.getDefaultState().with(Keys.DOUBLE_PLANT_TYPE, DoublePlantTypes.GRASS).get()));
+				BlockTypes.TALLGRASS.getDefaultState().with(Keys.SHRUB_TYPE, ShrubTypes.TALL_GRASS).get()));
 
 		blocks.put(KCTBlockTypes.FERN, new Metadata(31, 2, "FERN", "TALLGRASS",
-				BlockTypes.TALLGRASS.getDefaultState().with(Keys.DOUBLE_PLANT_TYPE, DoublePlantTypes.FERN).get()));
+				BlockTypes.TALLGRASS.getDefaultState().with(Keys.SHRUB_TYPE, ShrubTypes.FERN).get()));
 
 		blocks.put(KCTBlockTypes.DEAD_BUSH, new Metadata(32, 0, "DEAD_BUSH", "DEADBUSH",
 				BlockTypes.DEADBUSH.getDefaultState()));

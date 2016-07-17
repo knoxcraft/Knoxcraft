@@ -9,10 +9,16 @@ import java.util.Stack;
 
 import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
+import org.knoxcraft.turtle3d.KCTBlockTypes;
+import org.knoxcraft.turtle3d.KCTBlockTypesBuilder;
 import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTScript;
+import org.knoxcraft.turtle3d.TurtleDirection;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -20,6 +26,10 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.DyeColors;
+import org.spongepowered.api.data.type.StoneTypes;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
@@ -28,7 +38,11 @@ import org.spongepowered.api.event.world.ChangeWorldWeatherEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 
 
@@ -88,7 +102,7 @@ public class TurtlePlugin {
             //jettyServer.enable();
         } catch (Exception e){
             if (jettyServer!=null) {
-             //   jettyServer.shutdown();
+                //jettyServer.shutdown();
             }
             log.error("Cannot initialize TurtlePlugin: JettyServer failed to start", e);
         }
@@ -103,7 +117,6 @@ public class TurtlePlugin {
         //lookupFromDB();
         
         log.info("just tried to call a method");
-
         // set up commands
         setupCommands();
     }
@@ -111,6 +124,32 @@ public class TurtlePlugin {
     
     //TODO LOG STATEMENTS to show commands work, and check if arguments make sense 
     private void setupCommands() {
+        // test command
+        CommandSpec check=CommandSpec.builder()
+                .description(Text.of("test command"))
+                .permission("")
+                .executor(new CommandExecutor() {
+                    @Override
+                    public CommandResult execute(CommandSource src, CommandContext args)
+                    throws CommandException
+                    {
+                        if(src instanceof Player){
+                            Player player = (Player) src;
+                            Location<World> loc=player.getLocation();
+                            Vector3i pos=loc.getBlockPosition();
+                            World world=player.getWorld();
+                            int x=pos.getX();
+                            int y=pos.getY();
+                            int z=pos.getZ();
+                            //BlockState s=BlockTypes.STONE.getDefaultState().with(Keys.STONE_TYPE, StoneTypes.GRANITE).get();
+                            world.setBlock(x, y-1, z, KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.BLUE_WOOL));
+                            
+                        }
+                        return CommandResult.success();
+                    }
+                }).build();
+        Sponge.getCommandManager().register(this, check, "check");
+        
         // List all the scripts
         CommandSpec listScripts=CommandSpec.builder()
                 .description(Text.of("List Knoxcraft Turtle Scripts"))
@@ -193,9 +232,9 @@ public class TurtlePlugin {
                         
                         log.debug(String.format("%s invokes script %s from player %s", src.getName(), scriptName, playerName));
                         ///////
-                        log.info("scripts == null" + (scripts == null));
-                        log.info("playerName ==" + playerName);
-                        log.info("scriptName== " + scriptName);
+//                        log.info("scripts == null" + (scripts == null));
+//                        log.info("playerName ==" + playerName);
+//                        log.info("scriptName== " + scriptName);
                         KCTScript script = scripts.getScript(playerName, scriptName);
                         
                         /*
@@ -210,12 +249,46 @@ public class TurtlePlugin {
                         // make the fake square
                         script=makeFakeSquare();
                         
+                        SpongeTurtle turtle = new SpongeTurtle(log);
+                        
+                        //location of turtle = location of player
+                        if(src instanceof Player){
+                        	Player player = (Player) src;
+                            Location<World> loc=player.getLocation();
+                            Vector3i pos=loc.getBlockPosition();
+                        	turtle.setLoc(pos);
+                        	//get world from setter in spongeTurtle
+                        	World w = player.getWorld();
+                        	//rotation in degrees = direction 
+                        	Vector3d headRotation = player.getHeadRotation();
+                        	Vector3d rotation = player.getRotation();
+                        	log.info("headRotation=" + headRotation);
+                        	log.info("rotation=" + rotation);
+                        	TurtleDirection d = getTurtleDirection(rotation);
+                        	log.info("pos= " + pos);
+                        	turtle.setWorld(w);
+                        	turtle.setTurtleDirection(d);
+                        	turtle.executeScript(script);
+                        	
+                        	
+              
+                        	
+                        	
+                        	}
+                       
+                        
+                        // turtle.setLoc(src instanceof player);
+                    
+                        
+                        
                         // TODO: follow commented out code to create a turtle and
                         // test it
                         
                         /*
                         //Create turtle
+                        
                         Turtle turtle = new Turtle();
+                        //sender from canary change to work with src!!!!!!!!!!!!!!!
                         turtle.turtleInit(sender);
 
                         //Get script from map
@@ -326,7 +399,45 @@ public class TurtlePlugin {
         KCTScript script=new KCTScript("testscript");
         // TODO flesh this out to test a number of other commands
         script.addCommand(KCTCommand.forward(10));
+        script.addCommand(KCTCommand.turnLeft(10, 90));
+        script.addCommand(KCTCommand.backward(10));
+        script.addCommand(KCTCommand.turnRight(10, 90));
         return script;
+    }
+
+    
+    private TurtleDirection getTurtleDirection(Vector3d direction){
+    	
+    	double d = direction.getY()/360*8;
+    	int x = (int)Math.round(d);
+    	
+    	if (x==0 || x==8) {
+    		return TurtleDirection.NORTH;
+    	
+    	} else if (x==1) {
+    		return TurtleDirection.NORTHEAST;
+    	
+    	} else if (x==2) {
+    		return TurtleDirection.EAST;
+    	
+    	} else if (x==3) {
+    		return TurtleDirection.SOUTHEAST;
+    	
+    	} else if (x==4) {
+    		return TurtleDirection.SOUTH;
+    	
+    	} else if (x==5) {
+    		return TurtleDirection.SOUTHWEST;
+    	
+    	} else if (x==6) {
+    		return TurtleDirection.WEST;
+    	
+    	} else if (x==7) {
+    		return TurtleDirection.NORTHWEST;
+    	
+    	} else {
+    		throw new RuntimeException("Direction invalid = " + direction);
+    	}	
     }
     
     /**
