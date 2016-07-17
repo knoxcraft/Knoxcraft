@@ -78,7 +78,7 @@ jar {
 
 task copyTask(type: Copy, dependsOn: 'jar', overwrite: true) {
     // Copy a single file
-    from 'build/libs/knoxsponge-0.1.jar'
-    into "$forgepath"
+    from('build/libs/knoxcraft-0.2.jar')
+    into forgepath
 }
 
