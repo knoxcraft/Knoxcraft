@@ -87,9 +87,28 @@ public final class KCTBlockTypesBuilder {
 	 * @param type
 	 * @return
 	 */
+	public static int getNumID(KCTBlockTypes type) {
+		initialize();
+		return blocks.get(type).getNumID();
+	}
+	
+	public static int getMetadata(KCTBlockTypes type) {
+		initialize();
+		return blocks.get(type).getMetadata();
+	}
+	
+	public static String getName(KCTBlockTypes type) {
+		initialize();
+		return blocks.get(type).getName();
+	}
+	
+	public static String getTextID(KCTBlockTypes type) {
+		initialize();
+		return blocks.get(type).getTextID();
+	}
+	
 	public static BlockState getBlockState(KCTBlockTypes type) {
 	    initialize();
-	    
 	    return blocks.get(type).getBlock();
 	}
 	
