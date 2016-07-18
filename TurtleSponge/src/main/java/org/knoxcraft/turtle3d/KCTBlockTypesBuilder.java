@@ -1,4 +1,4 @@
-package org.knoxcraft.turtle3d;
+ package org.knoxcraft.turtle3d;
 
 import java.util.HashMap;
 
@@ -99,7 +99,7 @@ public final class KCTBlockTypesBuilder {
 	    }
 	    isInitialized=true;
 		blocks.put(KCTBlockTypes.AIR, new Metadata(0, 0, "AIR", "AIR",
-				BlockState.builder().build()));
+				BlockTypes.AIR.getDefaultState()));
 
 		blocks.put(KCTBlockTypes.STONE, new Metadata(1, 0, "STONE", "STONE",
 				BlockTypes.STONE.getDefaultState()));

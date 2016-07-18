@@ -140,7 +140,6 @@ public class TurtlePlugin {
                             int x=pos.getX();
                             int y=pos.getY();
                             int z=pos.getZ();
-                            //BlockState s=BlockTypes.STONE.getDefaultState().with(Keys.STONE_TYPE, StoneTypes.GRANITE).get();
                             world.setBlock(x, y-1, z, KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.BLUE_WOOL));
                             
                         }
