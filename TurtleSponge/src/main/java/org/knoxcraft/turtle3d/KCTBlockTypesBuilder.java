@@ -11,13 +11,18 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.BrickTypes;
 import org.spongepowered.api.data.type.DirtTypes;
 import org.spongepowered.api.data.type.DisguisedBlockTypes;
+import org.spongepowered.api.data.type.DoublePlantTypes;
 import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.data.type.PlantTypes;
+import org.spongepowered.api.data.type.PrismarineTypes;
+import org.spongepowered.api.data.type.QuartzTypes;
 import org.spongepowered.api.data.type.SandTypes;
 import org.spongepowered.api.data.type.SandstoneTypes;
+import org.spongepowered.api.data.type.ShrubTypes;
 import org.spongepowered.api.data.type.SlabTypes;
 import org.spongepowered.api.data.type.StoneTypes;
 import org.spongepowered.api.data.type.TreeTypes;
+import org.spongepowered.api.data.type.WallTypes;
 
 public final class KCTBlockTypesBuilder {
 	private static class Metadata {
@@ -84,8 +89,10 @@ public final class KCTBlockTypesBuilder {
 	 */
 	public static BlockState getBlockState(KCTBlockTypes type) {
 	    initialize();
+	    
 	    return blocks.get(type).getBlock();
 	}
+	
 	private static boolean isInitialized=false;
 	
 	/**
@@ -98,6 +105,7 @@ public final class KCTBlockTypesBuilder {
 	        return;
 	    }
 	    isInitialized=true;
+	    
 		blocks.put(KCTBlockTypes.AIR, new Metadata(0, 0, "AIR", "AIR",
 				BlockTypes.AIR.getDefaultState()));
 
@@ -278,12 +286,11 @@ public final class KCTBlockTypesBuilder {
 		blocks.put(KCTBlockTypes.DEAD_SHRUB, new Metadata(31, 0, "DEAD_SHRUB", "TALLGRASS",
 				BlockTypes.TALLGRASS.getDefaultState()));
 
-// FIXME: doesn't exist?
-//		blocks.put(KCTBlockTypes.GRASS, new Metadata(31, 1, "GRASS", "TALLGRASS",
-//				BlockTypes.TALLGRASS.getDefaultState().with(Keys.DOUBLE_PLANT_TYPE, DoublePlantTypes.GRASS).get()));
-//
-//		blocks.put(KCTBlockTypes.FERN, new Metadata(31, 2, "FERN", "TALLGRASS",
-//				BlockTypes.TALLGRASS.getDefaultState().with(Keys.DOUBLE_PLANT_TYPE, DoublePlantTypes.FERN).get()));
+		blocks.put(KCTBlockTypes.GRASS_TALLGRASS, new Metadata(31, 1, "GRASS", "TALLGRASS",
+				BlockTypes.TALLGRASS.getDefaultState().with(Keys.SHRUB_TYPE, ShrubTypes.TALL_GRASS).get()));
+
+		blocks.put(KCTBlockTypes.FERN, new Metadata(31, 2, "FERN", "TALLGRASS",
+				BlockTypes.TALLGRASS.getDefaultState().with(Keys.SHRUB_TYPE, ShrubTypes.FERN).get()));
 
 		blocks.put(KCTBlockTypes.DEAD_BUSH, new Metadata(32, 0, "DEAD_BUSH", "DEADBUSH",
 				BlockTypes.DEADBUSH.getDefaultState()));
@@ -713,7 +720,7 @@ public final class KCTBlockTypesBuilder {
 
 		blocks.put(KCTBlockTypes.NETHER_WART, new Metadata(115, 0, "NETHER_WART", "NETHER_WART",
 				BlockTypes.NETHER_WART.getDefaultState()));
-/*		
+		
 		blocks.put(KCTBlockTypes.ENCHANTMENT_TABLE, new Metadata(116, 0, "ENCHANTMENT_TABLE", "ENCHANTING_TABLE",
 				BlockTypes.ENCHANTING_TABLE.getDefaultState()));
 
@@ -1010,8 +1017,7 @@ public final class KCTBlockTypesBuilder {
 
 		blocks.put(KCTBlockTypes.PRISMARINE_BRICKS, new Metadata(168, 1, "PRISMARINE_BRICKS", "PRISMARINE",
 				BlockTypes.PRISMARINE.getDefaultState().with(Keys.PRISMARINE_TYPE, PrismarineTypes.BRICKS).get()));
-*/
-		/*
+
 		blocks.put(KCTBlockTypes.DARK_PRISMARINE, new Metadata(168, 2, "DARK_PRISMARINE", "PRISMARINE",
 				BlockTypes.PRISMARINE.getDefaultState().with(Keys.PRISMARINE_TYPE, PrismarineTypes.DARK).get()));
 
@@ -1167,7 +1173,7 @@ public final class KCTBlockTypesBuilder {
 
 		blocks.put(KCTBlockTypes.DARK_OAK_DOOR_BLOCK, new Metadata(197, 0, "DARK_OAK_DOOR_BLOCK", "DARK_OAK_DOOR",
 				BlockTypes.DARK_OAK_DOOR.getDefaultState()));
-		*/
+		
 		/* Minecraft Blocks added after Version 1.9 
 		blocks.put(KCTBlockTypes.END_ROD, new Metadata(198, 0, "END_ROD", "END_ROD",
 				BlockTypes.END_ROD.getDefaultState()));

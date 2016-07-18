@@ -116,6 +116,7 @@ public class TurtlePlugin {
         // TODO fix this method
         //lookupFromDB();
         
+        log.info("just tried to call a method");
         // set up commands
         setupCommands();
     }

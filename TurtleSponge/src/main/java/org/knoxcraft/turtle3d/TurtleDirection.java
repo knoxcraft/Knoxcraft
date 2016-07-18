@@ -1,6 +1,5 @@
 package org.knoxcraft.turtle3d;
 
-import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.Direction.Division;
 
 import com.flowpowered.math.vector.Vector3d;
