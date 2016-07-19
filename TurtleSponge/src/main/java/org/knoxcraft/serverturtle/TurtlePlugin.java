@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.Stack;
 
 import org.knoxcraft.hooks.KCTUploadHook;
-import org.knoxcraft.jetty.server.JettyServer;
+import org.knoxcraft.jetty.server.TomcatServer;
 import org.knoxcraft.turtle3d.KCTBlockTypes;
 import org.knoxcraft.turtle3d.KCTBlockTypesBuilder;
 import org.knoxcraft.turtle3d.KCTCommand;
@@ -49,7 +49,7 @@ public class TurtlePlugin {
     private static final String PLAYER_NAME = "playerName";
     private static final String SCRIPT_NAME = "scriptName";
     private static final String NUM_UNDO = "numUndo";
-    private JettyServer jettyServer;
+    private TomcatServer tomcatServer;
     @Inject
     private Logger log;
     private ScriptManager scripts;
@@ -72,8 +72,8 @@ public class TurtlePlugin {
      */
     @Listener
     public void onServerStop(GameStoppedServerEvent event) {
-        if (jettyServer!=null) {
-            jettyServer.shutdown();
+        if (tomcatServer!=null) {
+            tomcatServer.shutdown();
         }
     }
 
@@ -94,11 +94,11 @@ public class TurtlePlugin {
         try {
             //this.getClass().getClassLoader().loadClass("org.apache.jasper.servlet.JspServlet");
             //this.getClass().getClassLoader().getParent().loadClass("org.apache.jasper.servlet.JspServlet");
-            jettyServer=new JettyServer();
-            jettyServer.enable();
+            tomcatServer=new TomcatServer();
+            tomcatServer.startup();
         } catch (Exception e){
-            if (jettyServer!=null) {
-                jettyServer.shutdown();
+            if (tomcatServer!=null) {
+                tomcatServer.shutdown();
             }
             log.error("Cannot initialize TurtlePlugin: JettyServer failed to start", e);
         }
