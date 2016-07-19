@@ -1,11 +1,14 @@
 package org.knoxcraft.serverturtle;
 
 import java.util.Map;
+import java.util.Stack;
 
 import org.knoxcraft.turtle3d.KCTBlockTypes;
 import org.knoxcraft.turtle3d.KCTBlockTypesBuilder;
 import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTScript;
+import org.knoxcraft.turtle3d.KCTUndoScript;
+import org.knoxcraft.turtle3d.KCTWorldBlockInfo;
 import org.knoxcraft.turtle3d.TurtleCommandException;
 import org.knoxcraft.turtle3d.TurtleDirection;
 import org.slf4j.Logger;
@@ -28,11 +31,15 @@ public class SpongeTurtle {
 	 */
 	// turtle location:relPos
 	private Vector3i curLoc;
+	private Vector3i startLoc;
 	// player location:originPos
 	private Vector3i playerLoc;
 	private TurtleDirection dir;
+	private TurtleDirection startDir;
 	private World world;
 	private BlockState bt = KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.STONE);
+	
+	private boolean undo = false;
 
 	public SpongeTurtle(Logger logger) {
 		this.log = logger;
@@ -40,10 +47,12 @@ public class SpongeTurtle {
 
 	public void setLoc(Vector3i curLoc) {
 		this.curLoc = curLoc;
+		this.startLoc = curLoc;
 	}
 
 	public void setTurtleDirection(TurtleDirection d) {
 		this.dir = d;
+		this.startDir = d;
 	}
 
 	public void setWorld(World w) {
@@ -113,7 +122,7 @@ public class SpongeTurtle {
 		}
 	}
 
-	private void move(int distance, TurtleDirection turtleDirection) {
+	private void move(int distance, TurtleDirection turtleDirection, Stack<KCTWorldBlockInfo> undoStack) {
 
 		int x = curLoc.getX();
 		int y = curLoc.getY();
@@ -130,56 +139,122 @@ public class SpongeTurtle {
 			 */
 			if (turtleDirection == TurtleDirection.NORTH) {
 				curLoc = curLoc.add(0, 0, 1);
-				world.setBlock(x, y, z + i, bt);
-
+				if (undo == false) {
+					undoStack.add(new KCTWorldBlockInfo(x, y, z + i, world.getBlock(x, y, z + i)));
+					world.setBlock(x, y, z + i, bt);
+				} else {
+					KCTWorldBlockInfo undoInfo = undoStack.pop();
+					world.setBlock(undoInfo.getLoc(), undoInfo.getBlock());
+				}
 			} else if (turtleDirection == TurtleDirection.NORTHEAST) {
 				curLoc = curLoc.add(-1, 0, 1);
-				world.setBlock(x - i, y, z + i, bt);
-
+				if (undo == false) {
+					undoStack.add(new KCTWorldBlockInfo(x - i, y, z + i, world.getBlock(x - i, y, z + i)));
+					world.setBlock(x - i, y, z + i, bt);
+				} else {
+					KCTWorldBlockInfo undoInfo = undoStack.pop();
+					world.setBlock(undoInfo.getLoc(), undoInfo.getBlock());
+				}
 			} else if (turtleDirection == TurtleDirection.EAST) {
 				curLoc = curLoc.add(-1, 0, 0);
-				world.setBlock(x - i, y, z, bt);
-
+				if (undo == false) {
+					undoStack.add(new KCTWorldBlockInfo(x - i, y, z, world.getBlock(x - i, y, z)));
+					world.setBlock(x - i, y, z, bt);
+				} else {
+					KCTWorldBlockInfo undoInfo = undoStack.pop();
+					world.setBlock(undoInfo.getLoc(), undoInfo.getBlock());
+				}
 			} else if (turtleDirection == TurtleDirection.SOUTHEAST) {
 				curLoc = curLoc.add(-1, 0, -1);
-				world.setBlock(x - i, y, z - i, bt);
-
+				if (undo == false) {
+					undoStack.add(new KCTWorldBlockInfo(x - i, y, z - i, world.getBlock(x - i, y, z - i)));
+					world.setBlock(x - i, y, z - i, bt);
+				} else {
+					KCTWorldBlockInfo undoInfo = undoStack.pop();
+					world.setBlock(undoInfo.getLoc(), undoInfo.getBlock());
+				}
 			} else if (turtleDirection == TurtleDirection.SOUTH) {
 				curLoc = curLoc.add(0, 0, -1);
-				world.setBlock(x, y, z - i, bt);
-
+				if (undo == false) {
+					undoStack.add(new KCTWorldBlockInfo(x, y, z - i, world.getBlock(x, y, z - i)));
+					world.setBlock(x, y, z - i, bt);
+				} else {
+					KCTWorldBlockInfo undoInfo = undoStack.pop();
+					world.setBlock(undoInfo.getLoc(), undoInfo.getBlock());
+				}
 			} else if (turtleDirection == TurtleDirection.SOUTHWEST) {
 				curLoc = curLoc.add(1, 0, -1);
-				world.setBlock(x + i, y, z - i, bt);
-
+				if (undo == false) {
+					undoStack.add(new KCTWorldBlockInfo(x + i, y, z - i, world.getBlock(x + i, y, z - i)));
+					world.setBlock(x + i, y, z - i, bt);
+				} else {
+					KCTWorldBlockInfo undoInfo = undoStack.pop();
+					world.setBlock(undoInfo.getLoc(), undoInfo.getBlock());
+				}
 			} else if (turtleDirection == TurtleDirection.WEST) {
 				curLoc = curLoc.add(1, 0, 0);
-				world.setBlock(x + i, y, z, bt);
-
+				if (undo == false) {
+					undoStack.add(new KCTWorldBlockInfo(x + i, y, z, world.getBlock(x + i, y, z)));
+					world.setBlock(x + i, y, z, bt);
+				} else {
+					KCTWorldBlockInfo undoInfo = undoStack.pop();
+					world.setBlock(undoInfo.getLoc(), undoInfo.getBlock());
+				}
 			} else if (turtleDirection == TurtleDirection.NORTHWEST) {
 				curLoc = curLoc.add(1, 0, 1);
-				world.setBlock(x + i, y, z + i, bt);
-
+				if (undo == false) {
+					undoStack.add(new KCTWorldBlockInfo(x + i, y, z + i, world.getBlock(x + i, y, z + i)));
+					world.setBlock(x + i, y, z + i, bt);
+				} else {
+					KCTWorldBlockInfo undoInfo = undoStack.pop();
+					world.setBlock(undoInfo.getLoc(), undoInfo.getBlock());
+				}
 			} else if (turtleDirection == TurtleDirection.UP) {
-				log.info("UP WAS CALLED");
 				curLoc = curLoc.add(0, 1, 0);
-				world.setBlock(x, y + i, z, bt);
-
+				if (undo == false) {
+					undoStack.add(new KCTWorldBlockInfo(x, y + i, z, world.getBlock(x, y + i, z)));
+					world.setBlock(x, y + i, z, bt);
+				} else {
+					KCTWorldBlockInfo undoInfo = undoStack.pop();
+					world.setBlock(undoInfo.getLoc(), undoInfo.getBlock());
+				}
 			} else if (turtleDirection == TurtleDirection.DOWN) {
 				curLoc = curLoc.add(0, -1, 0);
-				world.setBlock(x, y - i, z, bt);
-
+				if (undo == false) {
+					undoStack.add(new KCTWorldBlockInfo(x, y - i, z, world.getBlock(x, y - i, z)));
+					world.setBlock(x, y - i, z, bt);
+				} else {
+					KCTWorldBlockInfo undoInfo = undoStack.pop();
+					world.setBlock(undoInfo.getLoc(), undoInfo.getBlock());
+				}
 			} else {
 				throw new RuntimeException("TurtleDirection invalid=" + turtleDirection);
 			}
 		}
 	}
 
-	public void executeScript(KCTScript script) {
-
+	public KCTUndoScript executeScript(KCTScript script) {
+		Stack<KCTWorldBlockInfo> undoStack = new Stack<KCTWorldBlockInfo>();
+		undo = false;
+		
 		for (KCTCommand c : script.getCommands()) {
 			try {
-				executeCommand(c);
+				executeCommand(c, undoStack);
+			} catch (TurtleCommandException e) {
+				log.info("Unable to execute Turtle script:" + script.getScriptName());
+				return null;
+			}
+		}
+		
+		return new KCTUndoScript(script, startLoc, startDir, world, undoStack, log);
+	}
+	
+	public void executeUndoScript(KCTScript script, Stack<KCTWorldBlockInfo> undoStack) {
+		undo = true;
+		
+		for (KCTCommand c : script.getCommands()) {
+			try {
+				executeCommand(c, undoStack);
 			} catch (TurtleCommandException e) {
 				log.info("Unable to execute Turtle script:" + script.getScriptName());
 				return;
@@ -187,8 +262,7 @@ public class SpongeTurtle {
 		}
 	}
 
-	private void executeCommand(KCTCommand c) throws TurtleCommandException {
-
+	private void executeCommand(KCTCommand c, Stack<KCTWorldBlockInfo> undoStack) throws TurtleCommandException {
 		// get command info
 		Map<String, Object> m = c.getArguments();
 		String commandName = c.getCommandName();
@@ -203,8 +277,7 @@ public class SpongeTurtle {
 			} else {
 				distance = toInt(m.get(KCTCommand.DIST));
 			}
-			move(distance, dir);
-
+			move(distance, dir, undoStack);
 		} else if (commandName.equals(KCTCommand.BACKWARD)) {
 			// go backward
 			int distance;
@@ -213,7 +286,7 @@ public class SpongeTurtle {
 			} else {
 				distance = toInt(m.get(KCTCommand.DIST));
 			}
-			move(distance, dir.flip());
+			move(distance, dir.flip(), undoStack);
 
 		} else if (commandName.equals(KCTCommand.TURNRIGHT)) {
 			int degrees;
@@ -241,7 +314,7 @@ public class SpongeTurtle {
 			} else {
 				distance = toInt(m.get(KCTCommand.DIST));
 			}
-			move(distance, dir.turn(false, 2));
+			move(distance, dir.turn(false, 2), undoStack);
 		} else if (commandName.equals(KCTCommand.LEFT)) {
 			// strafe left
 			int distance;
@@ -250,7 +323,7 @@ public class SpongeTurtle {
 			} else {
 				distance = toInt(m.get(KCTCommand.DIST));
 			}
-			move(distance, dir.turn(true, 2));
+			move(distance, dir.turn(true, 2), undoStack);
 		} else if (commandName.equals(KCTCommand.UP)) {
 			// go up
 			int distance;
@@ -259,7 +332,7 @@ public class SpongeTurtle {
 			} else {
 				distance = toInt(m.get(KCTCommand.DIST));
 			}
-			move(distance, TurtleDirection.UP);
+			move(distance, TurtleDirection.UP, undoStack);
 
 		} else if (commandName.equals(KCTCommand.DOWN)) {
 			// go down
@@ -269,7 +342,7 @@ public class SpongeTurtle {
 			} else {
 				distance = toInt(m.get(KCTCommand.DIST));
 			}
-			move(distance, TurtleDirection.DOWN);
+			move(distance, TurtleDirection.DOWN, undoStack);
 		} else if (commandName.equals(KCTCommand.SETBLOCK)) {
 			String blockName = m.get(KCTCommand.BLOCKTYPE).toString();
 			bt = KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.valueOf(blockName));

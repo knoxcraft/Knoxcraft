@@ -9,14 +9,6 @@ import com.flowpowered.math.vector.Vector3d;
  * @author kakoijohn
  *
  */
-/**
- * @author kakoijohn
- *
- */
-/**
- * @author kakoijohn
- *
- */
 public enum TurtleDirection {
 	NORTH(new Vector3d(0, 0, -1), Division.CARDINAL),    //North(0, 0, -1) = 0
     NORTHEAST(new Vector3d(1, 0, -1), Division.ORDINAL), //NorthEast(1, 0, -1) = 1
