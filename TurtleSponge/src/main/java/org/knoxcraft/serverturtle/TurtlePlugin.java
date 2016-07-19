@@ -78,6 +78,12 @@ public class TurtlePlugin {
     }
 
 
+    private void loadlog(String classname) throws Exception {
+        log.info(this.getClass().getClassLoader().loadClass(classname).getCanonicalName());
+    }
+    private void loadlog(String classname, ClassLoader loader) throws Exception {
+        log.info(loader.loadClass(classname).getCanonicalName());
+    }
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
         // Hey! The server has started!
@@ -92,8 +98,17 @@ public class TurtlePlugin {
         //logger.trace(String.format("Did weather work? %s did daylight work? %s", b1, b2));
 
         try {
-            //this.getClass().getClassLoader().loadClass("org.apache.jasper.servlet.JspServlet");
-            //this.getClass().getClassLoader().getParent().loadClass("org.apache.jasper.servlet.JspServlet");
+            
+            loadlog("org.knoxcraft.jetty.server.JettyServer");
+            loadlog("org.eclipse.jetty.server.Server");
+            loadlog("org.apache.commons.io.HexDump");
+            loadlog("org.glassfish.jsp.api.JspProbeEmitter");
+            loadlog("org.apache.jasper.Constants", ClassLoader.getSystemClassLoader());
+            loadlog("org.apache.taglibs.standard.Version");
+            loadlog("org.apache.jasper.Constants");
+            loadlog("org.apache.jasper.JspC");
+            loadlog("org.apache.jasper.servlet.JasperLoader");
+            loadlog("org.apache.jasper.servlet.JspServlet");
             jettyServer=new JettyServer();
             jettyServer.enable();
         } catch (Exception e){
