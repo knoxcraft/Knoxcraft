@@ -2,19 +2,17 @@ package org.knoxcraft.serverturtle;
 
 import java.util.Map;
 
+import org.knoxcraft.turtle3d.KCTBlockTypes;
+import org.knoxcraft.turtle3d.KCTBlockTypesBuilder;
 import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.TurtleCommandException;
 import org.knoxcraft.turtle3d.TurtleDirection;
 import org.slf4j.Logger;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.world.World;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.inject.Inject;
 
 public class SpongeTurtle {
 
@@ -34,7 +32,7 @@ public class SpongeTurtle {
 	private Vector3i playerLoc;
 	private TurtleDirection dir;
 	private World world;
-	private BlockType bt = BlockTypes.STONE;
+	private BlockState bt = KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.STONE);
 
 	public SpongeTurtle(Logger logger) {
 		this.log = logger;
@@ -132,44 +130,44 @@ public class SpongeTurtle {
 			 */
 			if (turtleDirection == TurtleDirection.NORTH) {
 				curLoc = curLoc.add(0, 0, 1);
-				world.setBlockType(x, y, z + i, bt);
+				world.setBlock(x, y, z + i, bt);
 
 			} else if (turtleDirection == TurtleDirection.NORTHEAST) {
 				curLoc = curLoc.add(-1, 0, 1);
-				world.setBlockType(x - i, y, z + i, bt);
+				world.setBlock(x - i, y, z + i, bt);
 
 			} else if (turtleDirection == TurtleDirection.EAST) {
 				curLoc = curLoc.add(-1, 0, 0);
-				world.setBlockType(x - i, y, z, bt);
+				world.setBlock(x - i, y, z, bt);
 
 			} else if (turtleDirection == TurtleDirection.SOUTHEAST) {
 				curLoc = curLoc.add(-1, 0, -1);
-				world.setBlockType(x - i, y, z - i, bt);
+				world.setBlock(x - i, y, z - i, bt);
 
 			} else if (turtleDirection == TurtleDirection.SOUTH) {
 				curLoc = curLoc.add(0, 0, -1);
-				world.setBlockType(x, y, z - i, bt);
+				world.setBlock(x, y, z - i, bt);
 
 			} else if (turtleDirection == TurtleDirection.SOUTHWEST) {
 				curLoc = curLoc.add(1, 0, -1);
-				world.setBlockType(x + i, y, z - i, bt);
+				world.setBlock(x + i, y, z - i, bt);
 
 			} else if (turtleDirection == TurtleDirection.WEST) {
 				curLoc = curLoc.add(1, 0, 0);
-				world.setBlockType(x + i, y, z, bt);
+				world.setBlock(x + i, y, z, bt);
 
 			} else if (turtleDirection == TurtleDirection.NORTHWEST) {
 				curLoc = curLoc.add(1, 0, 1);
-				world.setBlockType(x + i, y, z + i, bt);
+				world.setBlock(x + i, y, z + i, bt);
 
 			} else if (turtleDirection == TurtleDirection.UP) {
 				log.info("UP WAS CALLED");
 				curLoc = curLoc.add(0, 1, 0);
-				world.setBlockType(x, y + i, z, bt);
+				world.setBlock(x, y + i, z, bt);
 
 			} else if (turtleDirection == TurtleDirection.DOWN) {
 				curLoc = curLoc.add(0, -1, 0);
-				world.setBlockType(x, y - i, z, bt);
+				world.setBlock(x, y - i, z, bt);
 
 			} else {
 				throw new RuntimeException("TurtleDirection invalid=" + turtleDirection);
@@ -261,7 +259,7 @@ public class SpongeTurtle {
 			} else {
 				distance = toInt(m.get(KCTCommand.DIST));
 			}
-			move(distance, dir.UP);
+			move(distance, TurtleDirection.UP);
 
 		} else if (commandName.equals(KCTCommand.DOWN)) {
 			// go down
@@ -271,7 +269,10 @@ public class SpongeTurtle {
 			} else {
 				distance = toInt(m.get(KCTCommand.DIST));
 			}
-			move(distance, dir.DOWN);
+			move(distance, TurtleDirection.DOWN);
+		} else if (commandName.equals(KCTCommand.SETBLOCK)) {
+			String blockName = m.get(KCTCommand.BLOCKTYPE).toString();
+			bt = KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.valueOf(blockName));
 		}
 	}
 }

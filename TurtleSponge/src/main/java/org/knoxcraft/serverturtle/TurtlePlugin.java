@@ -9,6 +9,7 @@ import java.util.Stack;
 
 import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
+import org.knoxcraft.turtle3d.KCTBlockTypes;
 import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.TurtleDirection;
@@ -351,15 +352,27 @@ public class TurtlePlugin {
 	private KCTScript makeFakeSquare() {
 		KCTScript script = new KCTScript("testscript");
 		// TODO flesh this out to test a number of other commands
-//		script.addCommand(KCTCommand.forward(70));
-//		script.addCommand(KCTCommand.turnLeft(90));
-//		script.addCommand(KCTCommand.forward(10));
-//		script.addCommand(KCTCommand.Right(10));
-//		script.addCommand(KCTCommand.turnRight(90));
-//		script.addCommand(KCTCommand.forward(10));
-		script.addCommand(KCTCommand.up(5));
-//		script.addCommand(KCTCommand.backward(70));
-//		script.addCommand(KCTCommand.down(100));
+		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.REDSTONE_BLOCK));
+		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.turnLeft(90));
+		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.turnLeft(90));
+		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.turnLeft(90));
+		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.turnLeft(90));
+		
+//		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.AIR));
+		script.addCommand(KCTCommand.up(1));
+		
+		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.POWERED_RAIL));
+		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.turnLeft(90));
+		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.turnLeft(90));
+		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.turnLeft(90));
+		script.addCommand(KCTCommand.forward(70));
 //		
 		return script;
 	}
@@ -368,6 +381,10 @@ public class TurtlePlugin {
 
 		double d = direction.getY() / 360 * 8;
 		int x = (int) Math.round(d);
+		
+		while (x < 0) {
+			x += 8;
+		}
 
 		if (x == 0 || x == 8) {
 			return TurtleDirection.NORTH;
