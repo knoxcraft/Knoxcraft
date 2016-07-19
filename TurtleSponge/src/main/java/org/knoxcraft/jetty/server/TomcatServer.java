@@ -21,6 +21,18 @@ public class TomcatServer
     
     public void startup() throws ServletException, LifecycleException {
         int port=Integer.parseInt(System.getProperty("PORT", "8888"));
+        String contextPath = "/";
+        String appBase = "web";
+        Tomcat tomcat = new Tomcat();     
+        tomcat.setPort(port);
+        tomcat.getHost().setAppBase(appBase);
+        tomcat.addWebapp(contextPath, appBase);
+        tomcat.start();
+        tomcat.getServer().await();
+    }
+    
+    public void startup2() throws ServletException, LifecycleException {
+        int port=Integer.parseInt(System.getProperty("PORT", "8888"));
         tomcat=new Tomcat();
         tomcat.setPort(port);
         String webappDirLocation = "src/main/resources/web/";
@@ -38,7 +50,6 @@ public class TomcatServer
 
         tomcat.start();
         tomcat.getServer().await();
-        
     }
     
     public void shutdown(){
