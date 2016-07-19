@@ -26,6 +26,15 @@ dependencies {
     // not sure why I need to include javax.servlet-api; thought Jetty would have this?
     compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
     compile group: 'javax.servlet', name: 'jstl', version: '1.2'
+    
+    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.0.M6'
+    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: '9.0.0.M6'
+    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-logging-juli', version: '9.0.0.M6'
+    compile group: 'org.apache.tomcat', name: 'tomcat-jasper', version: '9.0.0.M6'
+    compile group: 'org.apache.tomcat', name: 'tomcat-jasper-el', version: '9.0.0.M6'
+    compile group: 'org.apache.tomcat', name: 'tomcat-jsp-api', version: '9.0.0.M6'
+    
+    
 
 /*    
     compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.0.M0'
