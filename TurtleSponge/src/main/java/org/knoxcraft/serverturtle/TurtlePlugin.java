@@ -16,9 +16,6 @@ import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.TurtleDirection;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -26,9 +23,6 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.DyeColors;
-import org.spongepowered.api.data.type.StoneTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
@@ -98,19 +92,21 @@ public class TurtlePlugin {
         //logger.trace(String.format("Did weather work? %s did daylight work? %s", b1, b2));
 
         try {
+            //this.getClass().getClassLoader().loadClass("org.apache.jasper.servlet.JspServlet");
+            //this.getClass().getClassLoader().getParent().loadClass("org.apache.jasper.servlet.JspServlet");
             jettyServer=new JettyServer();
-            //jettyServer.enable();
+            jettyServer.enable();
         } catch (Exception e){
             if (jettyServer!=null) {
-                //jettyServer.shutdown();
+                jettyServer.shutdown();
             }
             log.error("Cannot initialize TurtlePlugin: JettyServer failed to start", e);
         }
 
         //httpServer=new HttpUploadServer();
         //httpServer.enable(getLogman());
-        log.info("Enabling "+container.getName() + " Version " + container.getVersion()); 
-        log.info("Authored by "+container.getAuthors());
+        //log.info("Enabling "+container.getName() + " Version " + container.getVersion()); 
+        //log.info("Authored by "+container.getAuthors());
         //Canary.commands().registerCommands(this, this, false);
 
         // TODO fix this method
