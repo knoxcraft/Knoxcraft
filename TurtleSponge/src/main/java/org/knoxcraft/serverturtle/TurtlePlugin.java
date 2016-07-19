@@ -238,6 +238,8 @@ public class TurtlePlugin {
 							log.info("pos= " + pos);
 							turtle.setWorld(w);
 							turtle.setTurtleDirection(d);
+							
+							
 							KCTUndoScript undoScript = turtle.executeScript(script);
 							if (!undoBuffer.containsKey(playerName))
 								undoBuffer.put(playerName, new Stack<KCTUndoScript>());
