@@ -38,11 +38,13 @@ public class JettyServer
         
         System.setProperty("org.apache.jasper.compiler.disablejsr199","false");
         
+        
+        
         // default context and classloader
         WebAppContext context = new WebAppContext();
         context.setParentLoaderPriority(true);
         context.setResourceBase(baseUri.toASCIIString());
-        context.setExtraClasspath(baseUri.toASCIIString());
+        //context.setExtraClasspath(baseUri.toASCIIString());
         context.setTempDirectory(getScratchDir());
         context.setContextPath("/");
         context.setClassLoader(new URLClassLoader(new URL[0], this.getClass().getClassLoader()));
@@ -89,8 +91,6 @@ public class JettyServer
         context.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
                 ".*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/.*taglibs.*\\.jar$");
         
-        
-
         // Multipart servlet
         ServletHolder multipartHolder = new ServletHolder(KCTUploadServlet.class);
         multipartHolder.getRegistration().setMultipartConfig(new MultipartConfigElement(
