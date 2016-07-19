@@ -33,7 +33,7 @@ dependencies {
     compile group: 'org.apache.tomcat', name: 'tomcat-jasper', version: '9.0.0.M6'
     compile group: 'org.apache.tomcat', name: 'tomcat-jasper-el', version: '9.0.0.M6'
     compile group: 'org.apache.tomcat', name: 'tomcat-jsp-api', version: '9.0.0.M6'
-    
+    compile group: 'org.apache.commons', name: 'commons-digester3', version: '3.2'
     
 
 /*    
@@ -45,14 +45,14 @@ dependencies {
     //compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.0.M0'
     compile group: 'org.eclipse.jetty', name: 'jetty-jsp', version: '9.4.0.M0'
 */
-
+/*
     compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '8.1.19.v20160209'
     compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '8.1.19.v20160209'
     compile group: 'org.eclipse.jetty', name: 'jetty-webapp', version: '8.1.19.v20160209'
     compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '8.1.19.v20160209'
     compile group: 'org.eclipse.jetty', name: 'jetty-jmx', version: '8.1.19.v20160209'
 	compile group: 'org.eclipse.jetty', name: 'jetty-jsp', version: '8.1.19.v20160209'
-
+*/
     /*
     compile group: 'org.eclipse.jetty', name: 'jetty-jaas', version: '8.1.19.v20160209'
     compile group: 'org.eclipse.jetty.websocket', name: 'websocket-server', version: '8.1.19.v20160209'
@@ -73,6 +73,7 @@ sourceSets {
         java {
             exclude 'net/canarymod/database/**'
             exclude 'org/knoxcraft/database/**'
+            exclude 'org/knoxcraft/jetty/server/Jetty*'
         }
     }
 }
