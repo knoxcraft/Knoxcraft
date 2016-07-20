@@ -1,6 +1,5 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
-//apply plugin: 'war'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -18,8 +17,6 @@ repositories {
 configurations {
     provided
     compile.extendsFrom provided
-    //webinf
-    //compile.extendsFrom webinf
 }
 
 dependencies {
@@ -29,16 +26,6 @@ dependencies {
     compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
     compile group: 'javax.servlet', name: 'jstl', version: '1.2'
 
-/*    
-    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.0.M0'
-    compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.0.M0'
-    compile group: 'org.eclipse.jetty', name: 'jetty-webapp', version: '9.4.0.M0'
-    compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '9.4.0.M0'
-    compile group: 'org.eclipse.jetty', name: 'jetty-jmx', version: '9.4.0.M0'
-    //compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.0.M0'
-    compile group: 'org.eclipse.jetty', name: 'jetty-jsp', version: '9.4.0.M0'
-*/
-    //def jettyVersion='8.1.19.v20160209'
     def jettyVersion='9.3.10.v20160621'
     compile group: 'org.eclipse.jetty', name: 'jetty-server', version: jettyVersion
     compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: jettyVersion
@@ -47,7 +34,7 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'jetty-jmx', version: jettyVersion
 	compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: jettyVersion
 
-    /*
+    /*// These seem to be unnecessary
     compile group: 'org.eclipse.jetty', name: 'jetty-jaas', version: '8.1.19.v20160209'
     compile group: 'org.eclipse.jetty.websocket', name: 'websocket-server', version: '8.1.19.v20160209'
     compile group: 'org.eclipse.jetty.websocket', name: 'websocket-api', version: '8.1.19.v20160209'
@@ -75,14 +62,8 @@ jar {
     // TODO: read names from project
     baseName = 'knoxcraft'
     version =  '0.2'
-    
-/*
-    into('web/WEB-INF/lib') {
-        from configurations.webinf
-    }
-*/
+   
     // Leave out the sponge code, since the sponge plugin will have this
-
     dependsOn configurations.runtime
     from {
         (configurations.runtime - configurations.provided).collect {
