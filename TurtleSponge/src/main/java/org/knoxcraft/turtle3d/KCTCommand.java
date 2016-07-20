@@ -124,19 +124,31 @@ public class KCTCommand
     	return result;
     }
     
-    public static KCTCommand turnRight(int distance, int degrees){
+    public static KCTCommand turnRight(int degrees){
     	Map<String, Object> map = new HashMap<String, Object>();
-    	map.put(DIST, distance);
     	map.put(DEGREES, degrees);
     	KCTCommand result = new KCTCommand(TURNRIGHT, map);
     	return result;
     }
     
-    public static KCTCommand turnLeft(int distance, int degrees){
+    public static KCTCommand turnLeft(int degrees){
     	Map<String, Object> map = new HashMap<String, Object>();
-    	map.put(DIST, distance);
     	map.put(DEGREES, degrees);
     	KCTCommand result = new KCTCommand(TURNLEFT, map);
+    	return result;
+    }
+    
+    public static KCTCommand Right(int distance){
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put(DIST, distance);
+    	KCTCommand result = new KCTCommand(RIGHT, map);
+    	return result;
+    }
+    
+    public static KCTCommand Left(int distance){
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put(DIST, distance);
+    	KCTCommand result = new KCTCommand(LEFT, map);
     	return result;
     }
     
@@ -154,29 +166,10 @@ public class KCTCommand
     	return result;
     }
     
-  /*
-    public static final String DIR = "dir";
-    public static final String DEGREES = "degrees";
-    public static final String PLACE = "place";
-    public static final String X = "x";
-    public static final String Y = "y";
-    public static final String Z = "z";
-    public static final String DIST = "dist";
-    public static final String BLOCKTYPE = "blockType";
-    
-    public static final String CMD = "cmd";
-    public static final String CMDKEY = "\"cmd\"";
-    public static final String ARGS= "args";
-    public static final String ARGSKEY = "\"args\"";
-    public static final String SCRIPTNAMEKEY = "\"scriptname\"";
-    public static final String COMMANDSKEY = "\"commands\"";
-
-    public static final String PLACEBLOCKS = "placeBlocks";
-    public static final String BLOCKPLACEMODE = "blockPlaceMode";
-    public static final String SETDIRECTION = "setDirection";
-    public static final String SETPOSITION = "setPosition";
-    public static final String SETBLOCK = "setBlock";
-    public static final String RIGHT = "right";
-    public static final String LEFT = "left";
-    */
+    public static KCTCommand setBlock(KCTBlockTypes blockType) {
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put(BLOCKTYPE, blockType);
+    	KCTCommand result = new KCTCommand(SETBLOCK, map);
+    	return result;
+    }
 }
