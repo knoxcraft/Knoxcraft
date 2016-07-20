@@ -14,20 +14,19 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import org.knoxcraft.hooks.KCTUploadHook;
+import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.TurtleCompiler;
 import org.knoxcraft.turtle3d.TurtleCompilerException;
 import org.knoxcraft.turtle3d.TurtleException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
-
-import com.google.inject.Inject;
 
 public class KCTUploadServlet extends HttpServlet
 {
     
-    @Inject
-    private Logger logger;
+    private Logger logger=LoggerFactory.getLogger(TurtlePlugin.ID);
     
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException

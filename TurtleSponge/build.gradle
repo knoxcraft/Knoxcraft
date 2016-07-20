@@ -41,7 +41,7 @@ dependencies {
     compile group: 'org.eclipse.jetty.websocket', name: 'websocket-client', version: '8.1.19.v20160209'
     compile group: 'org.eclipse.jetty.websocket', name: 'websocket-common', version: '8.1.19.v20160209'
 	*/
-    
+    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.3'
     compile 'commons-io:commons-io:2.4'
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     compile group: 'com.mchange', name: 'c3p0', version: '0.9.5.2'
@@ -49,6 +49,7 @@ dependencies {
     testCompile 'junit:junit:4.8.2'
 }
 
+/*
 sourceSets {
     main {
         java {
@@ -57,6 +58,7 @@ sourceSets {
         }
     }
 }
+*/
 
 jar {
     // TODO: read names from project

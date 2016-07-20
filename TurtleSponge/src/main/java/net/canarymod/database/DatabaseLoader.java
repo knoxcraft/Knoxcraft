@@ -1,11 +1,10 @@
 package net.canarymod.database;
 
 import java.io.File;
-import java.net.MalformedURLException;
 
+import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.slf4j.Logger;
-
-import com.google.inject.Inject;
+import org.slf4j.LoggerFactory;
 
 import net.canarymod.database.exceptions.DatabaseException;
 
@@ -17,8 +16,7 @@ import net.canarymod.database.exceptions.DatabaseException;
  * @author Chris (damagefilter)
  */
 public class DatabaseLoader {
-    @Inject
-    private static Logger log;
+    private static Logger log=LoggerFactory.getLogger(TurtlePlugin.ID);
     /**
      * Scans db adapters folder, loads all valid databases and registers them
      * at Database.Type. This must be the first bootstrapping step,
@@ -35,20 +33,22 @@ public class DatabaseLoader {
                 continue;
             }
             try {
-                PropertiesFile inf = new PropertiesFile(file.getAbsolutePath(), "Canary.inf");
-                CanaryClassLoader ploader = new CanaryClassLoader(file.toURI().toURL(), DatabaseLoader.class.getClassLoader());
-                String mainclass = inf.getString("main-class");
-                String dbName = inf.getString("database-name");
-                Class<?> dbClass = ploader.loadClass(mainclass);
+                // TODO: support multiple different DB adapters by loading each one from
+                // a folder or some other well-known location
+                // For now, let's just load JDBC
+                
+                //PropertiesFile inf = new PropertiesFile(file.getAbsolutePath(), "Canary.inf");
+                //CanaryClassLoader ploader = new CanaryClassLoader(file.toURI().toURL(), DatabaseLoader.class.getClassLoader());
+                //String mainclass = inf.getString("main-class");
+                //String dbName = inf.getString("database-name");
+                String mainclass="com.mysql.jdbc.Driver";
+                String dbName="mysql";
+                Class<?> dbClass = TurtlePlugin.class.getClassLoader().loadClass(mainclass);
 
                 Database db = (Database)dbClass.newInstance();
                 if (db != null) {
                     Database.Type.registerDatabase(dbName, db);
                 }
-            }
-            catch (UtilityException e) {
-                log.error("Could not find databases mainclass", e);
-                return;
             }
             catch (ClassNotFoundException e) {
                 log.error("Could not find databases mainclass", e);
@@ -63,9 +63,6 @@ public class DatabaseLoader {
                 log.error(e.getMessage(), e);
             }
             catch (InstantiationException e) {
-                log.error(e.getMessage(), e);
-            }
-            catch (MalformedURLException e) {
                 log.error(e.getMessage(), e);
             }
         }

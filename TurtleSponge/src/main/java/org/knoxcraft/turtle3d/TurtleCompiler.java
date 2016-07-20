@@ -15,7 +15,9 @@ import org.knoxcraft.javacompiler.ByteArrayClassLoader;
 import org.knoxcraft.javacompiler.CompilationResult;
 import org.knoxcraft.javacompiler.CompilerDiagnostic;
 import org.knoxcraft.javacompiler.InMemoryJavaCompiler;
+import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
 
@@ -30,8 +32,7 @@ public class TurtleCompiler
     public static final String PYTHON="python";
     public static final String BLOCKLY="blockly";
 
-    @Inject
-    private Logger log;
+    private Logger log=LoggerFactory.getLogger(TurtlePlugin.ID);
 
     public TurtleCompiler() {
     }

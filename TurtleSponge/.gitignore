@@ -2,4 +2,4 @@
 /bin/
 .gradle
 gradle.properties
-.settings
+.settings/
