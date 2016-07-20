@@ -4,41 +4,6 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
              http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
-<!-- 
-	<servlet>
-		<servlet-name>jsp</servlet-name>
-		<servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
-		<init-param>
-			<param-name>logVerbosityLevel</param-name>
-			<param-value>DEBUG</param-value>
-		</init-param>
-		<init-param>
-				<param-name>fork</param-name>
-				<param-value>false</param-value>
-		</init-param>
-		<init-param>
-			<param-name>keepgenerated</param-name>
-			<param-value>true</param-value>
-		</init-param>
-	</servlet>
- -->
-	<servlet id="jsp">
-    	<servlet-name>jsp</servlet-name>
-    	<servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
-    	<init-param>
-        	<param-name>logVerbosityLevel</param-name>
-        	<param-value>DEBUG</param-value>
-    	</init-param>
-    	<init-param>
-        	<param-name>fork</param-name>
-        	<param-value>>false</param-value>
-    	</init-param>
-    	<init-param>
-        	<param-name>keepgenerated</param-name>
-        	<param-value>>true</param-value>
-    	</init-param>
-	    <load-on-startup>0</load-on-startup>
-	</servlet>
 
 	<servlet>
 		<servlet-name>KCTUploadServlet</servlet-name>
@@ -79,18 +44,6 @@
 		<url-pattern>/admin/download</url-pattern>
 	</servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>jsp</servlet-name>
-		<url-pattern>*.jsp</url-pattern>
-		<url-pattern>*.jspf</url-pattern>
-		<url-pattern>*.jspx</url-pattern>
-		<url-pattern>*.xsp</url-pattern>
-		<url-pattern>*.JSP</url-pattern>
-		<url-pattern>*.JSPF</url-pattern>
-		<url-pattern>*.JSPX</url-pattern>
-		<url-pattern>*.XSP</url-pattern>
-	</servlet-mapping>
-
 	<filter>
 		<filter-name>KCTScriptFilter</filter-name>
 		<filter-class>org.knoxcraft.jetty.server.KCTScriptFilter</filter-class>
@@ -112,36 +65,4 @@
 		<filter-name>LoginFilter</filter-name>
 		<url-pattern>/admin/*</url-pattern>
 	</filter-mapping>
-	
-	
-	
-	<jsp-config>
-		<!--  With Jetty 9.4, we have to use the taglib uri as a URI
-			and we need to import it this way. Not sure why we can't pick different names.
-		 -->
-		<taglib>
-			<taglib-uri>http://java.sun.com/jsp/jstl/core</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/c.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>http://java.sun.com/jsp/jstl/functions</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/fn.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>http://java.sun.com/jsp/jstl/fmt</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/fmt.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>http://java.sun.com/jsp/jstl/sql</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/sql.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>http://java.sun.com/jsp/jstl/x</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/x.tld</taglib-location>
-		</taglib>
-		<taglib>
-			<taglib-uri>http://java.sun.com/jsp/jstl/scriptfree</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/scriptfree.tld</taglib-location>
-		</taglib>
-	</jsp-config>
 </web-app>

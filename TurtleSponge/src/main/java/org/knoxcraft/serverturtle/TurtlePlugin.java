@@ -87,42 +87,18 @@ public class TurtlePlugin {
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
         // Hey! The server has started!
-        // Try instantiating your logger in here.
-        // (There's a guide for that)
         log.info("Registering Knoxcraft Turtles plugin");
 
-        //Canary.hooks().registerListener(this, this);
-        // TODO: these seem to have no effect; figure out why!
-        //boolean b1=Canary.getServer().consoleCommand("weather clear 1000000");
-        //boolean b2=Canary.getServer().consoleCommand("gamerule doDaylightCycle false");
-        //logger.trace(String.format("Did weather work? %s did daylight work? %s", b1, b2));
-
         try {
-            
-            loadlog("org.knoxcraft.jetty.server.JettyServer");
-            loadlog("org.eclipse.jetty.server.Server");
-            loadlog("org.apache.commons.io.HexDump");
-            loadlog("org.glassfish.jsp.api.JspProbeEmitter");
-            loadlog("org.apache.jasper.Constants", ClassLoader.getSystemClassLoader());
-            loadlog("org.apache.taglibs.standard.Version");
-            loadlog("org.apache.jasper.Constants");
-            loadlog("org.apache.jasper.JspC");
-            loadlog("org.apache.jasper.servlet.JasperLoader");
-            loadlog("org.apache.jasper.servlet.JspServlet");
             jettyServer=new JettyServer();
             jettyServer.enable();
+            
         } catch (Exception e){
             if (jettyServer!=null) {
                 jettyServer.shutdown();
             }
             log.error("Cannot initialize TurtlePlugin: JettyServer failed to start", e);
         }
-
-        //httpServer=new HttpUploadServer();
-        //httpServer.enable(getLogman());
-        //log.info("Enabling "+container.getName() + " Version " + container.getVersion()); 
-        //log.info("Authored by "+container.getAuthors());
-        //Canary.commands().registerCommands(this, this, false);
 
         // TODO fix this method
         //lookupFromDB();
