@@ -64,7 +64,7 @@ public class JettyServer
     public void startup() throws Exception
     {
         int port=Integer.parseInt(System.getProperty("PORT", "8888"));
-        Server server = new Server(port);
+        server = new Server(port);
         
         // base URI
         URI baseUri = this.getClass().getResource("/web").toURI();

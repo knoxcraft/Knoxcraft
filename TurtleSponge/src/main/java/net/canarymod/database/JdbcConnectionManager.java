@@ -6,8 +6,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import net.canarymod.database.exceptions.DatabaseAccessException;
@@ -23,8 +23,8 @@ import net.canarymod.database.exceptions.DatabaseAccessException;
  * @author Jason Jones (darkdiplomat)
  */
 public class JdbcConnectionManager {
-    @Inject
-    private static Logger log;
+    
+    private static Logger log=LoggerFactory.getLogger(JdbcConnectionManager.class);
     
     private ComboPooledDataSource cpds; // The data source pool ;)
     private Connection nonManaged; // For those that bypass the manager/unable to use the manager

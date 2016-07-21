@@ -3,6 +3,8 @@ package org.knoxcraft.serverturtle;
 import java.util.Collection;
 import java.util.EmptyStackException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -15,7 +17,9 @@ import org.knoxcraft.turtle3d.KCTBlockTypes;
 import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.KCTUndoScript;
+import org.knoxcraft.turtle3d.TurtleCompiler;
 import org.knoxcraft.turtle3d.TurtleDirection;
+import org.knoxcraft.turtle3d.TurtleException;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -41,7 +45,12 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 
-@Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft")
+import net.canarymod.database.DataAccess;
+import net.canarymod.database.Database;
+import net.canarymod.database.exceptions.DatabaseReadException;
+import net.canarymod.database.exceptions.DatabaseWriteException;
+
+@Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft", authors = {"kakoijohn", "mrmoeee", "spacdog"})
 public class TurtlePlugin {
 
 	public static final String ID = "kct";
@@ -79,49 +88,28 @@ public class TurtlePlugin {
 	@Listener
 	public void onServerStart(GameStartedServerEvent event) {
 		// Hey! The server has started!
-		// Try instantiating your logger in here.
-		// (There's a guide for that)
 		log.info("Registering Knoxcraft Turtles plugin");
-
-		// Canary.hooks().registerListener(this, this);
-		// TODO: these seem to have no effect; figure out why!
-		// boolean b1=Canary.getServer().consoleCommand("weather clear
-		// 1000000");
-		// boolean b2=Canary.getServer().consoleCommand("gamerule
-		// doDaylightCycle false");
-		// logger.trace(String.format("Did weather work? %s did daylight work?
-		// %s", b1, b2));
 
 		try {
 			jettyServer = new JettyServer();
-			// jettyServer.enable();
+			jettyServer.startup();
 		} catch (Exception e) {
 			if (jettyServer != null) {
-				// jettyServer.shutdown();
+				jettyServer.shutdown();
 			}
 			log.error("Cannot initialize TurtlePlugin: JettyServer failed to start", e);
 		}
 
-		// httpServer=new HttpUploadServer();
-		// httpServer.enable(getLogman());
 		log.info("Enabling " + container.getName() + " Version " + container.getVersion());
 		log.info("Authored by " + container.getAuthors());
-		// Canary.commands().registerCommands(this, this, false);
 
-		// TODO fix this method
-		// lookupFromDB();
-
-		// TestClass t=new TestClass();
-		// t.method();
-
-		log.info("just tried to call a method");
+		// Look up previously submitted scripts from the DB
+		lookupFromDB();
 
 		// set up commands
 		setupCommands();
 	}
 
-	// TODO LOG STATEMENTS to show commands work, and check if arguments make
-	// sense
 	private void setupCommands() {
 		// List all the scripts
 		CommandSpec listScripts = CommandSpec.builder().description(Text.of("List Knoxcraft Turtle Scripts"))
@@ -209,23 +197,20 @@ public class TurtlePlugin {
 						// log.info("scriptName== " + scriptName);
 						KCTScript script = scripts.getScript(playerName, scriptName);
 
-						/*
-						 * TODO: uncomment once we're done testing if
-						 * (script==null) { log.warn(String.
-						 * format("player %s cannot find script %s", playerName,
-						 * scriptName)); src.sendMessage(Text.of(String.
-						 * format("%s, you have no script named %s", playerName,
-						 * scriptName))); return CommandResult.success(); }
-						 */
-
-						// make the fake square
-						script = makeFakeSquare();
+						if (script==null) { 
+						     log.warn(String.format("player %s cannot find script %s", playerName,scriptName)); 
+						     src.sendMessage(Text.of(String.format("%s, you have no script named %s", 
+						             playerName,scriptName)));
+						     // FIXME: remove this fake square
+						     script = makeFakeSquare();
+						     return CommandResult.success();
+						 }
 
 						SpongeTurtle turtle = new SpongeTurtle(log);
 
 						// location of turtle = location of player
 						if (src instanceof Player) {
-							Player player = (Player) src;
+						    Player player = (Player) src;
 							Location<World> loc = player.getLocation();
 							Vector3i pos = loc.getBlockPosition();
 							turtle.setLoc(pos);
@@ -247,56 +232,6 @@ public class TurtlePlugin {
 								undoBuffer.put(playerName, new Stack<KCTUndoScript>());
 							undoBuffer.get(playerName).add(undoScript);
 						}
-
-						// turtle.setLoc(src instanceof player);
-
-						// TODO: follow commented out code to create a turtle
-						// and
-						// test it
-
-						/*
-						 * //Create turtle
-						 * 
-						 * Turtle turtle = new Turtle(); //sender from canary
-						 * change to work with src!!!!!!!!!!!!!!!
-						 * turtle.turtleInit(sender);
-						 * 
-						 * //Get script from map KCTScript script = null; try {
-						 * log.trace(String.format("%s is looking for %s",
-						 * playerName, scriptName)); for (String p :
-						 * scripts.getAllScripts().keySet()) {
-						 * log.trace("Player name: "+p); for (String s :
-						 * scripts.getAllScriptsForPlayer(p).keySet()) {
-						 * log.trace(String.
-						 * format("Player name %s has script named %s", p, s));
-						 * } } script = scripts.getScript(playerName,
-						 * scriptName); if (script==null) { log.warn(String.
-						 * format("player %s cannot find script %s", playerName,
-						 * scriptName)); src.sendMessage(Text.of(String.
-						 * format("%s, you have no script named %s", playerName,
-						 * scriptName))); // FIXME Should be
-						 * CommandResult.success()? return
-						 * CommandResult.empty(); } } catch (Exception e) {
-						 * turtle.turtleConsole("Script failed to load!");
-						 * log.error("Script failed to load", e); // FIXME
-						 * Should be CommandResult.success()? return
-						 * CommandResult.empty(); }
-						 * 
-						 * //Execute script try { turtle.executeScript(script);
-						 * } catch (Exception e) {
-						 * turtle.turtleConsole("Script failed to execute!");
-						 * log.error("Script failed to execute", e); }
-						 * 
-						 * //add script's blocks to undo buffer try { //create
-						 * buffer if doesn't exist if
-						 * (!undoBuffers.containsKey(senderName)) {
-						 * undoBuffers.put(senderName, new
-						 * Stack<Stack<BlockRecord>>()); } //add to buffer
-						 * undoBuffers.get(senderName).push(turtle.getOldBlocks(
-						 * )); } catch (Exception e) {
-						 * turtle.turtleConsole("Failed to add to undo buffer!"
-						 * ); log.error("Faile to add to undo buffer", e); }
-						 */
 						return CommandResult.success();
 					}
 				}).build();
@@ -345,7 +280,7 @@ public class TurtlePlugin {
 		Sponge.getCommandManager().register(this, undo, "undo", "un");
 	}
 
-	private KCTScript makeFakeSquare() {
+	public static KCTScript makeFakeSquare() {
 		KCTScript script = new KCTScript("testscript");
 		// TODO flesh this out to test a number of other commands
 		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.REDSTONE_BLOCK));
@@ -413,55 +348,56 @@ public class TurtlePlugin {
 
 	/**
 	 * Load the latest version of each script from the DB for each player on
-	 * this world TODO Check how Canary handles worlds; do we have only one XML
+	 * this world 
+	 * 
+	 * TODO low priority: Check how Sponge handles worlds; do we have only one XML
 	 * file of scripts for worlds and should we include the world name or world
 	 * ID with the script?
 	 */
 	private void lookupFromDB() {
 		// FIXME translate to Sponge
-		// KCTScriptAccess data=new KCTScriptAccess();
-		// List<DataAccess> results=new LinkedList<DataAccess>();
-		// Map<String,KCTScriptAccess> mostRecentScripts=new
-		// HashMap<String,KCTScriptAccess>();
-		//
-		// try {
-		// Map<String,Object> filters=new HashMap<String,Object>();
-		// Database.get().loadAll(data, results, filters);
-		// for (DataAccess d : results) {
-		// KCTScriptAccess scriptAccess=(KCTScriptAccess)d;
-		// // Figure out the most recent script for each player-scriptname combo
-		// String key=scriptAccess.playerName+"-"+scriptAccess.scriptName;
-		// if (!mostRecentScripts.containsKey(key)) {
-		// mostRecentScripts.put(key, scriptAccess);
-		// } else {
-		// if (scriptAccess.timestamp > mostRecentScripts.get(key).timestamp) {
-		// mostRecentScripts.put(key,scriptAccess);
-		// }
-		// }
-		// log.trace(String.format("from DB: player %s has script %s at time
-		// %d%n",
-		// scriptAccess.playerName, scriptAccess.scriptName,
-		// scriptAccess.timestamp));
-		// }
-		// TurtleCompiler turtleCompiler=new TurtleCompiler();
-		// for (KCTScriptAccess scriptAccess : mostRecentScripts.values()) {
-		// try {
-		// KCTScript script=turtleCompiler.parseFromJson(scriptAccess.json);
-		// script.setLanguage(scriptAccess.language);
-		// script.setScriptName(scriptAccess.scriptName);
-		// script.setSourceCode(scriptAccess.source);
-		// script.setPlayerName(scriptAccess.playerName);
-		//
-		// scripts.putScript(scriptAccess.playerName, script);
-		// log.info(String.format("Loaded script %s for player %s",
-		// scriptAccess.scriptName, scriptAccess.playerName));
-		// } catch (TurtleException e){
-		// log.error("Internal Server error", e);
-		// }
-		// }
-		// } catch (DatabaseReadException e) {
-		// log.error("cannot read DB", e);
-		// }
+	    KCTScriptAccess data=new KCTScriptAccess();
+	    List<DataAccess> results=new LinkedList<DataAccess>();
+	    Map<String,KCTScriptAccess> mostRecentScripts=new
+	            HashMap<String,KCTScriptAccess>();
+
+	    try {
+	        Map<String,Object> filters=new HashMap<String,Object>();
+	        Database.get().loadAll(data, results, filters);
+	        for (DataAccess d : results) {
+	            KCTScriptAccess scriptAccess=(KCTScriptAccess)d;
+	            // Figure out the most recent script for each player-scriptname combo
+	            String key=scriptAccess.playerName+"-"+scriptAccess.scriptName;
+	            if (!mostRecentScripts.containsKey(key)) {
+	                mostRecentScripts.put(key, scriptAccess);
+	            } else {
+	                if (scriptAccess.timestamp > mostRecentScripts.get(key).timestamp) {
+	                    mostRecentScripts.put(key,scriptAccess);
+	                }
+	            }
+	            log.trace(String.format("from DB: player %s has script %s at time %d%n",
+	                    scriptAccess.playerName, scriptAccess.scriptName,
+	                    scriptAccess.timestamp));
+	        }
+	        TurtleCompiler turtleCompiler=new TurtleCompiler();
+	        for (KCTScriptAccess scriptAccess : mostRecentScripts.values()) {
+	            try {
+	                KCTScript script=turtleCompiler.parseFromJson(scriptAccess.json);
+	                script.setLanguage(scriptAccess.language);
+	                script.setScriptName(scriptAccess.scriptName);
+	                script.setSourceCode(scriptAccess.source);
+	                script.setPlayerName(scriptAccess.playerName);
+
+	                scripts.putScript(scriptAccess.playerName, script);
+	                log.info(String.format("Loaded script %s for player %s",
+	                        scriptAccess.scriptName, scriptAccess.playerName));
+	            } catch (TurtleException e){
+	                log.error("Internal Server error", e);
+	            }
+	        }
+	    } catch (DatabaseReadException e) {
+	        log.error("cannot read DB", e);
+	    }
 	}
 
 	// Listeners
@@ -496,27 +432,26 @@ public class TurtlePlugin {
 	 */
 	@Listener
 	public void uploadJSON(KCTUploadHook event) {
-		log.trace("Hook called!");
+		log.debug("Hook called!");
 		// add scripts to manager and db
 		Collection<KCTScript> list = event.getScripts();
 		for (KCTScript script : list) {
 			scripts.putScript(event.getPlayerName().toLowerCase(), script);
 
-			// FIXME translate to Sponge
-			// // This will create the table if it doesn't exist
-			// // and then insert data for the script into a new row
-			// KCTScriptAccess data=new KCTScriptAccess();
-			// data.json=script.toJSONString();
-			// data.source=script.getSourceCode();
-			// data.playerName=event.getPlayerName();
-			// data.scriptName=script.getScriptName();
-			// data.language=script.getLanguage();
-			// try {
-			// Database.get().insert(data);
-			// } catch (DatabaseWriteException e) {
-			// // TODO how to log the full stack trace?
-			// log.error(e.toString());
-			// }
+			// This will create the table if it doesn't exist
+			// and then insert data for the script into a new row
+			KCTScriptAccess data=new KCTScriptAccess();
+			data.json=script.toJSONString();
+			data.source=script.getSourceCode();
+			data.playerName=event.getPlayerName();
+			data.scriptName=script.getScriptName();
+			data.language=script.getLanguage();
+			try {
+			    Database.get().insert(data);
+			} catch (DatabaseWriteException e) {
+			    // TODO how to log the full stack trace?
+			    log.error(e.toString());
+			}
 		}
 	}
 }

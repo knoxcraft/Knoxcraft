@@ -41,7 +41,7 @@ public class DatabaseLoader {
                 //CanaryClassLoader ploader = new CanaryClassLoader(file.toURI().toURL(), DatabaseLoader.class.getClassLoader());
                 //String mainclass = inf.getString("main-class");
                 //String dbName = inf.getString("database-name");
-                String mainclass="com.mysql.jdbc.Driver";
+                String mainclass="com.mysql.cj.jdbc.Driver";
                 String dbName="mysql";
                 Class<?> dbClass = TurtlePlugin.class.getClassLoader().loadClass(mainclass);
 

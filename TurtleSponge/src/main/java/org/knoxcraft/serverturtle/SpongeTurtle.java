@@ -128,7 +128,7 @@ public class SpongeTurtle {
 		int y = curLoc.getY();
 		int z = curLoc.getZ();
 
-		log.info("current location: " + x + ", " + y + ", " + z);
+		log.trace("current location: " + x + ", " + y + ", " + z);
 
 		for (int i = 1; i <= distance; i++) {
 			/*
@@ -268,8 +268,8 @@ public class SpongeTurtle {
 		String commandName = c.getCommandName();
 		// execute command
 		if (commandName.equals(KCTCommand.FORWARD)) {
-			log.info("is m null? " + (m == null));
-			log.info("m argument =" + m);
+			log.trace("is m null? " + (m == null));
+			log.trace("m argument =" + m);
 			// go forward
 			int distance;
 			if (!m.containsKey(KCTCommand.DIST)) {

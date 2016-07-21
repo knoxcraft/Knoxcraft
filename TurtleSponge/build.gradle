@@ -32,6 +32,7 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'jetty-webapp', version: jettyVersion
     compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: jettyVersion
     compile group: 'org.eclipse.jetty', name: 'jetty-jmx', version: jettyVersion
+    compile group: 'org.eclipse.jetty', name: 'jetty-util', version: jettyVersion
 	compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: jettyVersion
 
     /*// These seem to be unnecessary
@@ -48,17 +49,6 @@ dependencies {
     compile group: 'org.jdom', name: 'jdom2', version: '2.0.6'
     testCompile 'junit:junit:4.8.2'
 }
-
-/*
-sourceSets {
-    main {
-        java {
-            exclude 'net/canarymod/database/**'
-            exclude 'org/knoxcraft/database/**'
-        }
-    }
-}
-*/
 
 jar {
     // TODO: read names from project

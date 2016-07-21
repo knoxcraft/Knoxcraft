@@ -25,7 +25,8 @@ import org.spongepowered.api.Sponge;
 
 public class KCTUploadServlet extends HttpServlet
 {
-    
+    // serial version ID to make Eclipse happy
+    private static final long serialVersionUID = 1L;
     private Logger logger=LoggerFactory.getLogger(TurtlePlugin.ID);
     
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -99,7 +100,13 @@ public class KCTUploadServlet extends HttpServlet
             KCTUploadHook event = new KCTUploadHook();
             event.setPlayerName(playerName);
             StringBuilder res=new StringBuilder();
+            // FIXME: hack for testing
+            KCTScript testscript=TurtlePlugin.makeFakeSquare();
+            testscript.setScriptName("testscript2");
+            event.addScript(testscript);
+            res.append(String.format("Uploading script %s with %d instructions", testscript.getScriptName(), testscript.getCommands().size()));
             
+            /*
             TurtleCompiler turtleCompiler=new TurtleCompiler();
             int success=0;
             int failure=0;
@@ -173,6 +180,9 @@ public class KCTUploadServlet extends HttpServlet
             if (failure>0) {
                 res.append(String.format("\nFailed to upload %d KnoxCraft Turtles programs\n", failure));
             }
+            */
+
+            
             //FIXME convert to Sponge
             Sponge.getEventManager().post(event);
             logger.info(String.format("Upload event triggered by %s", event.getPlayerName()));
