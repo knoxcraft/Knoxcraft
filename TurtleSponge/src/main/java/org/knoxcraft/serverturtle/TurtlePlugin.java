@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Stack;
 
+import org.knoxcraft.database.KCTScriptAccess;
 import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
 import org.knoxcraft.turtle3d.KCTBlockTypes;
@@ -38,6 +39,9 @@ import org.spongepowered.api.world.World;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
+
+import net.canarymod.database.DatabaseConfiguration;
+import net.canarymod.database.exceptions.DatabaseReadException;
 
 
 @Plugin(id = TurtlePlugin.ID,
@@ -91,7 +95,7 @@ public class TurtlePlugin {
 
         try {
             jettyServer=new JettyServer();
-            jettyServer.enable();
+            jettyServer.startup();
             
         } catch (Exception e){
             if (jettyServer!=null) {
@@ -120,16 +124,25 @@ public class TurtlePlugin {
                     public CommandResult execute(CommandSource src, CommandContext args)
                     throws CommandException
                     {
-                        if(src instanceof Player){
-                            Player player = (Player) src;
-                            Location<World> loc=player.getLocation();
-                            Vector3i pos=loc.getBlockPosition();
-                            World world=player.getWorld();
-                            int x=pos.getX();
-                            int y=pos.getY();
-                            int z=pos.getZ();
-                            world.setBlock(x, y-1, z, KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.BLUE_WOOL));
-                            
+//                        if(src instanceof Player){
+//                            Player player = (Player) src;
+//                            Location<World> loc=player.getLocation();
+//                            Vector3i pos=loc.getBlockPosition();
+//                            World world=player.getWorld();
+//                            int x=pos.getX();
+//                            int y=pos.getY();
+//                            int z=pos.getZ();
+//                            world.setBlock(x, y-1, z, KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.BLUE_WOOL));
+//                        }
+                        
+                        try {
+                            //DatabaseConfiguration dbconf=DatabaseConfiguration.getDbConfig();
+                            Map<String,KCTScriptAccess> map=KCTScriptAccess.getMostRecentScripts();
+                            for (String key : map.keySet()){
+                                log.info("key="+key);
+                            }
+                        } catch (DatabaseReadException e) {
+                            throw new CommandException(Text.of(e.toString()));
                         }
                         return CommandResult.success();
                     }

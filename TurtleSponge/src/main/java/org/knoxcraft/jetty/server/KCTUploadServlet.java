@@ -31,8 +31,8 @@ public class KCTUploadServlet extends HttpServlet
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {
-        // redirect to kctupload.jsp
-        response.sendRedirect("kctupload.jsp");
+        // redirect to kctupload.html
+        response.sendRedirect("kctupload.html");
     }
     
     private static String readFromInputStream(InputStream in) {
