@@ -1,6 +1,7 @@
 package org.knoxcraft.serverturtle;
 
 import java.util.Collection;
+import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -9,8 +10,10 @@ import java.util.Stack;
 
 import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
+import org.knoxcraft.turtle3d.KCTBlockTypes;
 import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTScript;
+import org.knoxcraft.turtle3d.KCTUndoScript;
 import org.knoxcraft.turtle3d.TurtleDirection;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -30,7 +33,6 @@ import org.spongepowered.api.event.world.ChangeWorldWeatherEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -48,7 +50,7 @@ public class TurtlePlugin {
 	@Inject
 	private Logger log;
 	private ScriptManager scripts;
-	private HashMap<String, Stack<Stack<BlockRecord>>> undoBuffers; // PlayerName->buffer
+	private HashMap<String, Stack<KCTUndoScript>> undoBuffer; // PlayerName->buffer
 	@Inject
 	private PluginContainer container;
 
@@ -59,7 +61,7 @@ public class TurtlePlugin {
 	 */
 	public TurtlePlugin() {
 		scripts = new ScriptManager();
-		undoBuffers = new HashMap<String, Stack<Stack<BlockRecord>>>();
+		undoBuffer = new HashMap<String, Stack<KCTUndoScript>>();
 	}
 
 	/**
@@ -236,8 +238,12 @@ public class TurtlePlugin {
 							log.info("pos= " + pos);
 							turtle.setWorld(w);
 							turtle.setTurtleDirection(d);
-							turtle.executeScript(script);
-
+							
+							
+							KCTUndoScript undoScript = turtle.executeScript(script);
+							if (!undoBuffer.containsKey(playerName))
+								undoBuffer.put(playerName, new Stack<KCTUndoScript>());
+							undoBuffer.get(playerName).add(undoScript);
 						}
 
 						// turtle.setLoc(src instanceof player);
@@ -309,34 +315,23 @@ public class TurtlePlugin {
 						String senderName = src.getName().toLowerCase();
 
 						// sender has not executed any scripts
-						if (!undoBuffers.containsKey(senderName)) {
+						if (!undoBuffer.containsKey(senderName)) {
 							src.sendMessage(Text.of("You have not executed any scripts to undo!"));
 						} else { // buffer exists
 							// get buffer
-							Stack<Stack<BlockRecord>> buffer = undoBuffers.get(senderName);
+							Stack<KCTUndoScript> undoUserScripts = undoBuffer.get(senderName);
 
-							if (buffer.empty()) { // buffer empty
-								src.sendMessage(Text.of("There are no more scripts to undo!"));
-
-							} else { // okay to undo last script executed
-
-								// get buffer
-								Stack<BlockRecord> blocks = buffer.pop();
-
-								// replace original blocks
-								while (!blocks.empty()) {
-									// FIXME Currently, we just use the
-									// coordinates to replace the block with
-									// air, so it won't work
-									// underwater for example.
-									BlockRecord b = blocks.pop();
-									/*
-									 * TODO: make the undo part work World world
-									 * = sender.asPlayer().getWorld();
-									 * world.setBlockAt(b.getBlock().getPosition
-									 * (), BlockType.Air);
-									 */
-									// blocks.pop().revert();
+							if (undoUserScripts == null) { // buffer empty
+								src.sendMessage(Text.of("There were no scripts invoked by the player!"));
+							} else {
+								for (int i = 0; i < numUndo; i++) {
+									try {
+										KCTUndoScript undoScript = undoUserScripts.pop();
+										undoScript.executeUndo();
+									} catch (EmptyStackException e) {
+										src.sendMessage(Text.of("There are no more scripts to undo!"));
+										break;
+									}	
 								}
 							}
 						}
@@ -351,12 +346,28 @@ public class TurtlePlugin {
 	private KCTScript makeFakeSquare() {
 		KCTScript script = new KCTScript("testscript");
 		// TODO flesh this out to test a number of other commands
-		script.addCommand(KCTCommand.forward(100000));
+
+		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.REDSTONE_BLOCK));
+		script.addCommand(KCTCommand.forward(70));
 		script.addCommand(KCTCommand.turnLeft(90));
-		script.addCommand(KCTCommand.forward(10));
-		script.addCommand(KCTCommand.Right(10));
-		script.addCommand(KCTCommand.turnRight(90));
-		script.addCommand(KCTCommand.forward(10));
+		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.turnLeft(90));
+		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.turnLeft(90));
+		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.turnLeft(90));
+		
+//		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.AIR));
+		script.addCommand(KCTCommand.up(1));
+		
+		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.POWERED_RAIL));
+		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.turnLeft(90));
+		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.turnLeft(90));
+		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.turnLeft(90));
+		script.addCommand(KCTCommand.forward(70));
 
 		return script;
 	}
@@ -365,6 +376,10 @@ public class TurtlePlugin {
 
 		double d = direction.getY() / 360 * 8;
 		int x = (int) Math.round(d);
+		
+		while (x < 0) {
+			x += 8;
+		}
 
 		if (x == 0 || x == 8) {
 			return TurtleDirection.NORTH;

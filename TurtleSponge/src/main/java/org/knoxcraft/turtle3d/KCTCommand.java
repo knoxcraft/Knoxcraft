@@ -159,7 +159,6 @@ public class KCTCommand
     	return result;
     }
     
-    
     public static KCTCommand down(int distance){
     	Map<String, Object> map = new HashMap<String, Object>();
     	map.put(DIST, distance);
@@ -167,4 +166,10 @@ public class KCTCommand
     	return result;
     }
     
+    public static KCTCommand setBlock(KCTBlockTypes blockType) {
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put(BLOCKTYPE, blockType);
+    	KCTCommand result = new KCTCommand(SETBLOCK, map);
+    	return result;
+    }
 }
