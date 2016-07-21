@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 public class DatabaseConfiguration
 {
     // TODO: subclass of properties that saves data and also produces comments
+    // Should we use something like this?
+    // https://docs.spongepowered.org/master/en/plugin/configuration/loaders.html
     private Properties cfg;
     private Logger log=LoggerFactory.getLogger(TurtlePlugin.ID);
     

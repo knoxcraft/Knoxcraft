@@ -156,6 +156,17 @@ public class JettyServer
         return scratchDir;
     }
   
+    /**
+     * Currently this fails because it cannot load FutureCallback
+     * 
+     * [org.eclipse.jetty.util.component.AbstractLifeCycle]: 
+     * FAILED org.eclipse.jetty.server.Server@71e52eb: 
+     * java.lang.NoClassDefFoundError: org/eclipse/jetty/util/FutureCallback
+     * 
+     * I fear this is also a classloader issue. Luckily this only happens at shutdown
+     * so I'm going to ignore it for now.
+     * 
+     */
     public void shutdown()
     {
         try {
