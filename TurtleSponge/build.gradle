@@ -81,3 +81,17 @@ task copyTask(type: Copy, dependsOn: 'jar', overwrite: true) {
     into forgepath
 }
 
+task clientLib(type: Jar, dependsOn: 'compileJava') {
+    baseName = 'kctjava'
+    version =  '0.2'
+    from('build/classes/main') {
+        include 'org/knoxcraft/turtle3d/Turtle3D.class'
+        include 'org/knoxcraft/turtle3d/Turtle3DBase.class'
+        include 'org/knoxcraft/turtle3d/TurtleException.class'
+        include 'org/knoxcraft/turtle3d/TurtleDirection.class'
+        include 'org/knoxcraft/turtle3d/KCTScript.class'
+        include 'org/knoxcraft/turtle3d/KCTCommand.class'
+        include 'org/knoxcraft/turtle3d/JSONUtil.class'
+        include 'org/knoxcraft/turtle3d/BlockType.class'
+    }
+}

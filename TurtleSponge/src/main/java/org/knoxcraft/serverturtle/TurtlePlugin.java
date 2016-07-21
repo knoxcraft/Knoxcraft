@@ -50,7 +50,8 @@ import net.canarymod.database.Database;
 import net.canarymod.database.exceptions.DatabaseReadException;
 import net.canarymod.database.exceptions.DatabaseWriteException;
 
-@Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft", authors = {"kakoijohn", "mrmoeee", "spacdog"})
+@Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft", 
+    authors = {"kakoijohn", "mrmoeee", "emhastings", "ppypp", "jspacco"})
 public class TurtlePlugin {
 
 	public static final String ID = "kct";
