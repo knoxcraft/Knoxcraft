@@ -66,10 +66,10 @@ public class SpongeTurtle {
 			TurtleDirectionInt += 8;
 		}
 
-		if (TurtleDirectionInt == 0 || TurtleDirectionInt == 8) {
+		if (TurtleDirectionInt == 0) {
 			return TurtleDirection.NORTH;
 
-		} else if (TurtleDirectionInt == 1) {
+		} else if (TurtleDirectionInt == 1 || TurtleDirectionInt == 8) {
 			return TurtleDirection.NORTHEAST;
 
 		} else if (TurtleDirectionInt == 2) {
@@ -120,7 +120,7 @@ public class SpongeTurtle {
 		int x = curLoc.getX();
 		int y = curLoc.getY();
 		int z = curLoc.getZ();
-
+		
 		log.info("current location: " + x + ", " + y + ", " + z);
 
 		for (int i = 1; i <= distance; i++) {
@@ -161,15 +161,6 @@ public class SpongeTurtle {
 			} else if (turtleDirection == TurtleDirection.NORTHWEST) {
 				curLoc = curLoc.add(1, 0, 1);
 				world.setBlockType(x + i, y, z + i, bt);
-
-			} else if (turtleDirection == TurtleDirection.UP) {
-				log.info("UP WAS CALLED");
-				curLoc = curLoc.add(0, 1, 0);
-				world.setBlockType(x, y + i, z, bt);
-
-			} else if (turtleDirection == TurtleDirection.DOWN) {
-				curLoc = curLoc.add(0, -1, 0);
-				world.setBlockType(x, y - i, z, bt);
 
 			} else {
 				throw new RuntimeException("TurtleDirection invalid=" + turtleDirection);
@@ -253,28 +244,6 @@ public class SpongeTurtle {
 				distance = toInt(m.get(KCTCommand.DIST));
 			}
 			move(distance, dir.turn(true, 2));
-		} else if (commandName.equals(KCTCommand.UP)) {
-			// go up
-			int distance;
-			if (!m.containsKey(KCTCommand.DIST)) {
-				distance = 1;
-			} else {
-				distance = toInt(m.get(KCTCommand.DIST));
-			}
-			move(distance, dir.UP);
-
-		} else if (commandName.equals(KCTCommand.DOWN)) {
-			// go down
-			int distance;
-			if (!m.containsKey(KCTCommand.DIST)) {
-				distance = 1;
-			} else {
-				distance = toInt(m.get(KCTCommand.DIST));
-			}
-			move(distance, dir.DOWN);
 		}
 	}
 }
-
-// add execute command for other commands!
-// PASS SCRIPT TO TURTLE AND EXECUTE IT

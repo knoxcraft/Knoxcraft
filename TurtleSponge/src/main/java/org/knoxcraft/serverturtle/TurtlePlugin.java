@@ -351,16 +351,13 @@ public class TurtlePlugin {
 	private KCTScript makeFakeSquare() {
 		KCTScript script = new KCTScript("testscript");
 		// TODO flesh this out to test a number of other commands
-//		script.addCommand(KCTCommand.forward(70));
-//		script.addCommand(KCTCommand.turnLeft(90));
-//		script.addCommand(KCTCommand.forward(10));
-//		script.addCommand(KCTCommand.Right(10));
-//		script.addCommand(KCTCommand.turnRight(90));
-//		script.addCommand(KCTCommand.forward(10));
-		script.addCommand(KCTCommand.up(5));
-//		script.addCommand(KCTCommand.backward(70));
-//		script.addCommand(KCTCommand.down(100));
-//		
+		script.addCommand(KCTCommand.forward(100000));
+		script.addCommand(KCTCommand.turnLeft(90));
+		script.addCommand(KCTCommand.forward(10));
+		script.addCommand(KCTCommand.Right(10));
+		script.addCommand(KCTCommand.turnRight(90));
+		script.addCommand(KCTCommand.forward(10));
+
 		return script;
 	}
 
