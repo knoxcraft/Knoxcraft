@@ -15,7 +15,9 @@ import org.knoxcraft.javacompiler.ByteArrayClassLoader;
 import org.knoxcraft.javacompiler.CompilationResult;
 import org.knoxcraft.javacompiler.CompilerDiagnostic;
 import org.knoxcraft.javacompiler.InMemoryJavaCompiler;
+import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
 
@@ -30,8 +32,7 @@ public class TurtleCompiler
     public static final String PYTHON="python";
     public static final String BLOCKLY="blockly";
 
-    @Inject
-    private Logger log;
+    private Logger log=LoggerFactory.getLogger(TurtlePlugin.ID);
 
     public TurtleCompiler() {
     }
@@ -205,11 +206,11 @@ public class TurtleCompiler
         // Apparently we need to add extra classpath containing the Turtle code
         // at least I think this is what does that...
         
-        Optional<PluginContainer> optPlugin=Sponge.getPluginManager().getPlugin(TURTLE_PLUGIN);
-        if (!optPlugin.isPresent()) {
-            log.error(String.format("can't find plugin %s", TURTLE_PLUGIN));
-        }
-        PluginContainer plugin=optPlugin.get();
+//        Optional<PluginContainer> optPlugin=Sponge.getPluginManager().getPlugin(TURTLE_PLUGIN);
+//        if (!optPlugin.isPresent()) {
+//            log.error(String.format("can't find plugin %s", TURTLE_PLUGIN));
+//        }
+//        PluginContainer plugin=optPlugin.get();
         // FIXME this isn't how this works in Sponge
         //String extraClasspath=new File(plugin.getPath()).toURI().toString();
         String extraClasspath=new File(".").toString();

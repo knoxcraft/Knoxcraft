@@ -61,7 +61,7 @@ public class JettyServer
      * 
      * @throws Exception
      */
-    public void enable() throws Exception
+    public void startup() throws Exception
     {
         int port=Integer.parseInt(System.getProperty("PORT", "8888"));
         Server server = new Server(port);
@@ -137,7 +137,8 @@ public class JettyServer
         server.setHandler(context);
         
         server.start();
-        server.join();
+        // for some reason this crashes the thing
+        //server.join();
     }
     
     private File getScratchDir() throws IOException
@@ -168,7 +169,7 @@ public class JettyServer
     public static void main(String[] args) throws Exception
     {
         JettyServer server=new JettyServer();
-        server.enable();
+        server.startup();
         
         System.out.println("type anything to exit");
         Scanner scan=new Scanner(System.in);

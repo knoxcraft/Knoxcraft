@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.slf4j.Logger;
-
-import com.google.inject.Inject;
+import org.slf4j.LoggerFactory;
 
 import net.canarymod.database.exceptions.DatabaseException;
 import net.canarymod.database.exceptions.DatabaseReadException;
@@ -24,8 +24,12 @@ import net.canarymod.database.xml.XmlDatabase;
 public abstract class Database {
     // FIXME: figure out the way to read configuration information in Sponge
     
-    @Inject
-    private static Logger log;
+    public static final String MYSQL="mysql";
+    public static final String XML="xml";
+    public static final String SQLITE="sqlite";
+    public static final String H2="h2";
+    
+    private static Logger log=LoggerFactory.getLogger(TurtlePlugin.ID);
     
     /**
      * The datasource type
@@ -49,15 +53,19 @@ public abstract class Database {
 
         static {
             try {
-                String dbname = Configuration.getServerConfig().getDatasourceType();
-                if ("xml".equalsIgnoreCase(dbname)) {
-                    Database.Type.registerDatabase("xml", XmlDatabase.getInstance());
+                // TODO: read from server config file
+                String dbname = MYSQL;
+                if (XML.equalsIgnoreCase(dbname)) {
+                    Database.Type.registerDatabase(XML, XmlDatabase.getInstance());
                 }
-                else if ("mysql".equalsIgnoreCase(dbname)) {
-                    Database.Type.registerDatabase("mysql", MySQLDatabase.getInstance());
+                else if (MYSQL.equalsIgnoreCase(dbname)) {
+                    Database.Type.registerDatabase(MYSQL, MySQLDatabase.getInstance());
                 }
-                else if ("sqlite".equalsIgnoreCase(dbname)) {
-                    Database.Type.registerDatabase("sqlite", SQLiteDatabase.getInstance());
+                else if (SQLITE.equalsIgnoreCase(dbname)) {
+                    Database.Type.registerDatabase(SQLITE, SQLiteDatabase.getInstance());
+                }
+                else if (H2.equalsIgnoreCase(dbname)) {
+                    Database.Type.registerDatabase(H2, SQLiteDatabase.getInstance());
                 }
             }
             catch (Exception e) {
@@ -67,12 +75,14 @@ public abstract class Database {
     }
 
     public static Database get() {
-        Database ret = Database.Type.getDatabaseFromType(Configuration.getServerConfig().getDatasourceType());
+        // TODO: read Sponge configuration properties
+        String dataSourceType=MYSQL;
+        Database ret = Database.Type.getDatabaseFromType(dataSourceType);
         if (ret != null) {
             return ret;
         }
         else {
-            log.warn("Database type " + Configuration.getServerConfig().getDatasourceType() + " is not available, falling back to XML! Fix your server.cfg");
+            log.warn("Database type " + dataSourceType + " is not available, falling back to XML! Fix your server.cfg");
             return XmlDatabase.getInstance();
         }
     }

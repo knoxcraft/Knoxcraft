@@ -41,7 +41,7 @@ public class JdbcConnectionManager {
      * @throws SQLException
      */
     private JdbcConnectionManager(SQLType type) throws SQLException {
-        DatabaseConfiguration cfg = Configuration.getDbConfig();
+        DatabaseConfiguration cfg = DatabaseConfiguration.getDbConfig();
         cpds = new ComboPooledDataSource();
         this.type = type;
         if (type.usesJDBCManager()) {
@@ -101,11 +101,13 @@ public class JdbcConnectionManager {
      * @throws DatabaseAccessException
      */
     private static JdbcConnectionManager getInstance() throws DatabaseAccessException {
+        // TODO: read configuration out of Forge/Sponge server config files
+        String dataSourceType=Database.MYSQL;
         if (instance == null) {
             try {
-                SQLType type = SQLType.forName(Configuration.getServerConfig().getDatasourceType());
+                SQLType type = SQLType.forName(dataSourceType);
                 if (type == null) {
-                    throw new DatabaseAccessException(Configuration.getServerConfig().getDatasourceType() + " is not a valid JDBC Database type or has not been registered for use.");
+                    throw new DatabaseAccessException(dataSourceType + " is not a valid JDBC Database type or has not been registered for use.");
                 }
                 instance = new JdbcConnectionManager(type);
             }
@@ -130,7 +132,8 @@ public class JdbcConnectionManager {
                         return cman.nonManaged;
                     }
                 }
-                DatabaseConfiguration cfg = Configuration.getDbConfig();
+                // TODO: read from the appropriate file, if it exists
+                DatabaseConfiguration cfg = DatabaseConfiguration.getDbConfig();
                 cman.nonManaged = DriverManager.getConnection(cfg.getDatabaseUrl(cman.type.getIdentifier()), cfg.getDatabaseUser(), cfg.getDatabasePassword());
                 return cman.nonManaged;
             }

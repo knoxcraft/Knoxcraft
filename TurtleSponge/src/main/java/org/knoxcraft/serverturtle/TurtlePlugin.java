@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Stack;
 
+import org.knoxcraft.database.KCTScriptAccess;
 import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
 import org.knoxcraft.turtle3d.KCTBlockTypes;
