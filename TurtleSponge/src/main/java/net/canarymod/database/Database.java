@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.knoxcraft.database.h2.H2Database;
 import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,8 @@ public abstract class Database {
         static {
             try {
                 // TODO: read from server config file
-                String dbname = MYSQL;
+                DatabaseConfiguration config=DatabaseConfiguration.getDbConfig();
+                String dbname = config.getDataSourceType();
                 if (XML.equalsIgnoreCase(dbname)) {
                     Database.Type.registerDatabase(XML, XmlDatabase.getInstance());
                 }
@@ -65,7 +67,7 @@ public abstract class Database {
                     Database.Type.registerDatabase(SQLITE, SQLiteDatabase.getInstance());
                 }
                 else if (H2.equalsIgnoreCase(dbname)) {
-                    Database.Type.registerDatabase(H2, SQLiteDatabase.getInstance());
+                    Database.Type.registerDatabase(H2, H2Database.getInstance());
                 }
             }
             catch (Exception e) {
@@ -76,7 +78,8 @@ public abstract class Database {
 
     public static Database get() {
         // TODO: read Sponge configuration properties
-        String dataSourceType=MYSQL;
+        DatabaseConfiguration config=DatabaseConfiguration.getDbConfig();
+        String dataSourceType=config.getDataSourceType();
         Database ret = Database.Type.getDatabaseFromType(dataSourceType);
         if (ret != null) {
             return ret;

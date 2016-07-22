@@ -579,7 +579,8 @@ public class SQLiteDatabase extends Database {
         }
     }
 
-    public ResultSet getResultSet(Connection conn, DataAccess data, Map<String, Object> filters, boolean limitOne) throws DatabaseReadException {
+    public ResultSet getResultSet(Connection conn, DataAccess data, Map<String, Object> filters, boolean limitOne) throws DatabaseReadException
+    {
         PreparedStatement ps;
         ResultSet toRet;
 

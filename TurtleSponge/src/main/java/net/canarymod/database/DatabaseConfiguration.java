@@ -137,6 +137,15 @@ public class DatabaseConfiguration
 //
 //        cfg.save();
     }
+    
+    /**
+     * Get the type of datasource being used (MySQL, SQLite, XML, or 
+     * (once we add support for it) H2.
+     * @return
+     */
+    public String getDataSourceType() {
+        return cfg.getProperty("dbtype", Database.SQLITE);
+    }
 
     /**
      * Get the URL to the database.

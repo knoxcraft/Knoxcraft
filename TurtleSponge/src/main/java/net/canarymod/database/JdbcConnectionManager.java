@@ -79,7 +79,9 @@ public class JdbcConnectionManager {
             c.close();
         }
         else {
-            nonManaged = DriverManager.getConnection(cfg.getDatabaseUrl(type.getIdentifier()), cfg.getDatabaseUser(), cfg.getDatabasePassword());
+            String url="jdbc:sqlite:db/knoxcraft.db";
+            //nonManaged = DriverManager.getConnection(cfg.getDatabaseUrl(type.getIdentifier()), cfg.getDatabaseUser(), cfg.getDatabasePassword());
+            nonManaged = DriverManager.getConnection(url);
             nonManaged.close();
         }
     }
@@ -101,8 +103,8 @@ public class JdbcConnectionManager {
      * @throws DatabaseAccessException
      */
     private static JdbcConnectionManager getInstance() throws DatabaseAccessException {
-        // TODO: read configuration out of Forge/Sponge server config files
-        String dataSourceType=Database.MYSQL;
+        DatabaseConfiguration config=DatabaseConfiguration.getDbConfig();
+        String dataSourceType=config.getDataSourceType();
         if (instance == null) {
             try {
                 SQLType type = SQLType.forName(dataSourceType);
