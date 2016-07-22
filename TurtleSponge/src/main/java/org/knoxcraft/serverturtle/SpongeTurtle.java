@@ -17,7 +17,7 @@ import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3i;
 
-public class SpongeTurtle {
+public class SpongeTurtle implements Runnable {
 
 	// @Inject
 	private Logger log;
@@ -33,16 +33,25 @@ public class SpongeTurtle {
 	private Vector3i curLoc;
 	private Vector3i startLoc;
 	// player location:originPos
-	private Vector3i playerLoc;
+	private String senderName;
 	private TurtleDirection dir;
 	private TurtleDirection startDir;
 	private World world;
 	private BlockState bt = KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.STONE);
 	
+	private KCTScript script;
+	private KCTUndoScript undoScript;
+	
 	private boolean undo = false;
 
 	public SpongeTurtle(Logger logger) {
 		this.log = logger;
+	}
+	
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	public void setLoc(Vector3i curLoc) {
@@ -58,47 +67,24 @@ public class SpongeTurtle {
 	public void setWorld(World w) {
 		this.world = w;
 	}
+	
+	public void setScript(KCTScript script) {
+		this.script = script;
+	}
+	
+	public void setSenderName(String name) {
+		this.senderName = name;
+	}
+	
+	public String getSenderName() {
+		return this.senderName;
+	}
 
 	private static int toInt(Object o) {
 		if (o instanceof Long) {
 			return (int) ((Long) o).longValue();
 		} else {
 			return (Integer) o;
-		}
-	}
-
-	private TurtleDirection TurtleDirectionInt(int TurtleDirectionInt) {
-
-		while (TurtleDirectionInt < 0) {
-			TurtleDirectionInt += 8;
-		}
-
-		if (TurtleDirectionInt == 0 || TurtleDirectionInt == 8) {
-			return TurtleDirection.NORTH;
-
-		} else if (TurtleDirectionInt == 1) {
-			return TurtleDirection.NORTHEAST;
-
-		} else if (TurtleDirectionInt == 2) {
-			return TurtleDirection.EAST;
-
-		} else if (TurtleDirectionInt == 3) {
-			return TurtleDirection.SOUTHEAST;
-
-		} else if (TurtleDirectionInt == 4) {
-			return TurtleDirection.SOUTH;
-
-		} else if (TurtleDirectionInt == 5) {
-			return TurtleDirection.SOUTHWEST;
-
-		} else if (TurtleDirectionInt == 6) {
-			return TurtleDirection.WEST;
-
-		} else if (TurtleDirectionInt == 7) {
-			return TurtleDirection.NORTHWEST;
-
-		} else {
-			throw new RuntimeException("TurtleDirectionINT invalid=" + TurtleDirectionInt);
 		}
 	}
 
@@ -128,7 +114,7 @@ public class SpongeTurtle {
 		int y = curLoc.getY();
 		int z = curLoc.getZ();
 
-		log.info("current location: " + x + ", " + y + ", " + z);
+//		log.info("current location: " + x + ", " + y + ", " + z);
 
 		for (int i = 1; i <= distance; i++) {
 			/*
@@ -246,7 +232,12 @@ public class SpongeTurtle {
 			}
 		}
 		
-		return new KCTUndoScript(script, startLoc, startDir, world, undoStack, log);
+		undoScript = new KCTUndoScript(script, startLoc, startDir, world, undoStack, log); 
+		return undoScript;
+	}
+	
+	public KCTUndoScript executeScript() {
+		return executeScript(this.script);
 	}
 	
 	public void executeUndoScript(KCTScript script, Stack<KCTWorldBlockInfo> undoStack) {
@@ -261,6 +252,10 @@ public class SpongeTurtle {
 			}
 		}
 	}
+	
+	public KCTUndoScript getUndoScript() {
+		return undoScript;
+	}
 
 	private void executeCommand(KCTCommand c, Stack<KCTWorldBlockInfo> undoStack) throws TurtleCommandException {
 		// get command info
@@ -268,8 +263,8 @@ public class SpongeTurtle {
 		String commandName = c.getCommandName();
 		// execute command
 		if (commandName.equals(KCTCommand.FORWARD)) {
-			log.info("is m null? " + (m == null));
-			log.info("m argument =" + m);
+//			log.info("is m null? " + (m == null));
+//			log.info("m argument =" + m);
 			// go forward
 			int distance;
 			if (!m.containsKey(KCTCommand.DIST)) {
