@@ -6,9 +6,9 @@
 		<title>Knoxcraft Blockly Editor</title>    
 		
 		<!--Include Blockly files-- adjust these paths as necessary-->
-		<script src="blockly_compressed.js"></script>
-		<script src="blocks_compressed.js"></script>
-		<script src="javascript_compressed.js"></script>
+		<script src="js/blockly_compressed.js"></script>
+		<script src="js/blocks_compressed.js"></script>
+		<script src="js/javascript_compressed.js"></script>
 		<script src="msg/js/en.js"></script>
 		<script src="blocks/turtle.js"></script>
 		<script src="generators/javascript/turtle.js"></script>
@@ -51,7 +51,12 @@
 		</tr>
 		<tr>
 			<td>
-			<button onclick="runCode()">View JSON for this turtle</button>  <-- This will be a submit button.
+			<button onclick="displayCode()">View JSON for this turtle</button>  <-- This will be a submit button.
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<button onclick="upload()">Upload to Knoxcraft server</button>  
 			</td>
 		</tr>
 		<tr>
@@ -158,6 +163,11 @@
 			alert(code);
 		  }
 		  
+		  function displayCode() {
+			  var code=runCode();
+			  alert(code);
+		  }
+		  
 		  function runCode() {
 			  // Generate JavaScript code and run it.
 			  window.LoopTrap = 10000;	//TODO:  Will this cause problems for us?  Can increase if necessary.
@@ -168,11 +178,53 @@
 			  var code = Blockly.JavaScript.workspaceToCode(workspace);
 			  Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
 			  try {
-				eval(code);
+				return eval(code);
 			  } catch (e) {
 				alert(e);
 			  }
 		  }
+		  
+		function upload() {
+			//console.log("trying to upload");
+			var formData = {};
+			var playerName="spacdog";
+			formData["playerName"]=playerName;			
+			
+			var jsontext=runCode();
+			formData["jsontext"]=jsontext;
+			//TODO: figure out how to get a representation of the blocks
+			// that we can use to regenerate our blocks
+			formData["sourcetext"]=jsontext;
+			
+			formData["language"]="blockly";
+			formData["client"]="web";
+
+			var xhttp=new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (xhttp.readyState == XMLHttpRequest.DONE) {
+					alert(xhttp.responseText);
+				}
+			}
+			xhttp.open("POST", "http://localhost:8888/kctupload", true);
+			// pick a boundary character
+			var boundary='Pqrfh'+Math.random().toString().substr(5);
+		  	xhttp.setRequestHeader("content-type",
+	                  'multipart/form-data; charset=utf-8; boundary=' + boundary);
+		  	// create the multipart form element
+		  	// I don't know how to make JS do this automatically without also using
+		  	// JQuery and I wnat to test this without one more dependence
+		  	var multipart="";
+		  	for(var key in formData){
+	        	multipart += "--" + boundary
+	                   + '\r\nContent-Disposition: form-data; name="' + key +'"'
+	                   //+ "\r\nContent-type: application/octet-stream"
+	                   + "\r\n\r\n" + formData[key] + "\r\n";
+	        }
+		  	multipart += "--"+boundary+"--\r\n\r\n";
+		  	//console.log(multipart);
+		  	//alert(multipart);
+		  	xhttp.send(multipart);
+		}
 		</script>		
 	</BODY>
 </html>
