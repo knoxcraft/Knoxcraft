@@ -135,7 +135,12 @@ public class JdbcConnectionManager {
                     }
                 }
                 // TODO: read from the appropriate file, if it exists
+                // Getting SQLite to work has been a huge hack
                 DatabaseConfiguration cfg = DatabaseConfiguration.getDbConfig();
+                String dataSourceType=cfg.getDataSourceType();
+                if (dataSourceType.equals(Database.SQLITE)) {
+                    cman.nonManaged=DriverManager.getConnection(cfg.getDatabaseUrl(Database.SQLITE));
+                }
                 cman.nonManaged = DriverManager.getConnection(cfg.getDatabaseUrl(cman.type.getIdentifier()), cfg.getDatabaseUser(), cfg.getDatabasePassword());
                 return cman.nonManaged;
             }

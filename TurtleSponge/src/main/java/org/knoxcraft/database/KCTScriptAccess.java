@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +16,7 @@ import net.canarymod.database.exceptions.DatabaseReadException;
 
 public class KCTScriptAccess extends DataAccess
 {
-    private Logger log=LoggerFactory.getLogger(TurtlePlugin.ID);
+    private Logger log=LoggerFactory.getLogger(KCTScriptAccess.class);
     
     // XXX should we read KCTSCRIPT_TABLE_NAME out of a configuration file?
     public static final String KCTSCRIPT_TABLE_NAME="kctscript";

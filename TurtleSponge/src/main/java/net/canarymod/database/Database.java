@@ -30,7 +30,7 @@ public abstract class Database {
     public static final String SQLITE="sqlite";
     public static final String H2="h2";
     
-    private static Logger log=LoggerFactory.getLogger(TurtlePlugin.ID);
+    private static Logger log=LoggerFactory.getLogger(Database.class);
     
     /**
      * The datasource type
@@ -54,7 +54,7 @@ public abstract class Database {
 
         static {
             try {
-                // TODO: read from server config file
+                // read from server config file
                 DatabaseConfiguration config=DatabaseConfiguration.getDbConfig();
                 String dbname = config.getDataSourceType();
                 if (XML.equalsIgnoreCase(dbname)) {

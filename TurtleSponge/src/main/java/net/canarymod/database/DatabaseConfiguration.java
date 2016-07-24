@@ -157,8 +157,15 @@ public class DatabaseConfiguration
      * @return database url
      */
     public String getDatabaseUrl(String driver) {
+        if (getDataSourceType().equals(Database.SQLITE)){
+            return "jdbc:sqlite:"+getDatabaseFile();
+        }
         int port = getDatabasePort();
         return "jdbc:" + driver + "://" + getDatabaseHost() + ((port == 0) ? "" : (":" + port)) + "/" + getDatabaseName();
+    }
+    
+    public String getDatabaseFile() {
+        return cfg.getProperty("dbfile", "db/knoxcraft.db");
     }
 
     /**
