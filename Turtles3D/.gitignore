@@ -1,0 +1,13 @@
+bin
+crash-reports
+db
+dbadapters
+docs
+lang
+logs
+plugins
+pluginlangs
+target
+worlds
+eula.txt
+usercache.json
