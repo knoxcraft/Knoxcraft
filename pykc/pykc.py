@@ -1,11 +1,15 @@
-import http.client
 import urllib
 import time
 import inspect
 import os
+import sys
+# handle Python2 and Python3
+if sys.version_info[0]==2:
+    import httplib as httpclient
+else:
+    import http.client as httpclient
 
-
-VERSION='0.1'
+VERSION='0.2'
 
 '''
 {"scriptname" : "phillipe", 
@@ -83,7 +87,7 @@ class Turtle:
 	
 
 	def upload(self, url, minecraftName):
-		conn = http.client.HTTPConnection(url)
+		conn = httpclient.HTTPConnection(url)
 		json = self.toJson()
 		source = sourceCodeOfCaller()
 		params = {'jsontext': json, 
