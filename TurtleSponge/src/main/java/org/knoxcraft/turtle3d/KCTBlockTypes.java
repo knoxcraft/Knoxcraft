@@ -376,7 +376,7 @@ public enum KCTBlockTypes {
     
     /**
      * Create a Python class that looks like an enum that we can plug 
-     * into pykc2.py or pykc3.py
+     * into pykc.py
      * 
      * @return
      */
