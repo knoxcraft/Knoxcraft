@@ -67,41 +67,6 @@ public class SpongeTurtle {
 		}
 	}
 
-	private TurtleDirection TurtleDirectionInt(int TurtleDirectionInt) {
-
-		while (TurtleDirectionInt < 0) {
-			TurtleDirectionInt += 8;
-		}
-
-		if (TurtleDirectionInt == 0 || TurtleDirectionInt == 8) {
-			return TurtleDirection.NORTH;
-
-		} else if (TurtleDirectionInt == 1) {
-			return TurtleDirection.NORTHEAST;
-
-		} else if (TurtleDirectionInt == 2) {
-			return TurtleDirection.EAST;
-
-		} else if (TurtleDirectionInt == 3) {
-			return TurtleDirection.SOUTHEAST;
-
-		} else if (TurtleDirectionInt == 4) {
-			return TurtleDirection.SOUTH;
-
-		} else if (TurtleDirectionInt == 5) {
-			return TurtleDirection.SOUTHWEST;
-
-		} else if (TurtleDirectionInt == 6) {
-			return TurtleDirection.WEST;
-
-		} else if (TurtleDirectionInt == 7) {
-			return TurtleDirection.NORTHWEST;
-
-		} else {
-			throw new RuntimeException("TurtleDirectionINT invalid=" + TurtleDirectionInt);
-		}
-	}
-
 	private void turn(boolean left, int degrees) {
 
 		// get current TurtleDirection
