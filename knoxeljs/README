@@ -1,0 +1,15 @@
+INSTALL INSTRUCTIONS:
+
+1) In the terminal, navigate to your knoxeljs directory
+2) Make sure that you have npm installed (sudo apt-get install nodejs npm)
+3) Install the script dependencies (npm install)
+4) Compile the package into a single javascript file
+  a) Make sure that you have browserify installed (sudo apt-get install browserify)
+  b) Execute the included build.sh script with elevated privileges (sudo ./build.sh)
+    i) Alternatively, run the compile command manually! (browserify gameScript.js -o bundle.js)
+
+You're all set!
+
+LAUNCH INSTRUCTIONS:
+
+Open index.html in your favorite webbrowser. Tested with Chrome and Firefox

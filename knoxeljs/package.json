@@ -1,0 +1,17 @@
+{
+  "name": "knoxel",
+  "version": "0.0.1",
+  "dependencies": {
+    "voxel-engine": "~0.20.2",
+    "voxel-highlight": "0.0.9",
+    "voxel-fly": "~0.1.0",
+    "voxel-player": "~0.1.0"
+  },
+  "description": "A browser-based Minecraftesque program which enables students to create three-dimensional voxel constructions using the included Knoxcraft API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jspacco lkasser",
+  "license": "ISC"
+}

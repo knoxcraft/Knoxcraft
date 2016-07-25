@@ -1,0 +1,11 @@
+
+{
+   "scriptname" : "Test Script",
+   "commands" : [
+       {"cmd" : "forward",
+           "args" : {"dist" : 10}},
+       {"cmd" : "left",
+           "args" : {"dist" : 10}}
+   ]
+}
+
