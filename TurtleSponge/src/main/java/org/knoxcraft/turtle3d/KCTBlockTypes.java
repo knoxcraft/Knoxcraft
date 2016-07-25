@@ -374,6 +374,12 @@ public enum KCTBlockTypes {
 	FROSTED_ICE,
 	STRUCTURE_BLOCK;
     
+    /**
+     * Create a Python class that looks like an enum that we can plug 
+     * into pykc2.py or pykc3.py
+     * 
+     * @return
+     */
     public static String makePykcEnum() {
         StringBuilder buf=new StringBuilder();
         buf.append("class BlockType:\n");
@@ -386,15 +392,18 @@ public enum KCTBlockTypes {
         }
         return buf.toString();
     }
+    /**
+     * Create a JavaScript function that creates pairings of blocks that we
+     * can plug into the generators/javascript/turtle.js to use for Blockly.
+     * 
+     * @return
+     */
     public static String makeBlocklyFunction() {
-        /*
-         * 
-    function blockOptions() {
-        var options = [];
-        //types copied from Python version (pykc.py)
-        //there are some duplicates in here (same id number, different name) that we may want to remove...
-        options.push(['air', '"AIR"']);
-         */
+//function blockOptions() {
+//    var options = [];
+//    options.push(['air', '"AIR"']);
+//    ...
+//}
         StringBuilder buf=new StringBuilder();
         buf.append("/*\n");
         buf.append("*  Set block type with drop down.\n");
