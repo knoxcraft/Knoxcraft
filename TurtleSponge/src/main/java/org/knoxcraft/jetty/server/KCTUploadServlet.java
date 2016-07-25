@@ -104,38 +104,8 @@ public class KCTUploadServlet extends HttpServlet
             TurtleCompiler turtleCompiler=new TurtleCompiler();
             int success=0;
             int failure=0;
-            if (client.equalsIgnoreCase("web") || 
-                    client.equalsIgnoreCase("testclient") ||
-                    client.startsWith("pykc"))
-            {
-                // WEB OR PYTHON UPLOAD
-                logger.trace("Upload from web");
-                // must have both Json and source, either in text area or as uploaded files
-                if (sourceText!=null && jsonText!=null) {
-                    KCTScript script=turtleCompiler.parseFromJson(jsonText);
-                    script.setLanguage(language);
-                    script.setSourceCode(sourceText);
-                    res.append(String.format("Successfully uploaded KnoxCraft Turtle program "
-                            + "named %s, in programming language %s\n", 
-                            script.getScriptName(), script.getLanguage()));
-                    success++;
-                    event.addScript(script);
-                } else if (files.containsKey("jsonfile") && files.containsKey("sourcefile")) {
-                    UploadedFile sourceUpload=files.get("sourcefile");
-                    UploadedFile jsonUpload=files.get("jsonfile");
-                    KCTScript script=turtleCompiler.parseFromJson(jsonUpload.body);
-                    script.setLanguage(language);
-                    script.setSourceCode(sourceUpload.body);
-                    res.append(String.format("Successfully uploaded KnoxCraft Turtle program "
-                            + "named %s, in programming language %s\n", 
-                            script.getScriptName(), script.getLanguage()));
-                    success++;
-                    event.addScript(script);
-                } else {
-                    throw new TurtleException("You must upload BOTH json and the corresponding source code "
-                            + " (either as files or pasted into the text areas of the web form)");
-                }
-            } else if ("bluej".equalsIgnoreCase(client)) {
+            
+            if ("bluej".equalsIgnoreCase(client)) {
                 // BLUEJ UPLOAD
                 logger.trace("Upload from bluej");
                 for (Entry<String,UploadedFile> entry : files.entrySet()) {
@@ -165,17 +135,49 @@ public class KCTUploadServlet extends HttpServlet
                     }
                 }
             } else {
-                // UNKNOWN CLIENT UPLOAD
-                // TODO Unknown client; make a best effort to handle upload
-                res.append(String.format("Unknown upload client: %s; making our best effort to handle the upload"));
-            }
-            
+                if (!client.equalsIgnoreCase("web") &&
+                    !client.equalsIgnoreCase("testclient") &&
+                    !client.startsWith("pykc"))
+                {
+                    // TODO Unknown client; make a best effort to handle upload
+                    res.append(String.format("Unknown upload client: %s; making our best effort to handle the upload"));
+                }
+                // WEB OR PYTHON OR BLOCKLY UPLOAD
+                logger.trace(String.format("Upload client %s", client));
+                // must have both Json and source, either in text area or as uploaded files
+                if (sourceText!=null && jsonText!=null) {
+                    KCTScript script=turtleCompiler.parseFromJson(jsonText);
+                    script.setLanguage(language);
+                    script.setSourceCode(sourceText);
+                    res.append(String.format("Successfully uploaded KnoxCraft Turtle program "
+                            + "named %s, in programming language %s\n", 
+                            script.getScriptName(), script.getLanguage()));
+                    success++;
+                    event.addScript(script);
+                } else if (files.containsKey("jsonfile") && files.containsKey("sourcefile")) {
+                    UploadedFile sourceUpload=files.get("sourcefile");
+                    UploadedFile jsonUpload=files.get("jsonfile");
+                    KCTScript script=turtleCompiler.parseFromJson(jsonUpload.body);
+                    script.setLanguage(language);
+                    script.setSourceCode(sourceUpload.body);
+                    res.append(String.format("Successfully uploaded KnoxCraft Turtle program "
+                            + "named %s, in programming language %s\n", 
+                            script.getScriptName(), script.getLanguage()));
+                    success++;
+                    event.addScript(script);
+                } else {
+                    throw new TurtleException("You must upload BOTH json and the corresponding source code "
+                            + " (either as files or pasted into the text areas of the web form)");
+                }
+            } 
+
             res.append(String.format("\nSuccessfully uploaded %d KnoxCraft Turtles programs\n", success));
             if (failure>0) {
                 res.append(String.format("\nFailed to upload %d KnoxCraft Turtles programs\n", failure));
             }
             
-            //FIXME convert to Sponge
+            // trigger an event for Sponge to hear
+            // for once, no problems from the classloader
             Sponge.getEventManager().post(event);
             logger.info(String.format("Upload event triggered by %s", event.getPlayerName()));
             writeResponse(response, res.toString(), client);
