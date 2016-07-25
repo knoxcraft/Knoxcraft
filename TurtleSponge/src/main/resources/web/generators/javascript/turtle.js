@@ -49,13 +49,13 @@ Blockly.JavaScript['turtle_setblockplace'] = function(block) {
 };
 
 Blockly.JavaScript['turtle_setblocktype'] = function(block) {
-  var text_type = block.getFieldValue('type');
+  var text_type = block.getFieldValue('blockType');
   var code = 'json += \'     {"cmd" : "setBlock", \\n          "args" : {"type" : ' + text_type + '}},\\n\';\n';
   return code;
 };
 
 Blockly.JavaScript['turtle_setblocktype2'] = function(block) {
-  var dropdown_type = block.getFieldValue('type');
+  var dropdown_type = block.getFieldValue('blockType');
   var code = 'json += \'     {"cmd" : "setBlock", \\n          "args" : {"type" : ' + dropdown_type + '}},\\n\';\n';
   return code;
 };
