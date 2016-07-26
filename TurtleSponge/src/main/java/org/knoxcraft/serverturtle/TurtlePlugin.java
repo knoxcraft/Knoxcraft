@@ -12,6 +12,7 @@ import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
 import org.knoxcraft.turtle3d.KCTBlockTypes;
 import org.knoxcraft.turtle3d.KCTCommand;
+import org.knoxcraft.turtle3d.KCTJobQueue;
 import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.KCTUndoScript;
 import org.knoxcraft.turtle3d.TurtleDirection;
@@ -51,6 +52,8 @@ public class TurtlePlugin {
 	private Logger log;
 	private ScriptManager scripts;
 	private HashMap<String, Stack<KCTUndoScript>> undoBuffer; // PlayerName->buffer
+	private KCTJobQueue jobQueue;
+	
 	@Inject
 	private PluginContainer container;
 
@@ -72,6 +75,8 @@ public class TurtlePlugin {
 		if (jettyServer != null) {
 			jettyServer.shutdown();
 		}
+		
+		jobQueue.shutdownExecutor();
 	}
 
 	@Listener
@@ -116,6 +121,8 @@ public class TurtlePlugin {
 
 		// set up commands
 		setupCommands();
+		
+		jobQueue = new KCTJobQueue(Sponge.getScheduler().createSyncExecutor(this), Sponge.getScheduler().createAsyncExecutor(this));
 	}
 
 	// TODO LOG STATEMENTS to show commands work, and check if arguments make
@@ -238,63 +245,11 @@ public class TurtlePlugin {
 							log.info("pos= " + pos);
 							turtle.setWorld(w);
 							turtle.setTurtleDirection(d);
+							turtle.setScript(script);
 							
-							
-							KCTUndoScript undoScript = turtle.executeScript(script);
-							if (!undoBuffer.containsKey(playerName))
-								undoBuffer.put(playerName, new Stack<KCTUndoScript>());
-							undoBuffer.get(playerName).add(undoScript);
+							jobQueue.add(turtle);
 						}
 
-						// turtle.setLoc(src instanceof player);
-
-						// TODO: follow commented out code to create a turtle
-						// and
-						// test it
-
-						/*
-						 * //Create turtle
-						 * 
-						 * Turtle turtle = new Turtle(); //sender from canary
-						 * change to work with src!!!!!!!!!!!!!!!
-						 * turtle.turtleInit(sender);
-						 * 
-						 * //Get script from map KCTScript script = null; try {
-						 * log.trace(String.format("%s is looking for %s",
-						 * playerName, scriptName)); for (String p :
-						 * scripts.getAllScripts().keySet()) {
-						 * log.trace("Player name: "+p); for (String s :
-						 * scripts.getAllScriptsForPlayer(p).keySet()) {
-						 * log.trace(String.
-						 * format("Player name %s has script named %s", p, s));
-						 * } } script = scripts.getScript(playerName,
-						 * scriptName); if (script==null) { log.warn(String.
-						 * format("player %s cannot find script %s", playerName,
-						 * scriptName)); src.sendMessage(Text.of(String.
-						 * format("%s, you have no script named %s", playerName,
-						 * scriptName))); // FIXME Should be
-						 * CommandResult.success()? return
-						 * CommandResult.empty(); } } catch (Exception e) {
-						 * turtle.turtleConsole("Script failed to load!");
-						 * log.error("Script failed to load", e); // FIXME
-						 * Should be CommandResult.success()? return
-						 * CommandResult.empty(); }
-						 * 
-						 * //Execute script try { turtle.executeScript(script);
-						 * } catch (Exception e) {
-						 * turtle.turtleConsole("Script failed to execute!");
-						 * log.error("Script failed to execute", e); }
-						 * 
-						 * //add script's blocks to undo buffer try { //create
-						 * buffer if doesn't exist if
-						 * (!undoBuffers.containsKey(senderName)) {
-						 * undoBuffers.put(senderName, new
-						 * Stack<Stack<BlockRecord>>()); } //add to buffer
-						 * undoBuffers.get(senderName).push(turtle.getOldBlocks(
-						 * )); } catch (Exception e) {
-						 * turtle.turtleConsole("Failed to add to undo buffer!"
-						 * ); log.error("Faile to add to undo buffer", e); }
-						 */
 						return CommandResult.success();
 					}
 				}).build();
@@ -368,6 +323,35 @@ public class TurtlePlugin {
 		script.addCommand(KCTCommand.forward(70));
 		script.addCommand(KCTCommand.turnLeft(90));
 		script.addCommand(KCTCommand.forward(70));
+		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.BLUE_WOOL));
+		
+		for (int i = 0; i < 125; i++) {
+			for (int j = 0; j < 25; j++) {
+				script.addCommand(KCTCommand.forward(50));
+				script.addCommand(KCTCommand.turnLeft(90));
+				script.addCommand(KCTCommand.forward(1));
+				script.addCommand(KCTCommand.turnLeft(90));
+				script.addCommand(KCTCommand.forward(50));
+				script.addCommand(KCTCommand.turnRight(90));
+				script.addCommand(KCTCommand.forward(1));
+				script.addCommand(KCTCommand.turnRight(90));
+			}
+
+			script.addCommand(KCTCommand.up(1));
+
+			for (int j = 0; j < 25; j++) {
+				script.addCommand(KCTCommand.forward(50));
+				script.addCommand(KCTCommand.turnRight(90));
+				script.addCommand(KCTCommand.forward(1));
+				script.addCommand(KCTCommand.turnRight(90));
+				script.addCommand(KCTCommand.forward(50));
+				script.addCommand(KCTCommand.turnLeft(90));
+				script.addCommand(KCTCommand.forward(1));
+				script.addCommand(KCTCommand.turnLeft(90));
+			}
+			
+			script.addCommand(KCTCommand.up(1));
+		}
 
 		return script;
 	}
