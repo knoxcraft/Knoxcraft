@@ -3,6 +3,10 @@ package org.knoxcraft.turtle3d;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.CodeSource;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
@@ -15,11 +19,11 @@ import org.knoxcraft.javacompiler.ByteArrayClassLoader;
 import org.knoxcraft.javacompiler.CompilationResult;
 import org.knoxcraft.javacompiler.CompilerDiagnostic;
 import org.knoxcraft.javacompiler.InMemoryJavaCompiler;
+import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
-
-import com.google.inject.Inject;
 
 public class TurtleCompiler
 {
@@ -30,8 +34,7 @@ public class TurtleCompiler
     public static final String PYTHON="python";
     public static final String BLOCKLY="blockly";
 
-    @Inject
-    private Logger log;
+    private Logger log=LoggerFactory.getLogger(TurtlePlugin.ID);
 
     public TurtleCompiler() {
     }
@@ -79,7 +82,7 @@ public class TurtleCompiler
      * @throws TurtleException If there are any errors in the json
      */
     public KCTScript parseFromJson(String jsonText)
-            throws TurtleException
+    throws TurtleException
     {
         JSONParser parser=new JSONParser();
         
@@ -205,17 +208,19 @@ public class TurtleCompiler
         // Apparently we need to add extra classpath containing the Turtle code
         // at least I think this is what does that...
         
-        Optional<PluginContainer> optPlugin=Sponge.getPluginManager().getPlugin(TURTLE_PLUGIN);
-        if (!optPlugin.isPresent()) {
-            log.error(String.format("can't find plugin %s", TURTLE_PLUGIN));
+        // Figure out the jarfile that loaded this code
+        // TODO can Forge load mods that are NOT jarfiles?
+        CodeSource src = TurtlePlugin.class.getProtectionDomain().getCodeSource();
+        if (src == null) {
+            throw new TurtleException("Cannot find jar file of the Knoxcraft Turtles plugin to add to the classpath");
         }
-        PluginContainer plugin=optPlugin.get();
-        // FIXME this isn't how this works in Sponge
-        //String extraClasspath=new File(plugin.getPath()).toURI().toString();
-        String extraClasspath=new File(".").toString();
-        log.debug(String.format("Extra classpath: %s", extraClasspath));
+        URL jar = src.getLocation();
+        String extraClasspath=jar.toString().replaceAll(".*file:", "").replaceAll("!.*", "");
+        
+        log.info(String.format("Adding Sponge jarfile to classpath of in-memory compiler: %s", extraClasspath));
         compiler.setExtraClasspath(extraClasspath);
         compiler.addSourceFile(className, source);
+        log.trace("source file:\n"+source);
         //String driverName="Driver"+System.currentTimeMillis();
         String driverName="Driver";
         String driver=String.format(
@@ -224,15 +229,15 @@ public class TurtleCompiler
                         + "  public static void runMain() {\n"
                         + "    %s.main(new String[] {});\n"
                         + "  }\n"
-                        + "}\n", TURTLE3D_BASE, className);
-        log.debug("About to compile: \n"+driver);
+                        + "}\n", TURTLE3D_MAIN, className);
+        log.trace("About to compile: \n"+driver);
         compiler.addSourceFile(driverName, driver);
         boolean compileSuccess=compiler.compile();
         if (!compileSuccess) {
             CompilationResult c=compiler.getCompileResult();
             StringBuilder s=new StringBuilder();
             for (CompilerDiagnostic d : c.getCompilerDiagnosticList()) {
-                s.append(String.format("%s at or around line %d", d.getMessage(), d.getStartLine()));
+                s.append(String.format("%s at or around line %d\n", d.getMessage(), d.getStartLine()));
                 break;
             }
             throw new TurtleCompilerException("Unable to compile: "+s.toString());

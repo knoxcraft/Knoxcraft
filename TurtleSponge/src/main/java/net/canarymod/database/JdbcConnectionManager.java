@@ -6,8 +6,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import net.canarymod.database.exceptions.DatabaseAccessException;
@@ -23,8 +23,8 @@ import net.canarymod.database.exceptions.DatabaseAccessException;
  * @author Jason Jones (darkdiplomat)
  */
 public class JdbcConnectionManager {
-    @Inject
-    private static Logger log;
+    
+    private static Logger log=LoggerFactory.getLogger(JdbcConnectionManager.class);
     
     private ComboPooledDataSource cpds; // The data source pool ;)
     private Connection nonManaged; // For those that bypass the manager/unable to use the manager
@@ -41,7 +41,7 @@ public class JdbcConnectionManager {
      * @throws SQLException
      */
     private JdbcConnectionManager(SQLType type) throws SQLException {
-        DatabaseConfiguration cfg = Configuration.getDbConfig();
+        DatabaseConfiguration cfg = DatabaseConfiguration.getDbConfig();
         cpds = new ComboPooledDataSource();
         this.type = type;
         if (type.usesJDBCManager()) {
@@ -79,7 +79,9 @@ public class JdbcConnectionManager {
             c.close();
         }
         else {
-            nonManaged = DriverManager.getConnection(cfg.getDatabaseUrl(type.getIdentifier()), cfg.getDatabaseUser(), cfg.getDatabasePassword());
+            String url="jdbc:sqlite:db/knoxcraft.db";
+            //nonManaged = DriverManager.getConnection(cfg.getDatabaseUrl(type.getIdentifier()), cfg.getDatabaseUser(), cfg.getDatabasePassword());
+            nonManaged = DriverManager.getConnection(url);
             nonManaged.close();
         }
     }
@@ -101,11 +103,13 @@ public class JdbcConnectionManager {
      * @throws DatabaseAccessException
      */
     private static JdbcConnectionManager getInstance() throws DatabaseAccessException {
+        DatabaseConfiguration config=DatabaseConfiguration.getDbConfig();
+        String dataSourceType=config.getDataSourceType();
         if (instance == null) {
             try {
-                SQLType type = SQLType.forName(Configuration.getServerConfig().getDatasourceType());
+                SQLType type = SQLType.forName(dataSourceType);
                 if (type == null) {
-                    throw new DatabaseAccessException(Configuration.getServerConfig().getDatasourceType() + " is not a valid JDBC Database type or has not been registered for use.");
+                    throw new DatabaseAccessException(dataSourceType + " is not a valid JDBC Database type or has not been registered for use.");
                 }
                 instance = new JdbcConnectionManager(type);
             }
@@ -130,7 +134,13 @@ public class JdbcConnectionManager {
                         return cman.nonManaged;
                     }
                 }
-                DatabaseConfiguration cfg = Configuration.getDbConfig();
+                // TODO: read from the appropriate file, if it exists
+                // Getting SQLite to work has been a huge hack
+                DatabaseConfiguration cfg = DatabaseConfiguration.getDbConfig();
+                String dataSourceType=cfg.getDataSourceType();
+                if (dataSourceType.equals(Database.SQLITE)) {
+                    cman.nonManaged=DriverManager.getConnection(cfg.getDatabaseUrl(Database.SQLITE));
+                }
                 cman.nonManaged = DriverManager.getConnection(cfg.getDatabaseUrl(cman.type.getIdentifier()), cfg.getDatabaseUser(), cfg.getDatabasePassword());
                 return cman.nonManaged;
             }

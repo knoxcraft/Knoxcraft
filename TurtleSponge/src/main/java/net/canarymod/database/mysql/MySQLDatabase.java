@@ -49,7 +49,7 @@ public class MySQLDatabase extends Database {
 
     public static MySQLDatabase getInstance() {
         if (instance == null) {
-            SQLType.registerSQLDriver("mysql", "com.mysql.jdbc.Driver");
+            SQLType.registerSQLDriver("mysql", "com.mysql.cj.jdbc.Driver");
             instance = new MySQLDatabase();
         }
         return instance;

@@ -1,0 +1,110 @@
+<html>
+<head><title> Testing the editor </title>
+<script type="text/javascript" src="https://www.javapoly.com/javapoly.js"></script>
+  <script type="text/java">
+  // How the heck does this work? Can we off-load this to another file?
+  // Can this be simplified?
+  package com.javapoly.demo;
+
+  import java.util.Arrays;
+  import java.lang.reflect.InvocationTargetException;
+  import java.net.URL;
+  import java.net.URLClassLoader;
+  import java.nio.file.Path;
+  import java.nio.file.FileSystems;
+  import java.io.File;
+  import java.io.IOException;
+
+  import javax.tools.JavaCompiler;
+  import javax.tools.ToolProvider;
+
+  public class HomepageDemo {
+
+    public static void compileAndRun(String scriptText) throws ClassNotFoundException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+      final String className = "HelloWorld";
+      final String pkgName = "";
+      final String storageDir = ".";
+      final Path storageDirPath = FileSystems.getDefault().getPath(storageDir);
+      final String pkgDir = pkgName.replace(".", "/");
+      final Path pkgDirPath = storageDirPath.resolve(pkgDir);
+      final Path filePath = pkgDirPath.resolve(className + ".java");
+
+      try {
+        // Files.createDirectories(pkgDirPath);
+        pkgDirPath.toFile().mkdirs();
+        writeToFile(filePath, scriptText);
+
+        final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        final String[] compileData = {"-d", storageDir, filePath.toAbsolutePath().toString()};
+        System.out.println("Compiling: " + Arrays.toString(compileData));
+
+        int result = compiler.run(null, null, null, compileData);
+        if (result == 0) {
+          System.out.println("Normal compilation.");
+
+          URLClassLoader loader = new URLClassLoader(new URL[]{new File(storageDir).toURI().toURL()});
+          Class<?> cls = loader.loadClass("HelloWorld");
+          loader.close();
+          cls.getMethod("main", String[].class).invoke(null, (Object)new String[]{});
+        } else {
+          System.out.println("Compilation failed.");
+        }
+      } catch (final IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    private static void writeToFile(final Path path, final String data) throws IOException{
+      try(final java.io.FileWriter fileWriter = new java.io.FileWriter(path.toFile())) {
+        fileWriter.write(data);
+      }
+    }
+  }
+  </script>
+
+
+  <style type="text/css" media="screen">
+    #editor {
+        min-width: 50%;
+        max-width: 50%;
+        min-height: 33%;
+/*
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+*/
+    }
+  </style>
+</head>
+<body>
+
+<div id="editor">import com.javapoly.dom.Window;
+
+public class HelloWorld {
+  public static void main(String[] args) {
+    Window.alert("Hello World, from Java!");
+  }
+}
+</div>
+
+<script src="ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode("ace/mode/java");
+    //editor.style.fontSize='12px';
+    document.getElementById('editor').style.fontSize='12px';
+</script>
+<div>
+<h1>
+Hello world!
+</h1>
+</div>
+  <div>
+    <button onclick="JavaPoly.type('com.javapoly.demo.HomepageDemo').then(function(HomepageDemo){HomepageDemo.compileAndRun(editor.getValue());});">Compile &amp; Run!
+    </button>
+  </div>
+</body>
+</html>

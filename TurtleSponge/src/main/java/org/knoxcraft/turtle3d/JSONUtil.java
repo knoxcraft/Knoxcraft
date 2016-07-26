@@ -32,10 +32,11 @@ public class JSONUtil
         if (o instanceof Boolean) {
             return o.toString();
         }
-        if (o instanceof BlockType) {
-            return o.toString();
+        if (o instanceof KCTBlockTypes) {
+            return quoteString(o.toString());
         }
         if (o instanceof Direction) {
+            // FIXME replace with our own TurtleDirection, and test
             return o.toString();
         }
         throw new IllegalArgumentException(String.format("Unknown type: %s is of type %s, should be Integer or String", 

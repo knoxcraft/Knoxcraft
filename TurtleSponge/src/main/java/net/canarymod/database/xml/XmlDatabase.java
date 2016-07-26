@@ -24,6 +24,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -45,8 +46,8 @@ import net.canarymod.database.exceptions.DatabaseWriteException;
  * @author Chris (damagefilter)
  */
 public class XmlDatabase extends Database {
-    @Inject
-    private Logger log;
+
+    private Logger log=LoggerFactory.getLogger(XmlDatabase.class);
 
     private XmlDatabase() {
         File path = new File("db/");

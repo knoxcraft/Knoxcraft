@@ -8,13 +8,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
 public class DownloadAllSubmissions extends HttpServlet
 {
-    @Inject
-    private Logger logger;
+    private static final long serialVersionUID = 1L;
+    private Logger logger=LoggerFactory.getLogger(DownloadAllSubmissions.class);
     
     public DownloadAllSubmissions() {
     }

@@ -1,0 +1,28 @@
+KNOXELJS INSTALL INSTRUCTIONS:
+
+1) In the terminal, navigate to your knoxeljs directory
+2) Make sure that you have npm installed (sudo apt-get install nodejs npm)
+3) Install the script dependencies (npm install)
+4) Compile the package into a single javascript file
+  a) Make sure that you have browserify installed (sudo apt-get install browserify)
+  b) Execute the included build.sh script with elevated privileges (sudo ./build.sh)
+    i) Alternatively, run the compile command manually! (browserify gameScript.js -o bundle.js)
+
+You're all set!
+
+LAUNCH INSTRUCTIONS:
+
+Open index.html in your favorite webbrowser. Tested with Chrome and Firefox
+
+ACE EDITOR INSTRUCTIONS:
+
+1) run "bash install-ace.sh" to install the Ace editor; this uses SVN
+to download a pre-built version of Ace from github (github doesn't
+allow downloads of partial repos).
+2) If you don't have SVN, use git to download this pre-build version of
+Ace:
+https://github.com/ajaxorg/ace-builds/tree/master/src-min-noconflict. It
+should go into the ace-editor folder.
+
+Now open knoxeleditor.html in your favorite browser and you are ready
+to go!

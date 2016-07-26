@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
-
-import com.google.inject.Inject;
+import org.slf4j.LoggerFactory;
 
 import net.canarymod.database.Column;
 import net.canarymod.database.Column.DataType;
@@ -17,8 +16,7 @@ import net.canarymod.database.exceptions.DatabaseReadException;
 
 public class KCTScriptAccess extends DataAccess
 {
-    @Inject
-    private Logger log;
+    private Logger log=LoggerFactory.getLogger(KCTScriptAccess.class);
     
     // XXX should we read KCTSCRIPT_TABLE_NAME out of a configuration file?
     public static final String KCTSCRIPT_TABLE_NAME="kctscript";

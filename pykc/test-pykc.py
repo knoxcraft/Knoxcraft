@@ -2,8 +2,8 @@ from pykc import Turtle, BlockType as bt
 
 t = Turtle('francois')
 
-t.setBlock(bt.BlueWool)
-size=6
+t.setBlock(bt.red_wool)
+size=1
 for j in range(size):
 	for i in range(size):
 		t.blockPlace(True)
