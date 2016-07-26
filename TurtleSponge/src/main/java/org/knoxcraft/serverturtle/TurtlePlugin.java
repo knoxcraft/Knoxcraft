@@ -15,6 +15,7 @@ import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
 import org.knoxcraft.turtle3d.KCTBlockTypes;
 import org.knoxcraft.turtle3d.KCTCommand;
+import org.knoxcraft.turtle3d.KCTJobQueue;
 import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.KCTUndoScript;
 import org.knoxcraft.turtle3d.TurtleCompiler;
@@ -63,6 +64,8 @@ public class TurtlePlugin {
 	private Logger log;
 	private ScriptManager scripts;
 	private HashMap<String, Stack<KCTUndoScript>> undoBuffer; // PlayerName->buffer
+	private KCTJobQueue jobQueue;
+	
 	@Inject
 	private PluginContainer container;
 
@@ -84,6 +87,8 @@ public class TurtlePlugin {
 		if (jettyServer != null) {
 			jettyServer.shutdown();
 		}
+		
+		jobQueue.shutdownExecutor();
 	}
 
 	@Listener
@@ -109,6 +114,8 @@ public class TurtlePlugin {
 
 		// set up commands
 		setupCommands();
+		
+		jobQueue = new KCTJobQueue(Sponge.getScheduler().createSyncExecutor(this), Sponge.getScheduler().createAsyncExecutor(this));
 	}
 
 	private void setupCommands() {
@@ -226,12 +233,9 @@ public class TurtlePlugin {
 							log.info("pos= " + pos);
 							turtle.setWorld(w);
 							turtle.setTurtleDirection(d);
+							turtle.setScript(script);
 							
-							
-							KCTUndoScript undoScript = turtle.executeScript(script);
-							if (!undoBuffer.containsKey(playerName))
-								undoBuffer.put(playerName, new Stack<KCTUndoScript>());
-							undoBuffer.get(playerName).add(undoScript);
+							jobQueue.add(turtle);
 						}
 						return CommandResult.success();
 					}
@@ -284,28 +288,36 @@ public class TurtlePlugin {
 	public static KCTScript makeFakeSquare() {
 		KCTScript script = new KCTScript("testscript");
 		// TODO flesh this out to test a number of other commands
-		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.REDSTONE_BLOCK));
-		script.addCommand(KCTCommand.forward(70));
-		script.addCommand(KCTCommand.turnLeft(90));
-		script.addCommand(KCTCommand.forward(70));
-		script.addCommand(KCTCommand.turnLeft(90));
-		script.addCommand(KCTCommand.forward(70));
-		script.addCommand(KCTCommand.turnLeft(90));
-		script.addCommand(KCTCommand.forward(70));
-		script.addCommand(KCTCommand.turnLeft(90));
+		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.BLUE_WOOL));
 		
-//		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.AIR));
-		script.addCommand(KCTCommand.up(1));
-		
-		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.POWERED_RAIL));
-		script.addCommand(KCTCommand.forward(70));
-		script.addCommand(KCTCommand.turnLeft(90));
-		script.addCommand(KCTCommand.forward(70));
-		script.addCommand(KCTCommand.turnLeft(90));
-		script.addCommand(KCTCommand.forward(70));
-		script.addCommand(KCTCommand.turnLeft(90));
-		script.addCommand(KCTCommand.forward(70));
-//		
+		for (int i = 0; i < 125; i++) {
+			for (int j = 0; j < 25; j++) {
+				script.addCommand(KCTCommand.forward(50));
+				script.addCommand(KCTCommand.turnLeft(90));
+				script.addCommand(KCTCommand.forward(1));
+				script.addCommand(KCTCommand.turnLeft(90));
+				script.addCommand(KCTCommand.forward(50));
+				script.addCommand(KCTCommand.turnRight(90));
+				script.addCommand(KCTCommand.forward(1));
+				script.addCommand(KCTCommand.turnRight(90));
+			}
+
+			script.addCommand(KCTCommand.up(1));
+
+			for (int j = 0; j < 25; j++) {
+				script.addCommand(KCTCommand.forward(50));
+				script.addCommand(KCTCommand.turnRight(90));
+				script.addCommand(KCTCommand.forward(1));
+				script.addCommand(KCTCommand.turnRight(90));
+				script.addCommand(KCTCommand.forward(50));
+				script.addCommand(KCTCommand.turnLeft(90));
+				script.addCommand(KCTCommand.forward(1));
+				script.addCommand(KCTCommand.turnLeft(90));
+			}
+			
+			script.addCommand(KCTCommand.up(1));
+		}
+
 		return script;
 	}
 
