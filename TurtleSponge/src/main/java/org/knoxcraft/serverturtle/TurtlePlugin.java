@@ -122,7 +122,7 @@ public class TurtlePlugin {
 		// set up commands
 		setupCommands();
 		
-		jobQueue = new KCTJobQueue(Sponge.getScheduler().createAsyncExecutor(this));
+		jobQueue = new KCTJobQueue(Sponge.getScheduler().createSyncExecutor(this), Sponge.getScheduler().createAsyncExecutor(this));
 	}
 
 	// TODO LOG STATEMENTS to show commands work, and check if arguments make
@@ -303,7 +303,7 @@ public class TurtlePlugin {
 		// TODO flesh this out to test a number of other commands
 		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.BLUE_WOOL));
 		
-		for (int i = 0; i < 200; i++) {
+		for (int i = 0; i < 125; i++) {
 			for (int j = 0; j < 25; j++) {
 				script.addCommand(KCTCommand.forward(50));
 				script.addCommand(KCTCommand.turnLeft(90));

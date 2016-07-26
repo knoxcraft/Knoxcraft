@@ -6,46 +6,44 @@ import java.util.Queue;
 import java.util.Stack;
 
 import org.knoxcraft.serverturtle.SpongeTurtle;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
-import org.spongepowered.api.scheduler.Task;
 
 public class KCTJobQueue {
 	private Queue<SpongeTurtle> queue;
 	private HashMap<String, Stack<KCTUndoScript>> undoBuffer; // PlayerName->buffer
 	
-	SpongeExecutorService minecraftExecutor;
+	private SpongeExecutorService minecraftSyncExecutor;
+	private SpongeExecutorService minecraftAsyncExecutor;
 	
-	public KCTJobQueue(SpongeExecutorService minecraftExecutor) {
+	public KCTJobQueue(SpongeExecutorService minecraftSyncExecutor, SpongeExecutorService minecraftAsyncExecutor) {
 		queue = new LinkedList<SpongeTurtle>();
-		this.minecraftExecutor = minecraftExecutor;
+		this.minecraftSyncExecutor = minecraftSyncExecutor;
+		this.minecraftAsyncExecutor = minecraftAsyncExecutor;
 	}
 	
 	public void add(SpongeTurtle job) {
 		queue.add(job);
-		this.executeQueuedJobs();
+		spongeExecuteQueuedJobs();
 	}
 	
-	private void executeQueuedJobs() {
+	private void spongeExecuteQueuedJobs() {
 		while (!queue.isEmpty()) {
 			SpongeTurtle job = queue.poll();
 			
-			minecraftExecutor.submit(
-			    new Runnable() {
-			    	public void run() {
-				    	job.executeScript();
-				    	if (!undoBuffer.containsKey(job.getSenderName()))
-							undoBuffer.put(job.getSenderName(), new Stack<KCTUndoScript>());
-						undoBuffer.get(job.getSenderName()).add(job.getUndoScript());
-			    	}
-			    }
-			);
-			
+            minecraftAsyncExecutor.execute(new Runnable() {
+                public void run() {
+                    job.executeScript(minecraftSyncExecutor);
+                    if (!undoBuffer.containsKey(job.getSenderName()))
+                        undoBuffer.put(job.getSenderName(), new Stack<KCTUndoScript>());
+                    undoBuffer.get(job.getSenderName()).add(job.getUndoScript());
+                }
+            });
+            
 		}
 	}
 	
 	public void shutdownExecutor() {
-		minecraftExecutor.shutdown();
+		minecraftSyncExecutor.shutdown();
+		minecraftAsyncExecutor.shutdown();
 	}
 }
