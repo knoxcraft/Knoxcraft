@@ -5,21 +5,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 import javax.servlet.MultipartConfigElement;
 
-import org.apache.tomcat.InstanceManager;
-import org.apache.tomcat.SimpleInstanceManager;
-import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
-import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
-import org.eclipse.jetty.jsp.JettyJspServlet;
-import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -27,138 +17,128 @@ import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
-
 public class JettyServer
 {
     private Server server;
-    private final Logger logger = LoggerFactory.getLogger(TurtlePlugin.ID);
+    private Logger logger=LoggerFactory.getLogger(TurtlePlugin.ID);
 
     public JettyServer() {
     }
     
-    private static int MB=1024*1024;
+    private static final int MB=1024*1024;
     
-    public void enable() throws Exception
+    /**
+     * Enable the Jetty server.
+     * 
+     * TODO: This does not properly configure jsp or tlds/taglibs.
+     * 
+     * This is a Jetty classloading issue. Nothing in org.apache.jasper.*
+     * can be loaded by a Sponge plugin classloader.
+     * 
+     * It works in a separate class or when run with the jetty-runner.
+     * 
+     * I have tried many, many different ways of starting up the Jetty server,
+     * but since the Jasper classes cannot be loaded from TurtlePlugin's
+     * onServerStart() listener, it is unlikely to matter. So I've replaced
+     * the jsps with servlets, which do work.
+     * 
+     * There is a apache-tomcat branch where I started trying to change
+     * the dependencies to Tomcat to see if that worked, but I didn't finish,
+     * so I don't know if it works.
+     * 
+     * There is also a fix-jetty-jsp branch where I'm going to try to put
+     * the jarfile containing org.apache.jasper.* into web/WEB-INF, since this
+     * is where it's supposed to be in a regular webapp, and J2EE has some
+     * requirements about what classloaders are allowed to load jsps.
+     * 
+     * It's not clear why 
+     * I would be able to load classes from here, because I can't load
+     * anything in org.apache.jasper.* to begin with using Sponge's classloader.
+     * Maybe Jetty's Server class or WebContext class will know how to create
+     * a special classloader than can load things in org.apache.jasper.*? I have
+     * no idea.
+     * 
+     * 
+     * @throws Exception
+     */
+    public void startup() throws Exception
     {
         int port=Integer.parseInt(System.getProperty("PORT", "8888"));
-        server = new Server();
+        server = new Server(port);
         
-        ServerConnector connector = new ServerConnector(server);
-        connector.setPort(port);
-        server.addConnector(connector);
+        // base URI
         URI baseUri = this.getClass().getResource("/web").toURI();
         
-        WebAppContext webAppContext = getWebAppContext(baseUri, getScratchDir());
+        //ServerConnector connector = new ServerConnector(server);
+        //server.addConnector(connector);
         
-        server.setHandler(webAppContext);
-       
-        // Set JSP to use Standard JavaC always
         System.setProperty("org.apache.jasper.compiler.disablejsr199","false");
-
-        /*
-
-        // context path
-        wcon.setContextPath("/");
-        wcon.setDescriptor("web/WEB-INF/web.xml");
-        wcon.setResourceBase(webappUrl);
-        wcon.setParentLoaderPriority(true);
         
-        // set non-default classloader (needed for jsps)
-        ClassLoader jspClassLoader = new URLClassLoader(new URL[0], this.getClass().getClassLoader());
-        wcon.setClassLoader(jspClassLoader);
-        
-        // This webapp will use jsps and jstl. We need to enable the
-        // AnnotationConfiguration in order to correctly
-        // set up the jsp container
-        // from: http://www.eclipse.org/jetty/documentation/9.4.x/embedded-examples.html#embedded-webapp-jsp
-        Configuration.ClassList classlist = Configuration.ClassList.setServerDefault( server );
-        classlist.addBefore(
-                "org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
-                "org.eclipse.jetty.annotations.AnnotationConfiguration" );
-         */
-        
-        // Set the ContainerIncludeJarPattern so that jetty examines these
-        // container-path jars for tlds, web-fragments etc.
-        // If you omit the jar that contains the jstl .tlds, the jsp engine will
-        // scan for them instead.
-        // from: http://www.eclipse.org/jetty/documentation/9.4.x/embedded-examples.html#embedded-webapp-jsp
-//        wcon.setAttribute(
-//                "org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
-//                ".*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/[^/]*taglibs.*\\.jar$" );
-//        
-        // crashes with java.lang.NoClassDefFoundError: org/eclipse/jetty/apache/jsp/JettyJasperInitializer
-        // wcon.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
-        
-        // configure the upload servlet for multipart
-        // this has to be done in code rather than web.xml or an annotation
-        // so that we can use java.io.tmpdir to support multiple OSes
-
-        
-        //TODO: is this necessary?
-        // set default servlet (needed for jsps)
-//        ServletHolder holderDefault = new ServletHolder("default",DefaultServlet.class);
-//        holderDefault.setInitParameter("resourceBase", webappUrl);
-//        holderDefault.setInitParameter("dirAllowed","true");
-//        webAppContext.addServlet(holderDefault,"/");
-
-
-        server.start();
-    }
-    
-    private WebAppContext getWebAppContext(URI baseUri, File scratchDir)
-    {
+        // default context and classloader
         WebAppContext context = new WebAppContext();
-        context.setContextPath("/");
-        context.setDescriptor("web/WEB-INF/web.xml");
-        context.setAttribute("javax.servlet.context.tempdir", scratchDir);
-        context.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
-          ".*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/.*taglibs.*\\.jar$");
+        context.setParentLoaderPriority(true);
         context.setResourceBase(baseUri.toASCIIString());
-        context.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
+        //context.setExtraClasspath(baseUri.toASCIIString());
+        context.setTempDirectory(getScratchDir());
+        context.setContextPath("/");
+        context.setClassLoader(new URLClassLoader(new URL[0], this.getClass().getClassLoader()));
+        context.setDescriptor("web/WEB-INF/web.xml");
+        
+        // default servlet
+        ServletHolder holderDefault = new ServletHolder("default", DefaultServlet.class);
+        holderDefault.setInitParameter("resourceBase", baseUri.toASCIIString());
+        holderDefault.setInitParameter("dirAllowed", "true");
+        context.addServlet(holderDefault, "/");
+        
+        
+        // jsp support
+        /*
+        JettyJasperInitializer sci = new JettyJasperInitializer();
+        ContainerInitializer initializer = new ContainerInitializer(sci, null);
+        List<ContainerInitializer> initializers = new ArrayList<ContainerInitializer>();
+        initializers.add(initializer);
+        context.setAttribute("org.eclipse.jetty.containerInitializers", initializers);
         context.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
         context.addBean(new ServletContainerInitializersStarter(context), true);
-        context.setClassLoader(new URLClassLoader(new URL[0], this.getClass().getClassLoader()));
+        */
+        
+        // jsp servlet holder
+        //ServletHolder holderJsp = new ServletHolder("jsp", JspServlet.class);
+//        ServletHolder holderJsp = new ServletHolder("jsp", JspServlet.class);
+//        holderJsp.setInitOrder(0);
+//        holderJsp.setInitParameter("logVerbosityLevel", "DEBUG");
+//        holderJsp.setInitParameter("fork", "false");
+//        holderJsp.setInitParameter("xpoweredBy", "false");
+//        holderJsp.setInitParameter("compilerTargetVM", "1.7");
+//        holderJsp.setInitParameter("compilerSourceVM", "1.7");
+//        holderJsp.setInitParameter("keepgenerated", "true");
+//        context.addServlet(holderJsp, "*.jsp");
 
-        context.addServlet(jspServletHolder(), "*.jsp");
         
-        // Attempt to determine the location of the web folder embedded in the classpath.
-        ProtectionDomain domain = getClass().getProtectionDomain();
-        String codeBase = domain.getCodeSource().getLocation().toExternalForm();
-        String webappUrl="jar:" + codeBase + "!/web";
+        // Trying to configure tlds
+//        Configuration.ClassList classlist = Configuration.ClassList.setServerDefault(server);
+//        classlist.addBefore(
+//                "org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
+//                "org.eclipse.jetty.annotations.AnnotationConfiguration" );
         
-        // multipart servlet holder
-        // could probably configure in web.xml but I don't know how
+        // other jsp-related things
+        context.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
+                ".*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/.*taglibs.*\\.jar$");
+        
+        // Multipart servlet
         ServletHolder multipartHolder = new ServletHolder(KCTUploadServlet.class);
         multipartHolder.getRegistration().setMultipartConfig(new MultipartConfigElement(
                 System.getProperty("java.io.tmpdir"), 30*MB, 10*MB, 6*MB));
         context.addServlet(multipartHolder, "/kctupload");
         
-        context.setWar(webappUrl);
-
-        context.addServlet(defaultServletHolder(baseUri), "/");
-        return context;
-    }
-    
-    private ServletHolder jspServletHolder()
-    {
-        ServletHolder holderJsp = new ServletHolder("jsp", JettyJspServlet.class);
-        holderJsp.setInitOrder(0);
-        holderJsp.setInitParameter("logVerbosityLevel", "DEBUG");
-        holderJsp.setInitParameter("fork", "false");
-        holderJsp.setInitParameter("xpoweredBy", "false");
-        holderJsp.setInitParameter("compilerTargetVM", "1.7");
-        holderJsp.setInitParameter("compilerSourceVM", "1.7");
-        holderJsp.setInitParameter("keepgenerated", "true");
-        return holderJsp;
-    }
-    
-    private ServletHolder defaultServletHolder(URI baseUri)
-    {
-        ServletHolder holderDefault = new ServletHolder("default", DefaultServlet.class);
-        holderDefault.setInitParameter("resourceBase", baseUri.toASCIIString());
-        holderDefault.setInitParameter("dirAllowed", "true");
-        return holderDefault;
+        //final ServletHolder jsp = context.addServlet(JspServlet.class, "*.jsp");
+        //jsp.setInitParameter("classpath", context.getClassPath());
+        
+        server.setHandler(context);
+        
+        server.start();
+        // for some reason this crashes the thing
+        //server.join();
     }
     
     private File getScratchDir() throws IOException
@@ -175,19 +155,18 @@ public class JettyServer
         }
         return scratchDir;
     }
-    
+  
     /**
-     * Ensure the jsp engine is initialized correctly
+     * Currently this fails because it cannot load FutureCallback
+     * 
+     * [org.eclipse.jetty.util.component.AbstractLifeCycle]: 
+     * FAILED org.eclipse.jetty.server.Server@71e52eb: 
+     * java.lang.NoClassDefFoundError: org/eclipse/jetty/util/FutureCallback
+     * 
+     * I fear this is also a classloader issue. Luckily this only happens at shutdown
+     * so I'm going to ignore it for now.
+     * 
      */
-    private List<ContainerInitializer> jspInitializers()
-    {
-        JettyJasperInitializer sci = new JettyJasperInitializer();
-        ContainerInitializer initializer = new ContainerInitializer(sci, null);
-        List<ContainerInitializer> initializers = new ArrayList<ContainerInitializer>();
-        initializers.add(initializer);
-        return initializers;
-    }
-    
     public void shutdown()
     {
         try {
@@ -201,7 +180,7 @@ public class JettyServer
     public static void main(String[] args) throws Exception
     {
         JettyServer server=new JettyServer();
-        server.enable();
+        server.startup();
         
         System.out.println("type anything to exit");
         Scanner scan=new Scanner(System.in);

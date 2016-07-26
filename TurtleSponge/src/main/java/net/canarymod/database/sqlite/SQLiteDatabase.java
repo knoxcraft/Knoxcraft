@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -37,8 +38,8 @@ import net.canarymod.database.exceptions.DatabaseWriteException;
  * @author Jason (darkdiplomat)
  */
 public class SQLiteDatabase extends Database {
-    @Inject
-    private Logger log;
+
+    private Logger log=LoggerFactory.getLogger(SQLiteDatabase.class);
 
     private static SQLiteDatabase instance;
     private final String LIST_REGEX = "\u00B6";
@@ -51,6 +52,9 @@ public class SQLiteDatabase extends Database {
             path.mkdirs();
         }
         try {
+            
+            
+            
             PreparedStatement ps = JdbcConnectionManager.getConnection().prepareStatement("PRAGMA encoding = \"UTF-8\"");
             ps.execute();
             ps.close();
@@ -361,6 +365,8 @@ public class SQLiteDatabase extends Database {
     }
 
     public void createTable(DataAccess data) throws DatabaseWriteException {
+        // TODO: create table if it doesn't exist
+        // SELECT name FROM sqlite_master WHERE type='table' AND name='table_name';
         PreparedStatement ps = null;
 
         try {
@@ -579,7 +585,8 @@ public class SQLiteDatabase extends Database {
         }
     }
 
-    public ResultSet getResultSet(Connection conn, DataAccess data, Map<String, Object> filters, boolean limitOne) throws DatabaseReadException {
+    public ResultSet getResultSet(Connection conn, DataAccess data, Map<String, Object> filters, boolean limitOne) throws DatabaseReadException
+    {
         PreparedStatement ps;
         ResultSet toRet;
 

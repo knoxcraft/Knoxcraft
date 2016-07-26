@@ -17,8 +17,6 @@ Blockly.JavaScript['turtle_init'] = function(block) {
   
   code += 'json += \'     ]\\n}\';\n';
 	
-  code += 'alert(json);\n'; //display for testing
-			
   return code;
 };
 

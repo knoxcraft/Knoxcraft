@@ -1,0 +1,11 @@
+{
+    "scriptname" : "testscript",
+    "commands" : [
+        {"cmd" : "forward",
+            "args" : {"dist" : 10}},
+                {"" : "setBlockType",
+            "args" : {"" : "STONE"}},
+                {"cmd" : "right",
+            "args" : {"dist" : 5}}
+    ]
+}

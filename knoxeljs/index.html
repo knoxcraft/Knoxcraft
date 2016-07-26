@@ -1,0 +1,12 @@
+<!doctype html>
+<html>
+  <body>
+    <input type="file" id="JSONUploadButton" onchange="parseJSON(this.files)">
+    <p>Script Status: <span id="scriptstatus">No script loaded</span></p>
+    <button type="button" id="runscript">Run Current Script</button>
+    <button type="button" id="undo">Undo Last Script</button>
+    <p>Debug Look Location: <span id="looklocation">n/a</span></p>
+
+    <script src="bundle.js"></script>
+  <body>
+</html>

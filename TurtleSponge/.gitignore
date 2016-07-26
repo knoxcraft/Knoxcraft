@@ -2,3 +2,6 @@
 /bin/
 .gradle
 gradle.properties
+.settings/
+config
+db

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -28,8 +29,7 @@ public abstract class DataAccess {
     private boolean isInconsistent = false;
     private boolean isLoaded = false;
     private boolean hasData = false;
-    @Inject
-    private Logger log;
+    private Logger log=LoggerFactory.getLogger(DataAccess.class);
     private static final Set<Class<? extends DataAccess>> schemaUpdated = new HashSet<Class<? extends DataAccess>>();
 
     @Column(columnName = "id", dataType = Column.DataType.INTEGER, autoIncrement = true, columnType = Column.ColumnType.PRIMARY)
