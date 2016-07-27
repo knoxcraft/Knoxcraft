@@ -7,7 +7,6 @@ import org.knoxcraft.turtle3d.KCTBlockTypes;
 import org.knoxcraft.turtle3d.KCTBlockTypesBuilder;
 import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTScript;
-import org.knoxcraft.turtle3d.KCTUndoScript;
 import org.knoxcraft.turtle3d.KCTWorldBlockInfo;
 import org.knoxcraft.turtle3d.TurtleCommandException;
 import org.knoxcraft.turtle3d.TurtleDirection;
@@ -17,10 +16,11 @@ import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3i;
+import com.google.inject.Inject;
 
 public class SpongeTurtle {
 
-    // @Inject
+    @Inject
     private Logger log;
     
 
@@ -42,26 +42,21 @@ public class SpongeTurtle {
     private BlockState block = KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.STONE);
 
     private KCTScript script;
-    private KCTUndoScript undoScript;
-
+    private Stack<KCTWorldBlockInfo> undoStack;
     private boolean undo = false;
     
     private SpongeExecutorService minecraftSyncExecutor; 
     private boolean forceThreadSync = false;
-    private class BuildInfo {
-        Vector3i location;
-        BlockState block;
-        public BuildInfo(Vector3i location, BlockState block) {
-            this.location = location;
-            this.block = block;
-        }
-    }
-    private Stack<BuildInfo> buildPool;
+    private Stack<KCTWorldBlockInfo> buildPool;
     private int buildPoolSize = 1000;
 
     public SpongeTurtle(Logger logger) {
         this.log = logger;
-        buildPool = new Stack<BuildInfo>();
+        buildPool = new Stack<KCTWorldBlockInfo>();
+    }
+    
+    public SpongeTurtle() {
+        buildPool = new Stack<KCTWorldBlockInfo>();
     }
 
     public void setLoc(Vector3i curLoc) {
@@ -119,19 +114,19 @@ public class SpongeTurtle {
     }
     
     private void setWorldBlock(int x, int y, int z, BlockState block) {
-        buildPool.add(new BuildInfo(new Vector3i(x, y, z), block));
+        buildPool.add(new KCTWorldBlockInfo(new Vector3i(x, y, z), block));
         
         if (buildPool.size() > buildPoolSize) {
             @SuppressWarnings("unchecked")
-            Stack<BuildInfo> buildPoolCopy = (Stack<BuildInfo>) buildPool.clone();
+            Stack<KCTWorldBlockInfo> buildPoolCopy = (Stack<KCTWorldBlockInfo>) buildPool.clone();
             buildPool.clear();
             
             if (forceThreadSync) {
                 minecraftSyncExecutor.submit(new Runnable() {
                     public void run() {
                         while (!buildPoolCopy.empty()) {
-                            BuildInfo bi = buildPoolCopy.pop();
-                            world.setBlock(bi.location, bi.block);
+                            KCTWorldBlockInfo bi = buildPoolCopy.pop();
+                            world.setBlock(bi.getLoc(), bi.getBlock());
                         }
                     }
                 });
@@ -143,8 +138,8 @@ public class SpongeTurtle {
                 }
             } else {
                 while (!buildPoolCopy.empty()) {
-                    BuildInfo bi = buildPoolCopy.pop();
-                    world.setBlock(bi.location, bi.block);
+                    KCTWorldBlockInfo bi = buildPoolCopy.pop();
+                    world.setBlock(bi.getLoc(), bi.getBlock());
                 }
             }
         }
@@ -155,15 +150,15 @@ public class SpongeTurtle {
             minecraftSyncExecutor.submit(new Runnable() {
                 public void run() {
                     while (!buildPool.empty()) {
-                        BuildInfo bi = buildPool.pop();
-                        world.setBlock(bi.location, bi.block);
+                        KCTWorldBlockInfo bi = buildPool.pop();
+                        world.setBlock(bi.getLoc(), bi.getBlock());
                     }
                 }
             });
         } else {
             while (!buildPool.empty()) {
-                BuildInfo bi = buildPool.pop();
-                world.setBlock(bi.location, bi.block);
+                KCTWorldBlockInfo bi = buildPool.pop();
+                world.setBlock(bi.getLoc(), bi.getBlock());
             }
         }
     }
@@ -370,7 +365,7 @@ public class SpongeTurtle {
         }
     }
     
-    public KCTUndoScript executeScript(KCTScript script) {
+    public Stack<KCTWorldBlockInfo> executeScript(KCTScript script) {
         Stack<KCTWorldBlockInfo> undoStack = new Stack<KCTWorldBlockInfo>();
         undo = false;
         forceThreadSync = false;
@@ -386,15 +381,15 @@ public class SpongeTurtle {
         
         buildAndClearBlockPool();
 
-        undoScript = new KCTUndoScript(script, startLoc, startDir, world, undoStack, log); 
-        return undoScript;
+        this.undoStack = undoStack;
+        return undoStack;
     }
 
-    public KCTUndoScript executeScript() {
+    public Stack<KCTWorldBlockInfo> executeScript() {
         return executeScript(this.script);
     }
     
-    public KCTUndoScript executeScript(KCTScript script, SpongeExecutorService minecraftSyncExecutor) {
+    public Stack<KCTWorldBlockInfo> executeScript(KCTScript script, SpongeExecutorService minecraftSyncExecutor) {
         Stack<KCTWorldBlockInfo> undoStack = new Stack<KCTWorldBlockInfo>();
         undo = false;
         this.minecraftSyncExecutor = minecraftSyncExecutor;
@@ -409,32 +404,40 @@ public class SpongeTurtle {
         }
         
         buildAndClearBlockPool();
-
-        undoScript = new KCTUndoScript(script, startLoc, startDir, world, undoStack, log); 
-        return undoScript;
+        
+        this.undoStack = undoStack;
+        return undoStack;
     }
     
-    public KCTUndoScript executeScript(SpongeExecutorService minecraftSyncExecutor) {
+    public Stack<KCTWorldBlockInfo> executeScript(SpongeExecutorService minecraftSyncExecutor) {
         return executeScript(this.script, minecraftSyncExecutor);
     }
 
-    public void executeUndoScript(KCTScript script, Stack<KCTWorldBlockInfo> undoStack) {
+    public void executeUndoStack(Stack<KCTWorldBlockInfo> undoStack) {
         undo = true;
         forceThreadSync = false;
 
-        for (KCTCommand c : script.getCommands()) {
-            try {
-                executeCommand(c, undoStack);
-            } catch (TurtleCommandException e) {
-                log.info("Unable to execute Turtle script:" + script.getScriptName());
-                return;
-            }
+        while (!undoStack.empty()) {
+            KCTWorldBlockInfo worldBlock = undoStack.pop();
+            setWorldBlock(worldBlock.getLoc(), worldBlock.getBlock());
         }
         
         buildAndClearBlockPool();
     }
 
-    public KCTUndoScript getUndoScript() {
-        return undoScript;
+    public void executeUndoStack(Stack<KCTWorldBlockInfo> undoStack, SpongeExecutorService minecraftSyncExecutor) {
+        undo = true;
+        forceThreadSync = true;
+        
+        while (!undoStack.empty()) {
+            KCTWorldBlockInfo worldBlock = undoStack.pop();
+            setWorldBlock(worldBlock.getLoc(), worldBlock.getBlock());
+        }
+        
+        buildAndClearBlockPool();
+    }
+    
+    public Stack<KCTWorldBlockInfo> getUndoStack() {
+        return undoStack;
     }
 }

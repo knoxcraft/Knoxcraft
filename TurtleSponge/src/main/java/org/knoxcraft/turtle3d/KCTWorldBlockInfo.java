@@ -5,20 +5,21 @@ import org.spongepowered.api.block.BlockState;
 import com.flowpowered.math.vector.Vector3i;
 
 public class KCTWorldBlockInfo {
-	private int x;
-	private int y;
-	private int z;
+	private Vector3i location;
 	private BlockState block;
 	
 	public KCTWorldBlockInfo(int x, int y, int z, BlockState block) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+	    location = new Vector3i(x, y, z);
 		this.block = block;
 	}
 	
+	public KCTWorldBlockInfo(Vector3i location, BlockState block) {
+        this.location = location;
+        this.block = block;
+    }
+	
 	public Vector3i getLoc() {
-		return new Vector3i(x, y, z);
+		return location;
 	}
 	
 	public BlockState getBlock() {
