@@ -13,14 +13,16 @@ import org.spongepowered.api.text.Text;
 
 public class KCTJobQueue {
 	private Queue<SpongeTurtle> queue;
-	private HashMap<String, Stack<KCTUndoScript>> undoBuffer; // PlayerName->buffer
+	private HashMap<String, Stack<Stack<KCTWorldBlockInfo>>> undoBuffer; // PlayerName->buffer
 	
 	private SpongeExecutorService minecraftSyncExecutor;
 	private SpongeExecutorService minecraftAsyncExecutor;
 	
+	private SpongeTurtle undoWorkerTurtle;
+	
 	public KCTJobQueue(SpongeExecutorService minecraftSyncExecutor, SpongeExecutorService minecraftAsyncExecutor) {
 		queue = new LinkedList<SpongeTurtle>();
-		undoBuffer = new HashMap<String, Stack<KCTUndoScript>>();
+		undoBuffer = new HashMap<String, Stack<Stack<KCTWorldBlockInfo>>>();
 		this.minecraftSyncExecutor = minecraftSyncExecutor;
 		this.minecraftAsyncExecutor = minecraftAsyncExecutor;
 	}
@@ -28,6 +30,7 @@ public class KCTJobQueue {
 	public void add(SpongeTurtle job) {
 		queue.add(job);
 		spongeExecuteQueuedJobs();
+		undoWorkerTurtle = new SpongeTurtle();
 	}
 	
 	public void undoScript(CommandSource src, int numUndo) {
@@ -37,18 +40,18 @@ public class KCTJobQueue {
             src.sendMessage(Text.of("You have not executed any scripts to undo!"));
         } else { // buffer exists
             // get buffer
-            Stack<KCTUndoScript> undoUserScripts = undoBuffer.get(senderName);
+            Stack<Stack<KCTWorldBlockInfo>> undoUserScripts = undoBuffer.get(senderName);
 
             if (undoUserScripts == null) { // buffer empty
                 src.sendMessage(Text.of("There were no scripts invoked by the player!"));
             } else {
                 for (int i = 0; i < numUndo; i++) {
                     try {
-                        KCTUndoScript undoScript = undoUserScripts.pop();
+                        Stack<KCTWorldBlockInfo> undoJobStack = undoUserScripts.pop();
                         
                         minecraftAsyncExecutor.submit(new Runnable() {
                             public void run() {
-                                undoScript.executeUndo(minecraftSyncExecutor);
+                                undoWorkerTurtle.executeUndoStack(undoJobStack, minecraftSyncExecutor);
                             }
                         });
                     } catch (EmptyStackException e) {
@@ -68,8 +71,8 @@ public class KCTJobQueue {
                 public void run() {
                     job.executeScript(minecraftSyncExecutor);
                     if (!undoBuffer.containsKey(job.getSenderName()))
-                        undoBuffer.put(job.getSenderName(), new Stack<KCTUndoScript>());
-                    undoBuffer.get(job.getSenderName()).add(job.getUndoScript());
+                        undoBuffer.put(job.getSenderName(), new Stack<Stack<KCTWorldBlockInfo>>());
+                    undoBuffer.get(job.getSenderName()).add(job.getUndoStack());
                 }
             });
             

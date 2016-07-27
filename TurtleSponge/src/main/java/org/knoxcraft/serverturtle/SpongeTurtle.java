@@ -7,7 +7,6 @@ import org.knoxcraft.turtle3d.KCTBlockTypes;
 import org.knoxcraft.turtle3d.KCTBlockTypesBuilder;
 import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTScript;
-import org.knoxcraft.turtle3d.KCTUndoScript;
 import org.knoxcraft.turtle3d.KCTWorldBlockInfo;
 import org.knoxcraft.turtle3d.TurtleCommandException;
 import org.knoxcraft.turtle3d.TurtleDirection;
@@ -17,10 +16,11 @@ import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3i;
+import com.google.inject.Inject;
 
 public class SpongeTurtle {
 
-    // @Inject
+    @Inject
     private Logger log;
 
     // need to know initial location
@@ -41,7 +41,7 @@ public class SpongeTurtle {
     private BlockState block = KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.STONE);
 
     private KCTScript script;
-    private KCTUndoScript undoScript;
+    private Stack<KCTWorldBlockInfo> undoStack;
     private boolean undo = false;
     
     private SpongeExecutorService minecraftSyncExecutor; 
@@ -51,6 +51,10 @@ public class SpongeTurtle {
 
     public SpongeTurtle(Logger logger) {
         this.log = logger;
+        buildPool = new Stack<KCTWorldBlockInfo>();
+    }
+    
+    public SpongeTurtle() {
         buildPool = new Stack<KCTWorldBlockInfo>();
     }
 
@@ -360,7 +364,7 @@ public class SpongeTurtle {
         }
     }
     
-    public KCTUndoScript executeScript(KCTScript script) {
+    public Stack<KCTWorldBlockInfo> executeScript(KCTScript script) {
         Stack<KCTWorldBlockInfo> undoStack = new Stack<KCTWorldBlockInfo>();
         undo = false;
         forceThreadSync = false;
@@ -376,15 +380,15 @@ public class SpongeTurtle {
         
         buildAndClearBlockPool();
 
-        undoScript = new KCTUndoScript(script, startLoc, startDir, world, undoStack, log); 
-        return undoScript;
+        this.undoStack = undoStack;
+        return undoStack;
     }
 
-    public KCTUndoScript executeScript() {
+    public Stack<KCTWorldBlockInfo> executeScript() {
         return executeScript(this.script);
     }
     
-    public KCTUndoScript executeScript(KCTScript script, SpongeExecutorService minecraftSyncExecutor) {
+    public Stack<KCTWorldBlockInfo> executeScript(KCTScript script, SpongeExecutorService minecraftSyncExecutor) {
         Stack<KCTWorldBlockInfo> undoStack = new Stack<KCTWorldBlockInfo>();
         undo = false;
         this.minecraftSyncExecutor = minecraftSyncExecutor;
@@ -399,49 +403,40 @@ public class SpongeTurtle {
         }
         
         buildAndClearBlockPool();
-
-        undoScript = new KCTUndoScript(script, startLoc, startDir, world, undoStack, log); 
-        return undoScript;
+        
+        this.undoStack = undoStack;
+        return undoStack;
     }
     
-    public KCTUndoScript executeScript(SpongeExecutorService minecraftSyncExecutor) {
+    public Stack<KCTWorldBlockInfo> executeScript(SpongeExecutorService minecraftSyncExecutor) {
         return executeScript(this.script, minecraftSyncExecutor);
     }
 
-    public void executeUndoScript(KCTScript script, Stack<KCTWorldBlockInfo> undoStack) {
+    public void executeUndoStack(Stack<KCTWorldBlockInfo> undoStack) {
         undo = true;
         forceThreadSync = false;
 
-        for (KCTCommand c : script.getCommands()) {
-            try {
-                executeCommand(c, undoStack);
-            } catch (TurtleCommandException e) {
-                log.info("Unable to execute Turtle script:" + script.getScriptName());
-                return;
-            }
+        while (!undoStack.empty()) {
+            KCTWorldBlockInfo worldBlock = undoStack.pop();
+            setWorldBlock(worldBlock.getLoc(), worldBlock.getBlock());
         }
         
         buildAndClearBlockPool();
     }
 
-    public void executeUndoScript(KCTScript script, 
-            Stack<KCTWorldBlockInfo> undoStack, SpongeExecutorService minecraftSyncExecutor) {
+    public void executeUndoStack(Stack<KCTWorldBlockInfo> undoStack, SpongeExecutorService minecraftSyncExecutor) {
         undo = true;
         forceThreadSync = true;
         
-        for (KCTCommand c : script.getCommands()) {
-            try {
-                executeCommand(c, undoStack);
-            } catch (TurtleCommandException e) {
-                log.info("Unable to execute Turtle script:" + script.getScriptName());
-                return;
-            }
+        while (!undoStack.empty()) {
+            KCTWorldBlockInfo worldBlock = undoStack.pop();
+            setWorldBlock(worldBlock.getLoc(), worldBlock.getBlock());
         }
         
         buildAndClearBlockPool();
     }
     
-    public KCTUndoScript getUndoScript() {
-        return undoScript;
+    public Stack<KCTWorldBlockInfo> getUndoStack() {
+        return undoStack;
     }
 }
