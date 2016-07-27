@@ -1,6 +1,5 @@
 package org.knoxcraft.turtle3d;
 
-import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.Direction.Division;
 
 import com.flowpowered.math.vector.Vector3d;
@@ -47,6 +46,45 @@ public enum TurtleDirection {
 	public int getIntValue() {
 	    return ordinal();
 	}
+	
+	public static TurtleDirection getTurtleDirection(Vector3d direction) {
+
+        double d = direction.getY() / 360 * 8;
+        int x = (int) Math.round(d);
+        
+        while (x < 0) {
+            x += 8;
+        }
+
+        if (x == 0 || x == 8) {
+            return TurtleDirection.NORTH;
+
+        } else if (x == 1) {
+            return TurtleDirection.NORTHEAST;
+
+        } else if (x == 2) {
+            return TurtleDirection.EAST;
+
+        } else if (x == 3) {
+            return TurtleDirection.SOUTHEAST;
+
+        } else if (x == 4) {
+            return TurtleDirection.SOUTH;
+
+        } else if (x == 5) {
+            return TurtleDirection.SOUTHWEST;
+
+        } else if (x == 6) {
+            return TurtleDirection.WEST;
+
+        } else if (x == 7) {
+            return TurtleDirection.NORTHWEST;
+
+        } else {
+            throw new RuntimeException("Direction invalid = " + direction);
+        }
+    }
+
 	
 	/**
 	 * @return the opposite direction of the current heading.

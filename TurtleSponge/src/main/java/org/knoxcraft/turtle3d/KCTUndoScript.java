@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import org.knoxcraft.serverturtle.SpongeTurtle;
 import org.slf4j.Logger;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3i;
@@ -32,4 +33,12 @@ public class KCTUndoScript {
 		turtle.setWorld(world);
 		turtle.executeUndoScript(script, undoStack);
 	}
+	
+    public void executeUndo(SpongeExecutorService minecraftSyncExecutor) {
+        SpongeTurtle turtle = new SpongeTurtle(log);
+        turtle.setLoc(startLocation);
+        turtle.setTurtleDirection(direction);
+        turtle.setWorld(world);
+        turtle.executeUndoScript(script, undoStack, minecraftSyncExecutor);
+    }
 }

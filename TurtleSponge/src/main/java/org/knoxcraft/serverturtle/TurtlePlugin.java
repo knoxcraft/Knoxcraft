@@ -1,14 +1,17 @@
 package org.knoxcraft.serverturtle;
 
 import java.util.Collection;
-import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Stack;
+
+import net.canarymod.database.DataAccess;
+import net.canarymod.database.Database;
+import net.canarymod.database.exceptions.DatabaseReadException;
+import net.canarymod.database.exceptions.DatabaseWriteException;
 
 import org.knoxcraft.database.KCTScriptAccess;
 import org.knoxcraft.hooks.KCTUploadHook;
@@ -17,7 +20,6 @@ import org.knoxcraft.turtle3d.KCTBlockTypes;
 import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTJobQueue;
 import org.knoxcraft.turtle3d.KCTScript;
-import org.knoxcraft.turtle3d.KCTUndoScript;
 import org.knoxcraft.turtle3d.TurtleCompiler;
 import org.knoxcraft.turtle3d.TurtleDirection;
 import org.knoxcraft.turtle3d.TurtleException;
@@ -46,11 +48,6 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseReadException;
-import net.canarymod.database.exceptions.DatabaseWriteException;
-
 @Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft", 
     authors = {"kakoijohn", "mrmoeee", "emhastings", "ppypp", "jspacco"})
 public class TurtlePlugin {
@@ -63,7 +60,6 @@ public class TurtlePlugin {
 	@Inject
 	private Logger log;
 	private ScriptManager scripts;
-	private HashMap<String, Stack<KCTUndoScript>> undoBuffer; // PlayerName->buffer
 	private KCTJobQueue jobQueue;
 	
 	@Inject
@@ -76,7 +72,6 @@ public class TurtlePlugin {
 	 */
 	public TurtlePlugin() {
 		scripts = new ScriptManager();
-		undoBuffer = new HashMap<String, Stack<KCTUndoScript>>();
 	}
 
 	/**
@@ -211,8 +206,8 @@ public class TurtlePlugin {
 						             playerName,scriptName)));
 						     // FIXME: remove this fake square
 						     script = makeFakeSquare();
-						     return CommandResult.success();
-						 }
+//						     return CommandResult.success();
+						}
 
 						SpongeTurtle turtle = new SpongeTurtle(log);
 
@@ -221,17 +216,20 @@ public class TurtlePlugin {
 						    Player player = (Player) src;
 							Location<World> loc = player.getLocation();
 							Vector3i pos = loc.getBlockPosition();
-							turtle.setLoc(pos);
 							// get world from setter in spongeTurtle
 							World w = player.getWorld();
 							// rotation in degrees = direction
 							Vector3d headRotation = player.getHeadRotation();
 							Vector3d rotation = player.getRotation();
+							
 							log.info("headRotation=" + headRotation);
 							log.info("rotation=" + rotation);
-							TurtleDirection d = getTurtleDirection(rotation);
+							TurtleDirection d = TurtleDirection.getTurtleDirection(rotation);
 							log.info("pos= " + pos);
-							turtle.setWorld(w);
+
+                            turtle.setSenderName(playerName);
+                            turtle.setLoc(pos);
+                            turtle.setWorld(w);
 							turtle.setTurtleDirection(d);
 							turtle.setScript(script);
 							
@@ -254,29 +252,7 @@ public class TurtlePlugin {
 						}
 						log.debug("Undo invoked!");
 
-						String senderName = src.getName().toLowerCase();
-
-						// sender has not executed any scripts
-						if (!undoBuffer.containsKey(senderName)) {
-							src.sendMessage(Text.of("You have not executed any scripts to undo!"));
-						} else { // buffer exists
-							// get buffer
-							Stack<KCTUndoScript> undoUserScripts = undoBuffer.get(senderName);
-
-							if (undoUserScripts == null) { // buffer empty
-								src.sendMessage(Text.of("There were no scripts invoked by the player!"));
-							} else {
-								for (int i = 0; i < numUndo; i++) {
-									try {
-										KCTUndoScript undoScript = undoUserScripts.pop();
-										undoScript.executeUndo();
-									} catch (EmptyStackException e) {
-										src.sendMessage(Text.of("There are no more scripts to undo!"));
-										break;
-									}	
-								}
-							}
-						}
+						jobQueue.undoScript(src, numUndo);
 
 						return CommandResult.success();
 					}
@@ -290,7 +266,7 @@ public class TurtlePlugin {
 		// TODO flesh this out to test a number of other commands
 		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.BLUE_WOOL));
 		
-		for (int i = 0; i < 125; i++) {
+		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 25; j++) {
 				script.addCommand(KCTCommand.forward(50));
 				script.addCommand(KCTCommand.turnLeft(90));
@@ -321,44 +297,7 @@ public class TurtlePlugin {
 		return script;
 	}
 
-	private TurtleDirection getTurtleDirection(Vector3d direction) {
-
-		double d = direction.getY() / 360 * 8;
-		int x = (int) Math.round(d);
-		
-		while (x < 0) {
-			x += 8;
-		}
-
-		if (x == 0 || x == 8) {
-			return TurtleDirection.NORTH;
-
-		} else if (x == 1) {
-			return TurtleDirection.NORTHEAST;
-
-		} else if (x == 2) {
-			return TurtleDirection.EAST;
-
-		} else if (x == 3) {
-			return TurtleDirection.SOUTHEAST;
-
-		} else if (x == 4) {
-			return TurtleDirection.SOUTH;
-
-		} else if (x == 5) {
-			return TurtleDirection.SOUTHWEST;
-
-		} else if (x == 6) {
-			return TurtleDirection.WEST;
-
-		} else if (x == 7) {
-			return TurtleDirection.NORTHWEST;
-
-		} else {
-			throw new RuntimeException("Direction invalid = " + direction);
-		}
-	}
-
+	
 	/**
 	 * Load the latest version of each script from the DB for each player on
 	 * this world 
