@@ -17,33 +17,33 @@ public class KCTJobQueue {
     
     private Logger log;
     
-	private Queue<SpongeTurtle> queue;
-	private HashMap<String, Stack<Stack<KCTWorldBlockInfo>>> undoBuffer; // PlayerName->buffer
-	
-	private SpongeExecutorService minecraftSyncExecutor;
-	private SpongeExecutorService minecraftAsyncExecutor;
-	
-	private SpongeTurtle undoWorkerTurtle;
-	
-	public KCTJobQueue(SpongeExecutorService minecraftSyncExecutor, SpongeExecutorService minecraftAsyncExecutor, Logger log) {
-		this.log = log;
-	    
-	    queue = new LinkedList<SpongeTurtle>();
-		undoBuffer = new HashMap<String, Stack<Stack<KCTWorldBlockInfo>>>();
-		undoWorkerTurtle = new SpongeTurtle(log);
-		this.minecraftSyncExecutor = minecraftSyncExecutor;
-		this.minecraftAsyncExecutor = minecraftAsyncExecutor;
-	}
-	
-	public void add(SpongeTurtle job) {
-		queue.add(job);
-		spongeExecuteQueuedJobs();
-	}
-	
-	private void spongeExecuteQueuedJobs() {
-		while (!queue.isEmpty()) {
-			SpongeTurtle job = queue.poll();
-			
+    private Queue<SpongeTurtle> queue;
+    private HashMap<String, Stack<Stack<KCTWorldBlockInfo>>> undoBuffer; // PlayerName->buffer
+    
+    private SpongeExecutorService minecraftSyncExecutor;
+    private SpongeExecutorService minecraftAsyncExecutor;
+    
+    private SpongeTurtle undoWorkerTurtle;
+    
+    public KCTJobQueue(SpongeExecutorService minecraftSyncExecutor, SpongeExecutorService minecraftAsyncExecutor, Logger log) {
+        this.log = log;
+        
+        queue = new LinkedList<SpongeTurtle>();
+        undoBuffer = new HashMap<String, Stack<Stack<KCTWorldBlockInfo>>>();
+        undoWorkerTurtle = new SpongeTurtle(log);
+        this.minecraftSyncExecutor = minecraftSyncExecutor;
+        this.minecraftAsyncExecutor = minecraftAsyncExecutor;
+    }
+    
+    public void add(SpongeTurtle job) {
+        queue.add(job);
+        spongeExecuteQueuedJobs();
+    }
+    
+    private void spongeExecuteQueuedJobs() {
+        while (!queue.isEmpty()) {
+            SpongeTurtle job = queue.poll();
+            
             minecraftAsyncExecutor.submit(new Runnable() {
                 public void run() {
                     job.executeScript(minecraftSyncExecutor);
@@ -53,9 +53,9 @@ public class KCTJobQueue {
                 }
             });
             
-		}
-	}
-	
+        }
+    }
+    
     public void undoScript(CommandSource src, int numUndo) {
         String senderName = src.getName().toLowerCase();
         if (src instanceof Player) {
@@ -87,9 +87,9 @@ public class KCTJobQueue {
             }
         }
     }
-	
-	public void shutdownExecutor() {
-		minecraftSyncExecutor.shutdown();
-		minecraftAsyncExecutor.shutdown();
-	}
+    
+    public void shutdownExecutor() {
+        minecraftSyncExecutor.shutdown();
+        minecraftAsyncExecutor.shutdown();
+    }
 }

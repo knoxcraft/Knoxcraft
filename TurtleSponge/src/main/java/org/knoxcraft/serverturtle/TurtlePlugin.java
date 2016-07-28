@@ -7,11 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseReadException;
-import net.canarymod.database.exceptions.DatabaseWriteException;
+import java.util.concurrent.TimeUnit;
 
 import org.knoxcraft.database.KCTScriptAccess;
 import org.knoxcraft.hooks.KCTUploadHook;
@@ -33,23 +29,38 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent.Login;
 import org.spongepowered.api.event.world.ChangeWorldWeatherEvent;
+import org.spongepowered.api.event.world.LoadWorldEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.DimensionTypes;
+import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.WorldCreationSettings;
+import org.spongepowered.api.world.gen.WorldGeneratorModifier;
+import org.spongepowered.api.world.weather.Weather;
+import org.spongepowered.api.world.weather.Weathers;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 
-@Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft", 
-    authors = {"kakoijohn", "mrmoeee", "emhastings", "ppypp", "jspacco"})
+import net.canarymod.database.DataAccess;
+import net.canarymod.database.Database;
+import net.canarymod.database.exceptions.DatabaseReadException;
+import net.canarymod.database.exceptions.DatabaseWriteException;
+
+@Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft", authors = {
+		"kakoijohn", "mrmoeee", "emhastings", "ppypp", "jspacco" })
 public class TurtlePlugin {
 
 	public static final String ID = "kct";
@@ -61,7 +72,10 @@ public class TurtlePlugin {
 	private Logger log;
 	private ScriptManager scripts;
 	private KCTJobQueue jobQueue;
-	
+	private World world;
+
+	private SpongeExecutorService minecraftSyncExecutor;
+
 	@Inject
 	private PluginContainer container;
 
@@ -82,7 +96,7 @@ public class TurtlePlugin {
 		if (jettyServer != null) {
 			jettyServer.shutdown();
 		}
-		
+
 		jobQueue.shutdownExecutor();
 	}
 
@@ -109,10 +123,49 @@ public class TurtlePlugin {
 
 		// set up commands
 		setupCommands();
+
+		jobQueue = new KCTJobQueue(Sponge.getScheduler().createSyncExecutor(this),
+				Sponge.getScheduler().createAsyncExecutor(this), log);
 		
-		jobQueue = new KCTJobQueue(Sponge.getScheduler().createSyncExecutor(this), 
-		        Sponge.getScheduler().createAsyncExecutor(this), log);
+		//creating flat world?
+		//final KnoxCraftWorldModifier knoxCraftFlat = new KnoxCraftWorldModifier();
+		//Sponge.getRegistry().register(WorldGeneratorModifier.class, knoxCraftFlat);
+
+		Sponge.getGame().getServer().loadWorld(Sponge.getGame().getServer().createWorldProperties(WorldCreationSettings.builder()
+                .name("KnoxCraftFlatLands")
+                .enabled(true)
+                .loadsOnStartup(true)
+                .keepsSpawnLoaded(true)
+                .dimension(DimensionTypes.OVERWORLD)
+                .generator(GeneratorTypes.FLAT)
+                .gameMode(GameModes.ADVENTURE).build()).get());
 	}
+	
+	
+	@Listener
+	public void onWorldLoad(LoadWorldEvent event) {
+		if (event.getTargetWorld().getDimension().getType() == DimensionTypes.OVERWORLD) {
+			world = event.getTargetWorld();
+
+			// CLEAR SKIES
+			world.setWeather(Weathers.CLEAR);
+
+			// BRIGHT SUNNY DAY (12000 = sun set)
+			world.getProperties().setWorldTime(0);
+			log.info(String.format("currenttime " + world.getProperties().getWorldTime()));
+
+			// TIME CHANGE SCHEDULER > NOTE MAYBE PUT IN ONSERVERSTART
+			minecraftSyncExecutor = Sponge.getScheduler().createSyncExecutor(this);
+			minecraftSyncExecutor.scheduleWithFixedDelay(new Runnable() {
+				public void run() {
+					world.getProperties().setWorldTime(0);
+					log.info(String.format("timechange" + world.getProperties().getWorldTime()));
+				}
+				// change minecraftWorld time every 10 minutes.
+			}, 0, 10, TimeUnit.MINUTES);
+		}
+	}
+	
 
 	private void setupCommands() {
 		// List all the scripts
@@ -201,20 +254,20 @@ public class TurtlePlugin {
 						// log.info("scriptName== " + scriptName);
 						KCTScript script = scripts.getScript(playerName, scriptName);
 
-						if (script==null) { 
-						     log.warn(String.format("player %s cannot find script %s", playerName,scriptName)); 
-						     src.sendMessage(Text.of(String.format("%s, you have no script named %s", 
-						             playerName,scriptName)));
-						     // FIXME: remove this fake square
-						     script = makeFakeSquare();
-//						     return CommandResult.success();
+						if (script == null) {
+							log.warn(String.format("player %s cannot find script %s", playerName, scriptName));
+							src.sendMessage(
+									Text.of(String.format("%s, you have no script named %s", playerName, scriptName)));
+							// FIXME: remove this fake square
+							script = makeFakeSquare();
+							// return CommandResult.success();
 						}
 
 						SpongeTurtle turtle = new SpongeTurtle(log);
 
 						// location of turtle = location of player
 						if (src instanceof Player) {
-						    Player player = (Player) src;
+							Player player = (Player) src;
 							Location<World> loc = player.getLocation();
 							Vector3i pos = loc.getBlockPosition();
 							// get world from setter in spongeTurtle
@@ -222,18 +275,18 @@ public class TurtlePlugin {
 							// rotation in degrees = direction
 							Vector3d headRotation = player.getHeadRotation();
 							Vector3d rotation = player.getRotation();
-							
+
 							log.info("headRotation=" + headRotation);
 							log.info("rotation=" + rotation);
 							TurtleDirection d = TurtleDirection.getTurtleDirection(rotation);
 							log.info("pos= " + pos);
 
-                            turtle.setSenderName(playerName);
-                            turtle.setLoc(pos);
-                            turtle.setWorld(w);
+							turtle.setSenderName(playerName);
+							turtle.setLoc(pos);
+							turtle.setWorld(w);
 							turtle.setTurtleDirection(d);
 							turtle.setScript(script);
-							
+
 							jobQueue.add(turtle);
 						}
 						return CommandResult.success();
@@ -266,7 +319,7 @@ public class TurtlePlugin {
 		KCTScript script = new KCTScript("testscript");
 		// TODO flesh this out to test a number of other commands
 		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.BLUE_WOOL));
-		
+
 		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 25; j++) {
 				script.addCommand(KCTCommand.forward(50));
@@ -291,66 +344,64 @@ public class TurtlePlugin {
 				script.addCommand(KCTCommand.forward(1));
 				script.addCommand(KCTCommand.turnLeft(90));
 			}
-			
+
 			script.addCommand(KCTCommand.up(1));
 		}
 
 		return script;
 	}
 
-	
 	/**
 	 * Load the latest version of each script from the DB for each player on
-	 * this world 
+	 * this world
 	 * 
-	 * TODO low priority: Check how Sponge handles worlds; do we have only one XML
-	 * file of scripts for worlds and should we include the world name or world
-	 * ID with the script?
+	 * TODO low priority: Check how Sponge handles worlds; do we have only one
+	 * XML file of scripts for worlds and should we include the world name or
+	 * world ID with the script?
 	 */
 	private void lookupFromDB() {
 		// FIXME translate to Sponge
-	    KCTScriptAccess data=new KCTScriptAccess();
-	    List<DataAccess> results=new LinkedList<DataAccess>();
-	    Map<String,KCTScriptAccess> mostRecentScripts=new
-	            HashMap<String,KCTScriptAccess>();
+		KCTScriptAccess data = new KCTScriptAccess();
+		List<DataAccess> results = new LinkedList<DataAccess>();
+		Map<String, KCTScriptAccess> mostRecentScripts = new HashMap<String, KCTScriptAccess>();
 
-	    try {
-	        Map<String,Object> filters=new HashMap<String,Object>();
-	        Database.get().loadAll(data, results, filters);
-	        for (DataAccess d : results) {
-	            KCTScriptAccess scriptAccess=(KCTScriptAccess)d;
-	            // Figure out the most recent script for each player-scriptname combo
-	            String key=scriptAccess.playerName+"-"+scriptAccess.scriptName;
-	            if (!mostRecentScripts.containsKey(key)) {
-	                mostRecentScripts.put(key, scriptAccess);
-	            } else {
-	                if (scriptAccess.timestamp > mostRecentScripts.get(key).timestamp) {
-	                    mostRecentScripts.put(key,scriptAccess);
-	                }
-	            }
-	            log.trace(String.format("from DB: player %s has script %s at time %d%n",
-	                    scriptAccess.playerName, scriptAccess.scriptName,
-	                    scriptAccess.timestamp));
-	        }
-	        TurtleCompiler turtleCompiler=new TurtleCompiler();
-	        for (KCTScriptAccess scriptAccess : mostRecentScripts.values()) {
-	            try {
-	                KCTScript script=turtleCompiler.parseFromJson(scriptAccess.json);
-	                script.setLanguage(scriptAccess.language);
-	                script.setScriptName(scriptAccess.scriptName);
-	                script.setSourceCode(scriptAccess.source);
-	                script.setPlayerName(scriptAccess.playerName);
+		try {
+			Map<String, Object> filters = new HashMap<String, Object>();
+			Database.get().loadAll(data, results, filters);
+			for (DataAccess d : results) {
+				KCTScriptAccess scriptAccess = (KCTScriptAccess) d;
+				// Figure out the most recent script for each player-scriptname
+				// combo
+				String key = scriptAccess.playerName + "-" + scriptAccess.scriptName;
+				if (!mostRecentScripts.containsKey(key)) {
+					mostRecentScripts.put(key, scriptAccess);
+				} else {
+					if (scriptAccess.timestamp > mostRecentScripts.get(key).timestamp) {
+						mostRecentScripts.put(key, scriptAccess);
+					}
+				}
+				log.trace(String.format("from DB: player %s has script %s at time %d%n", scriptAccess.playerName,
+						scriptAccess.scriptName, scriptAccess.timestamp));
+			}
+			TurtleCompiler turtleCompiler = new TurtleCompiler();
+			for (KCTScriptAccess scriptAccess : mostRecentScripts.values()) {
+				try {
+					KCTScript script = turtleCompiler.parseFromJson(scriptAccess.json);
+					script.setLanguage(scriptAccess.language);
+					script.setScriptName(scriptAccess.scriptName);
+					script.setSourceCode(scriptAccess.source);
+					script.setPlayerName(scriptAccess.playerName);
 
-	                scripts.putScript(scriptAccess.playerName, script);
-	                log.info(String.format("Loaded script %s for player %s",
-	                        scriptAccess.scriptName, scriptAccess.playerName));
-	            } catch (TurtleException e){
-	                log.error("Internal Server error", e);
-	            }
-	        }
-	    } catch (DatabaseReadException e) {
-	        log.error("cannot read DB", e);
-	    }
+					scripts.putScript(scriptAccess.playerName, script);
+					log.info(String.format("Loaded script %s for player %s", scriptAccess.scriptName,
+							scriptAccess.playerName));
+				} catch (TurtleException e) {
+					log.error("Internal Server error", e);
+				}
+			}
+		} catch (DatabaseReadException e) {
+			log.error("cannot read DB", e);
+		}
 	}
 
 	// Listeners
@@ -373,9 +424,13 @@ public class TurtlePlugin {
 	 * @param hook
 	 */
 	@Listener
-	public void onWeatherChange(ChangeWorldWeatherEvent weatherChange) {
-		// TODO turn off weather
+	public void onWeatherChange(ChangeWorldWeatherEvent worldWeatherListener) {
+		// TODO turn off weather(weather set clear onWeatherChange
+		Weather curWeather;
+		worldWeatherListener.setWeather(Weathers.CLEAR);
+		curWeather = worldWeatherListener.getWeather();
 		log.info(String.format("Weather listener called"));
+		log.info(String.format("current weather = %s ", curWeather.getName()));
 	}
 
 	/**
@@ -393,17 +448,17 @@ public class TurtlePlugin {
 
 			// This will create the table if it doesn't exist
 			// and then insert data for the script into a new row
-			KCTScriptAccess data=new KCTScriptAccess();
-			data.json=script.toJSONString();
-			data.source=script.getSourceCode();
-			data.playerName=event.getPlayerName();
-			data.scriptName=script.getScriptName();
-			data.language=script.getLanguage();
+			KCTScriptAccess data = new KCTScriptAccess();
+			data.json = script.toJSONString();
+			data.source = script.getSourceCode();
+			data.playerName = event.getPlayerName();
+			data.scriptName = script.getScriptName();
+			data.language = script.getLanguage();
 			try {
-			    Database.get().insert(data);
+				Database.get().insert(data);
 			} catch (DatabaseWriteException e) {
-			    // TODO how to log the full stack trace?
-			    log.error(e.toString());
+				// TODO how to log the full stack trace?
+				log.error(e.toString());
 			}
 		}
 	}
