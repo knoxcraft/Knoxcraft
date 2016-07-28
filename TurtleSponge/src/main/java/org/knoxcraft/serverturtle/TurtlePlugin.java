@@ -7,11 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseReadException;
-import net.canarymod.database.exceptions.DatabaseWriteException;
+import java.util.concurrent.TimeUnit;
 
 import org.knoxcraft.database.KCTScriptAccess;
 import org.knoxcraft.hooks.KCTUploadHook;
@@ -33,22 +29,35 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent.Login;
 import org.spongepowered.api.event.world.ChangeWorldWeatherEvent;
+import org.spongepowered.api.event.world.LoadWorldEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.DimensionTypes;
+import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.WorldCreationSettings;
+import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
+
+import net.canarymod.database.DataAccess;
+import net.canarymod.database.Database;
+import net.canarymod.database.exceptions.DatabaseReadException;
+import net.canarymod.database.exceptions.DatabaseWriteException;
 
 @Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft", authors = {
 		"kakoijohn", "mrmoeee", "emhastings", "ppypp", "jspacco" })
@@ -63,6 +72,9 @@ public class TurtlePlugin {
 	private Logger log;
 	private ScriptManager scripts;
 	private KCTJobQueue jobQueue;
+	private World world;
+
+	private SpongeExecutorService minecraftSyncExecutor;
 
 	@Inject
 	private PluginContainer container;
@@ -114,7 +126,46 @@ public class TurtlePlugin {
 
 		jobQueue = new KCTJobQueue(Sponge.getScheduler().createSyncExecutor(this),
 				Sponge.getScheduler().createAsyncExecutor(this), log);
+		
+		//creating flat world?
+		//final KnoxCraftWorldModifier knoxCraftFlat = new KnoxCraftWorldModifier();
+		//Sponge.getRegistry().register(WorldGeneratorModifier.class, knoxCraftFlat);
+
+		Sponge.getGame().getServer().loadWorld(Sponge.getGame().getServer().createWorldProperties(WorldCreationSettings.builder()
+                .name("KnoxCraftFlatLands")
+                .enabled(true)
+                .loadsOnStartup(true)
+                .keepsSpawnLoaded(true)
+                .dimension(DimensionTypes.OVERWORLD)
+                .generator(GeneratorTypes.FLAT)
+                .gameMode(GameModes.ADVENTURE).build()).get());
 	}
+	
+	
+	@Listener
+	public void onWorldLoad(LoadWorldEvent event) {
+		if (event.getTargetWorld().getDimension().getType() == DimensionTypes.OVERWORLD) {
+			world = event.getTargetWorld();
+
+			// CLEAR SKIES
+			world.setWeather(Weathers.CLEAR);
+
+			// BRIGHT SUNNY DAY (12000 = sun set)
+			world.getProperties().setWorldTime(0);
+			log.info(String.format("currenttime " + world.getProperties().getWorldTime()));
+
+			// TIME CHANGE SCHEDULER > NOTE MAYBE PUT IN ONSERVERSTART
+			minecraftSyncExecutor = Sponge.getScheduler().createSyncExecutor(this);
+			minecraftSyncExecutor.scheduleWithFixedDelay(new Runnable() {
+				public void run() {
+					world.getProperties().setWorldTime(0);
+					log.info(String.format("timechange" + world.getProperties().getWorldTime()));
+				}
+				// change minecraftWorld time every 10 minutes.
+			}, 0, 10, TimeUnit.MINUTES);
+		}
+	}
+	
 
 	private void setupCommands() {
 		// List all the scripts
@@ -373,11 +424,11 @@ public class TurtlePlugin {
 	 * @param hook
 	 */
 	@Listener
-	public void onWeatherChange(ChangeWorldWeatherEvent worldWeather) {
-		// TODO turn off weather
+	public void onWeatherChange(ChangeWorldWeatherEvent worldWeatherListener) {
+		// TODO turn off weather(weather set clear onWeatherChange
 		Weather curWeather;
-		worldWeather.setWeather(Weathers.CLEAR);
-		curWeather = worldWeather.getWeather();
+		worldWeatherListener.setWeather(Weathers.CLEAR);
+		curWeather = worldWeatherListener.getWeather();
 		log.info(String.format("Weather listener called"));
 		log.info(String.format("current weather = %s ", curWeather.getName()));
 	}
