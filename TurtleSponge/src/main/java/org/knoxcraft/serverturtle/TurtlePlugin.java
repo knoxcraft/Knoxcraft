@@ -110,7 +110,8 @@ public class TurtlePlugin {
 		// set up commands
 		setupCommands();
 		
-		jobQueue = new KCTJobQueue(Sponge.getScheduler().createSyncExecutor(this), Sponge.getScheduler().createAsyncExecutor(this));
+		jobQueue = new KCTJobQueue(Sponge.getScheduler().createSyncExecutor(this), 
+		        Sponge.getScheduler().createAsyncExecutor(this), log);
 	}
 
 	private void setupCommands() {
