@@ -9,6 +9,11 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import net.canarymod.database.DataAccess;
+import net.canarymod.database.Database;
+import net.canarymod.database.exceptions.DatabaseReadException;
+import net.canarymod.database.exceptions.DatabaseWriteException;
+
 import org.knoxcraft.database.KCTScriptAccess;
 import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
@@ -29,9 +34,8 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent.Login;
@@ -42,22 +46,14 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.DimensionTypes;
-import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.WorldCreationSettings;
-import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
-
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseReadException;
-import net.canarymod.database.exceptions.DatabaseWriteException;
 
 @Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft", authors = {
 		"kakoijohn", "mrmoeee", "emhastings", "ppypp", "jspacco" })
@@ -99,6 +95,24 @@ public class TurtlePlugin {
 
 		jobQueue.shutdownExecutor();
 	}
+	
+	@Listener
+	public void gameConstructionEvent(GameConstructionEvent event) {
+	    //first event in the plugin lifecycle
+	    KCServerProperties kcProperties = new KCServerProperties();
+	    //If the server.properties file does not exist or is not in the correct format,
+	    //we must change the file to the correct format.
+	    int result = kcProperties.loadServerProperties();
+	    if (result == 1)
+	        log.info("Correct server.properties file loaded.");
+	    else if (result == 0) {
+	        log.info("Incorrect server.properties file. Replacing with new file.");
+	        kcProperties.createPropertiesFile();
+	    } else if (result == -1) {
+	        log.info("No server.properties file found. Creating new one.");
+	        kcProperties.createPropertiesFile();
+	    }
+	}
 
 	@Listener
 	public void onServerStart(GameStartedServerEvent event) {
@@ -126,21 +140,7 @@ public class TurtlePlugin {
 
 		jobQueue = new KCTJobQueue(Sponge.getScheduler().createSyncExecutor(this),
 				Sponge.getScheduler().createAsyncExecutor(this), log);
-		
-		//creating flat world?
-		//final KnoxCraftWorldModifier knoxCraftFlat = new KnoxCraftWorldModifier();
-		//Sponge.getRegistry().register(WorldGeneratorModifier.class, knoxCraftFlat);
-
-		Sponge.getGame().getServer().loadWorld(Sponge.getGame().getServer().createWorldProperties(WorldCreationSettings.builder()
-                .name("KnoxCraftFlatLands")
-                .enabled(true)
-                .loadsOnStartup(true)
-                .keepsSpawnLoaded(true)
-                .dimension(DimensionTypes.OVERWORLD)
-                .generator(GeneratorTypes.FLAT)
-                .gameMode(GameModes.ADVENTURE).build()).get());
 	}
-	
 	
 	@Listener
 	public void onWorldLoad(LoadWorldEvent event) {

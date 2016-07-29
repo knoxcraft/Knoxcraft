@@ -20,7 +20,6 @@ import com.flowpowered.math.vector.Vector3i;
 public class SpongeTurtle {
 
     private Logger log;
-    
 
     // need to know initial location
     // vector 3i, or XYZ, get location from turtle plugin, put turtle one block
