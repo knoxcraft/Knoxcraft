@@ -93,7 +93,7 @@ addMat("OBSIDIAN", "obsidian");
 addMat("MONSTER_SPAWNER", "mob_spawner");
 addMat("DIAMOND_ORE", "diamond_ore");
 addMat("DIAMOND_BLOCK", "diamond_block");
-addMat("CRAFTING_TABLE", ["crafting_table_side", "crafting_table_side", "crafting_table_top", "crafting_table_bottom", "crafting_table_side", "crafting_table_side"]);
+addMat("CRAFTING_TABLE", ["crafting_table_side", "crafting_table_side", "crafting_table_top", "crafting_table_top", "crafting_table_side", "crafting_table_side"]);
 addMat("FARMLAND", "farmland_dry");
 // TODO Add Furnace
 addMat("SNOW", ["grass_side_snowed", "grass_side_snowed", "snow", "dirt", "grass_side_snowed", "grass_side_snowed"]);
@@ -116,10 +116,8 @@ var game = createGame({
 });
 game.appendTo(document.body);
 
-// Set origin to RED
-game.setBlock(new Array(0, 0, 0), materialNames['RED']);
-
-game.setBlock(new Array(0, 3, 0), materialNames['GRASS']);
+// Set origin to RED_WOOL
+game.setBlock(new Array(0, 0, 0), materialNames['RED_WOOL']);
 
 // Now we have a world, but no player. The following code fixes that
 var createPlayer = require('voxel-player')(game);
@@ -134,24 +132,31 @@ var hl = game.highlighter = highlight(game, { color: 0x00ff00 })
 hl.on('highlight', function (voxelPos) { highlightPos = voxelPos })
 hl.on('remove', function (voxelPos) { highlightPos = null })
 
+// Updates the lookLocation indicator when the mouse is clicked ("fired")
 game.on('fire', function (target, state) {
   // Purely for debugging purposes
   document.getElementById("looklocation").innerHTML = highlightPos + " (type: " + game.getBlock(highlightPos) + ")";
 })
 
-/////////////////////////////////////Begin Turtle related code/////////////////
+
+//////////////////////////////////// Setup HTML Page /////////////////////////////////
 
 // Register the HTML buttons to run the relevant scripts
 document.getElementById("runscript").addEventListener("click", runScript);
 document.getElementById("JSONUploadButton").addEventListener('change', parseJSON, false);
 document.getElementById("undo").addEventListener("click", undo);
+document.getElementById("javapolycompile").addEventListener("click", runEmbeddedScript);
+
+
+/////////////////////////////////////Begin Turtle related code/////////////////
 
 // Turtle variables
 // For some ungodly reason, the creators of voxeljs decided to use Arrays to represent positions instead of vectors
 var position = new Array(0,1,0)
 var turnAngle = 0;
 var blockPlace = true;
-var blockType = 1;
+var defaultBlockName = "STONE";
+var blockType = materialNames[defaultBlockName];
 
 // The current commands that will be run (extracted directly from the JSON)
 var curScript = null;
@@ -191,16 +196,52 @@ function updateJSON(e) {
     var result = e.target.result;
     // Converts the text to a JSON file
     var json = JSON.parse(result);
-    // Sets the current script to be the JSON's list of commands
-    curScript = json.commands;
-    document.getElementById("scriptstatus").innerHTML = json.scriptname + " has been loaded successfully!";
+    extractCommandsFromJSON(json);
   }
   catch(err) {
     document.getElementById("scriptstatus").innerHTML = "ERROR READING FILE";
   }
 }
 
-// Registers the function onLoadCallBack to run after the file has been loaded
+// Call when Compile and Run button is pressed to compile the embedded script in the HTML page
+function runEmbeddedScript() {
+  // JavaPoly.type returns the promise of a function, so you have to pass it another function to
+  // execute when the promise is filled
+  JavaPoly.type('com.javapoly.demo.HomepageDemo').then(function(HomepageDemo){
+    HomepageDemo.compileAndRun(editor.getValue()).then(function(result){
+      // Check if compileAndRun has returned a valid string (the turtle JSON)
+      if (result != null) {
+        try {
+          var json = JSON.parse(result);
+          extractCommandsFromJSON(json);
+          runScript();
+        } catch(err) {
+          window.alert("Received data, but was invalid JSON");
+          document.getElementById("scriptstatus").innerHTML = "Received data, but was invalid JSON";
+        }
+      } else {
+        document.getElementById("scriptstatus").innerHTML = "Could not get turtle data";
+        window.alert("Could not get turtle data");
+      }
+    },
+    function(err){
+      document.getElementById("scriptstatus").innerHTML = "There was an internal error";
+    });
+  }); 
+}
+
+// Called once the JSON has been loaded
+function extractCommandsFromJSON(json) {
+  // Sets the current script to be the JSON's list of commands
+  curScript = json.commands;
+  if (curScript != null) {
+    document.getElementById("scriptstatus").innerHTML = json.scriptname + " has been loaded successfully!";
+  } else {
+    document.getElementById("scriptstatus").innerHTML = "LOADED JSON BUT COULD NOT FIND COMMANDS! (Did you upload the right JSON file?)";
+  }
+}
+
+// Registers the function onLoadCallBack to run after file has been loaded
 function readFile(file, onLoadCallback){
     var reader = new FileReader();
     reader.onload = onLoadCallback;
@@ -241,7 +282,7 @@ function runScript() {
       case "placeBlocks":
         setBlockPlace(cmd.args);
         break;
-      case "blockPlaceMode":
+      case "setBlock":
         setBlock(cmd.args);
         break;
       case "setPosition":
@@ -352,11 +393,16 @@ function turnCommand(args) {
 }
 
 function setBlockPlace(args) {
-  blockPlace = args.place;
+  blockPlace = args.blockPlaceMode;
 }
 
 function setBlock(args) {
-  blockType = args.blockType;
+  if (args.blockType in materialNames) {
+    blockType = materialNames[args.blockType];
+  } else {
+    window.alert("Warning! The BlockType " + args.blockType + " is not supported in KnoxelJS. These blocks have been replaced with " + defaultBlockName);
+    blockType = materialNames[defaultBlockName];
+  }
 }
 
 function setPosition(args) {
