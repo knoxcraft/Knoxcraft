@@ -4,3 +4,4 @@ gamescript_BACKUP.js
 node_modules
 ace-builds
 .DS_Store
+lib
