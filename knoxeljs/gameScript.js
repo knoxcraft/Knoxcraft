@@ -112,7 +112,8 @@ var game = createGame({
   },
   chunkDistance: 2,
   materials: allMaterials,
-  materialFlatColor: false
+  materialFlatColor: false,
+  texturePath: '/textures/'
 });
 game.appendTo(document.body);
 
