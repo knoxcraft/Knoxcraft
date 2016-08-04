@@ -1,0 +1,21 @@
+#middle {
+    font-size: 32px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.center {
+    font-size: 32px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    display: block;
+}
+
+#editor {
+    min-width: 50%;
+    max-width: 50%;
+    min-height: 33%;
+}
+

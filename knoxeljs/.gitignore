@@ -6,3 +6,4 @@ ace-builds
 .DS_Store
 lib
 npm-debug.log
+gradle.properties
