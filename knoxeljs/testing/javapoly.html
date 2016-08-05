@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     JavaPoly.type('org.knoxcraft.javapoly.JavaPolyCompiler').then(function(JavaPolyCompiler){
       var code=document.getElementById("code").value;
       //alert(code);
+      // TODO: timeout if this call takes too long
       JavaPolyCompiler.compileAndRun(code).then(function(result){
         console.log("result is "+result);
         if (result[0]=="true"){
