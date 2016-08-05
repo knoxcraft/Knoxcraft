@@ -21,6 +21,8 @@ configurations {
 
 dependencies {
     provided "org.spongepowered:spongeapi:4.1.0"
+    provided group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.5'
+
     
     // not sure why I need to include javax.servlet-api; thought Jetty would have this?
     compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
@@ -76,9 +78,6 @@ jar {
 }
 
 task copyTask(type: Copy, dependsOn: 'jar', overwrite: true) {
-    // Copy a single file
-
-	
     from 'build/libs/knoxcraft-0.2.jar'
     into forgepath
 }
@@ -94,6 +93,28 @@ task clientLib(type: Jar, dependsOn: 'compileJava') {
         include 'org/knoxcraft/turtle3d/KCTScript.class'
         include 'org/knoxcraft/turtle3d/KCTCommand.class'
         include 'org/knoxcraft/turtle3d/JSONUtil.class'
-        include 'org/knoxcraft/turtle3d/BlockType.class'
+        include 'org/knoxcraft/turtle3d/KCTBlockTypes.class'
     }
+}
+
+task knoxeljsLib(type: Jar, dependsOn: 'compileJava'){
+    baseName = 'knoxeljs'
+    version = '0.2'
+    from('build/classes/main'){
+        include 'org/knoxcraft/turtle3d/Turtle3D.class'
+        include 'org/knoxcraft/turtle3d/Turtle3DBase.class'
+        include 'org/knoxcraft/turtle3d/TurtleException.class'
+        include 'org/knoxcraft/turtle3d/TurtleDirection.class'
+        include 'org/knoxcraft/turtle3d/KCTScript.class'
+        include 'org/knoxcraft/turtle3d/KCTCommand.class'
+        include 'org/knoxcraft/turtle3d/JSONUtil.class'
+        include 'org/knoxcraft/turtle3d/KCTBlockTypes.class'
+        include 'org/knoxcraft/javacompiler/*class'
+        include 'org/knoxcraft/javapoly/JavaPolyCompiler.class'
+    }
+}
+task knoxelCopyTask(type: Copy, dependsOn: 'knoxeljsLib', overwrite: true) {
+    // Copy a single file
+    from 'build/libs/knoxeljs-0.2.jar'
+    into '../knoxeljs/java/lib'
 }

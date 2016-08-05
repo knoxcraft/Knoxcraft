@@ -24,10 +24,8 @@
 package org.knoxcraft.javacompiler;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
-import org.slf4j.Logger;
-
-import com.google.inject.Inject;
 
 /**
  * A class loader which loads classes from byte arrays.
@@ -45,30 +43,25 @@ public class ByteArrayClassLoader extends ClassLoader {
     private Map<String, byte[]> classes;
     private ClassLoader defaultClassLoader;
     
-    @Inject
-    private Logger logger;
-    
-    @Inject
-    public Logger getLogger() {
-        return logger;
-    }
-
     /**
      * Creates a new instance of ByteArrayClassLoader
      * @param classes a map from binary class names to class files stored as byte arrays
      */
     public ByteArrayClassLoader(ClassLoader defaultLoader, Map<String, byte[]> classes) {
         this.defaultClassLoader=defaultLoader;
+        if (this.defaultClassLoader==null) {
+            // make sure that we don't crash if someone gives us a null classloader
+            this.defaultClassLoader=ClassLoader.getSystemClassLoader();
+            if (this.defaultClassLoader==null){
+                throw new RuntimeException("Serious error! We cannot find the system class loader!");
+            }
+        }
         this.classes = classes;
     }
 
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
-
         try {
-            if (defaultClassLoader==null) {
-                logger.error("classloader is null");
-            }
             return defaultClassLoader.loadClass(name);
         } catch (ClassNotFoundException e) {
             byte[] classData = classes.get(name);
