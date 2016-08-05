@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Javapoly tests</title>
+<script type="text/javascript" src="https://www.javapoly.com/javapoly.js"></script>
+<script type="text/java" src="lib/knoxeljs-0.2.jar"></script>
+<script type="text/java">
+package foo;
+public class Foo {
+  public static String throwException() {
+    throw new RuntimeException("exception");
+  }
+  public static Ninja getNinja() {
+    return new Ninja("alicia", 100);
+  }
+  public static class Ninja {
+    String name;
+    int honor;
+    public Ninja(String n, int h) {
+      this.name=n;
+      this.honor=h;
+    }
+  }
+  public static String[] stringArr() {
+    return new String[] {"abcd", "def"};
+  }
+}
+</script>
+<script type="text/javascript">
+function postOutcome(outcome) {
+  document.getElementById("current").innerHTML = outcome;
+}
+
+function running() {
+  postOutcome("Java code compiling and running!");
+}
+function finished() {
+  postOutcome("success!");
+}
+document.addEventListener("DOMContentLoaded", function(event) {
+  // DOMContentLoaded not supported by IE8
+  document.getElementById("compile").addEventListener("click", function() {
+    JavaPoly.type('org.knoxcraft.javapoly.JavaPolyCompiler').then(function(JavaPolyCompiler){
+      running();
+      var code=document.getElementById("code");
+      alert(code);
+      JavaPolyCompiler.compileAndRun(code).then(function(result){
+        if (result){
+          alert("success");
+          postOutcome("success");
+        } else {
+          alert("failure");
+          postOutcome("failure");
+        }
+      });
+    });
+  });
+
+
+  document.getElementById("exception").addEventListener("click", function() {
+    running();
+    JavaPoly.type('foo.Foo').then(function(Foo){
+      Foo.throwException().then(function(result){
+        alert("result is "+result);
+        finished();
+      }, function(error) {
+        postOutcome("failure");
+        alert("error happened");
+        console.log(error);
+      });
+    });
+  });
+  document.getElementById("instance").addEventListener("click", function() {
+    JavaPoly.type('foo.Foo').then(function(Foo){
+      Foo.getNinja().then(function(result){
+        alert("name: "+result.name+", honor: "+result.honor);
+      });
+    });
+  });
+  document.getElementById("stringarr").addEventListener("click", function() {
+    JavaPoly.type('foo.Foo').then(function(Foo){
+      Foo.stringArr().then(function(result){
+        alert(result[0]+", "+result[1]);
+      });
+    });
+  });
+});
+</script>
+</head>
+
+<body>
+<h1></h1>
+
+<p>
+  <button type="button" id="exception">Text exception!</button>
+</p>
+<p>
+  <button type="button" id="instance">Test instance!</button>
+</p>
+<p>
+  <button type="button" id="stringarr">String array!</button>
+</p>
+<p>
+  <button type="button" id="compile">compile and run!</button>
+</p>
+
+<div id="current">
+
+</div>
+
+<textarea rows="10" cols="40">
+import org.knoxcraft.turtle3d.Turtle3D;
+import static org.knoxcraft.turtle3d.KCTBlockTypes.*;
+public class HelloWorld {
+  public static void main(String[] args) {
+    Turtle3D t=Turtle3D.createTurtle("bob");
+    t.setBlock(RED_WOOL);
+    t.forward(10);
+  }
+}
+</textarea>
+
+<hr>
+<address></address>
+<!-- hhmts start -->Last modified: Fri Aug  5 15:28:19 CDT 2016 <!-- hhmts end -->
+</body> </html>

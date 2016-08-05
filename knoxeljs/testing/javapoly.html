@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Javapoly tests</title>
+<script type="text/javascript" src="https://www.javapoly.com/javapoly.js"></script>
+<script type="text/java" src="lib/knoxeljs-0.2.jar"></script>
+
+<script type="text/javascript">
+function postOutcome(outcome) {
+  document.getElementById("current").innerHTML = outcome;
+}
+
+function running() {
+  postOutcome('Java code compiling and running!\n<img src="loading.gif"/>');
+}
+function finished() {
+  postOutcome("success!");
+}
+document.addEventListener("DOMContentLoaded", function(event) {
+  // DOMContentLoaded not supported by IE8
+  document.getElementById("compile").addEventListener("click", function() {
+    running();
+    JavaPoly.type('org.knoxcraft.javapoly.JavaPolyCompiler').then(function(JavaPolyCompiler){
+      var code=document.getElementById("code").value;
+      //alert(code);
+      JavaPolyCompiler.compileAndRun(code).then(function(result){
+        console.log("result is "+result);
+        if (result[0]=="true"){
+          // success
+          alert("success");
+          postOutcome("success!\n"+result[1]);
+        } else if (result[4]=="true" && result[2]=="false"){
+          // runtime error
+          postOutcome("runtime error:\n"+result[3]);
+        } else {
+          // compiler error
+          postOutcome("compile error: \n"+result[5]);
+        }
+      }, function(error) {
+        alert("Unexpected error!");
+      });
+    });
+  });
+});
+</script>
+</head>
+
+<body>
+
+<p>
+  <button type="button" id="compile">compile and run!</button>
+</p>
+
+<div id="current">
+
+</div>
+
+<textarea id="code" rows="10" cols="40">
+import org.knoxcraft.turtle3d.Turtle3D;
+import static org.knoxcraft.turtle3d.KCTBlockTypes.*;
+public class HelloWorld {
+  public static void main(String[] args) {
+    Turtle3D t=Turtle3D.createTurtle("bob");
+    t.setBlock(RED_WOOL);
+    t.forward(10);
+  }
+}
+</textarea>
+
+<hr>
+<address></address>
+</body> </html>
