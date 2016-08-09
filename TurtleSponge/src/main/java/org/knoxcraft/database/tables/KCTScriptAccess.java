@@ -1,18 +1,17 @@
-package org.knoxcraft.database;
+package org.knoxcraft.database.tables;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.knoxcraft.database.Column;
+import org.knoxcraft.database.DataAccess;
+import org.knoxcraft.database.Database;
+import org.knoxcraft.database.Column.DataType;
+import org.knoxcraft.database.exceptions.DatabaseReadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.canarymod.database.Column;
-import net.canarymod.database.Column.DataType;
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseReadException;
 
 public class KCTScriptAccess extends DataAccess
 {

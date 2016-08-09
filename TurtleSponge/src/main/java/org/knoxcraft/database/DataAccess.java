@@ -33,7 +33,7 @@
 // "Minecraft" is a trademark of Notch Development AB
 // "CanaryMod" name is used with permission from FallenMoonNetwork.
 
-package net.canarymod.database;
+package org.knoxcraft.database;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -44,14 +44,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.knoxcraft.database.exceptions.DatabaseAccessException;
+import org.knoxcraft.database.exceptions.DatabaseTableInconsistencyException;
+import org.knoxcraft.database.exceptions.DatabaseWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
-
-import net.canarymod.database.exceptions.DatabaseAccessException;
-import net.canarymod.database.exceptions.DatabaseTableInconsistencyException;
-import net.canarymod.database.exceptions.DatabaseWriteException;
 
 /**
  * Handle the layout and creation of tables

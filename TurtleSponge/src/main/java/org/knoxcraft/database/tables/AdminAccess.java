@@ -1,8 +1,8 @@
-package org.knoxcraft.database;
+package org.knoxcraft.database.tables;
 
-import net.canarymod.database.Column;
-import net.canarymod.database.Column.DataType;
-import net.canarymod.database.DataAccess;
+import org.knoxcraft.database.Column;
+import org.knoxcraft.database.DataAccess;
+import org.knoxcraft.database.Column.DataType;
 
 public class AdminAccess extends DataAccess
 {

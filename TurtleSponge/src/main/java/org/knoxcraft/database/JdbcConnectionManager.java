@@ -33,19 +33,18 @@
 // "Minecraft" is a trademark of Notch Development AB
 // "CanaryMod" name is used with permission from FallenMoonNetwork.
 
-package net.canarymod.database;
+package org.knoxcraft.database;
 
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.knoxcraft.database.exceptions.DatabaseAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-import net.canarymod.database.exceptions.DatabaseAccessException;
 
 /**
  * Represents a connection (pool) manager for all sorts of JDBC connections.

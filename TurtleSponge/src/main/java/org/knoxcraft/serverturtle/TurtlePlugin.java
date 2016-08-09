@@ -9,12 +9,11 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseReadException;
-import net.canarymod.database.exceptions.DatabaseWriteException;
-
-import org.knoxcraft.database.KCTScriptAccess;
+import org.knoxcraft.database.DataAccess;
+import org.knoxcraft.database.Database;
+import org.knoxcraft.database.exceptions.DatabaseReadException;
+import org.knoxcraft.database.exceptions.DatabaseWriteException;
+import org.knoxcraft.database.tables.KCTScriptAccess;
 import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
 import org.knoxcraft.turtle3d.KCTBlockTypes;

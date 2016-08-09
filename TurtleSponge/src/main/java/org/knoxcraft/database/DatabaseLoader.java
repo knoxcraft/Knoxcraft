@@ -33,15 +33,14 @@
 // "Minecraft" is a trademark of Notch Development AB
 // "CanaryMod" name is used with permission from FallenMoonNetwork.
 
-package net.canarymod.database;
+package org.knoxcraft.database;
 
 import java.io.File;
 
+import org.knoxcraft.database.exceptions.DatabaseException;
 import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.canarymod.database.exceptions.DatabaseException;
 
 
 /**

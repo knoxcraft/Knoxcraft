@@ -4,10 +4,10 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseReadException;
-import net.canarymod.database.exceptions.DatabaseWriteException;
+import org.knoxcraft.database.DataAccess;
+import org.knoxcraft.database.Database;
+import org.knoxcraft.database.exceptions.DatabaseReadException;
+import org.knoxcraft.database.exceptions.DatabaseWriteException;
 
 public class H2Database extends Database
 {

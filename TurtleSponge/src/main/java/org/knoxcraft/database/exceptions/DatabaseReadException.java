@@ -33,33 +33,22 @@
 // "Minecraft" is a trademark of Notch Development AB
 // "CanaryMod" name is used with permission from FallenMoonNetwork.
 
-package net.canarymod.database;
+package org.knoxcraft.database.exceptions;
 
 /**
- * Location assistant DataAccess object
+ * Thrown when trying to read data from the database and there is an error
  *
- * @author Jason Jones (darkdiplomat)
+ * @author Chris (damagefilter)
  */
-public abstract class LocationDataAccess extends PositionDataAccess {
+public class DatabaseReadException extends Exception {
 
-    public LocationDataAccess(String tableName) {
-        super(tableName);
+    private static final long serialVersionUID = -6274875008612771399L;
+
+    public DatabaseReadException(String str) {
+        super(str);
     }
 
-    public LocationDataAccess(String tableName, String tableSuffix) {
-        super(tableName, tableSuffix);
+    public DatabaseReadException(String str, Throwable t) {
+        super(str, t);
     }
-
-    // X Y Z from PositionDataAccess
-    @Column(columnName = "rotation", notNull = true, dataType = Column.DataType.FLOAT)
-    public float rotation = 0;
-
-    @Column(columnName = "pitch", notNull = true, dataType = Column.DataType.FLOAT)
-    public float pitch = 0;
-
-    @Column(columnName = "world", notNull = true, dataType = Column.DataType.STRING)
-    public String world = "default";
-
-    @Column(columnName = "dimension", notNull = true, dataType = Column.DataType.STRING)
-    public String dimension = "NORMAL";
 }

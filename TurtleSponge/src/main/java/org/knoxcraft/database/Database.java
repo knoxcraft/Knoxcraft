@@ -33,22 +33,21 @@
 // "Minecraft" is a trademark of Notch Development AB
 // "CanaryMod" name is used with permission from FallenMoonNetwork.
 
-package net.canarymod.database;
+package org.knoxcraft.database;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.knoxcraft.database.exceptions.DatabaseException;
+import org.knoxcraft.database.exceptions.DatabaseReadException;
+import org.knoxcraft.database.exceptions.DatabaseWriteException;
 import org.knoxcraft.database.h2.H2Database;
+import org.knoxcraft.database.mysql.MySQLDatabase;
+import org.knoxcraft.database.sqlite.SQLiteDatabase;
+import org.knoxcraft.database.xml.XmlDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.canarymod.database.exceptions.DatabaseException;
-import net.canarymod.database.exceptions.DatabaseReadException;
-import net.canarymod.database.exceptions.DatabaseWriteException;
-import net.canarymod.database.mysql.MySQLDatabase;
-import net.canarymod.database.sqlite.SQLiteDatabase;
-import net.canarymod.database.xml.XmlDatabase;
 
 
 /**

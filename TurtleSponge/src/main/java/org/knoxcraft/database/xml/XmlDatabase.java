@@ -33,7 +33,7 @@
 // "Minecraft" is a trademark of Notch Development AB
 // "CanaryMod" name is used with permission from FallenMoonNetwork.
 
-package net.canarymod.database.xml;
+package org.knoxcraft.database.xml;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,6 +58,14 @@ import org.jdom2.input.JDOMParseException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.knoxcraft.database.Column;
+import org.knoxcraft.database.DataAccess;
+import org.knoxcraft.database.Database;
+import org.knoxcraft.database.Column.DataType;
+import org.knoxcraft.database.exceptions.DatabaseAccessException;
+import org.knoxcraft.database.exceptions.DatabaseReadException;
+import org.knoxcraft.database.exceptions.DatabaseTableInconsistencyException;
+import org.knoxcraft.database.exceptions.DatabaseWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,15 +73,6 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
 import com.mchange.v1.lang.BooleanUtils;
-
-import net.canarymod.database.Column;
-import net.canarymod.database.Column.DataType;
-import net.canarymod.database.DataAccess;
-import net.canarymod.database.Database;
-import net.canarymod.database.exceptions.DatabaseAccessException;
-import net.canarymod.database.exceptions.DatabaseReadException;
-import net.canarymod.database.exceptions.DatabaseTableInconsistencyException;
-import net.canarymod.database.exceptions.DatabaseWriteException;
 
 /**
  * Represent access to an XML database

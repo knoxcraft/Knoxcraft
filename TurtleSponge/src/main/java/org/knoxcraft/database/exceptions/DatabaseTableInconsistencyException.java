@@ -33,22 +33,19 @@
 // "Minecraft" is a trademark of Notch Development AB
 // "CanaryMod" name is used with permission from FallenMoonNetwork.
 
-package net.canarymod.database.exceptions;
+package org.knoxcraft.database.exceptions;
 
 /**
- * Thrown when there is an error accessing the database
+ * Thrown when data is inconsistant, this often occours when you make a mistake
+ * in your @Column fields.
  *
  * @author Chris (damagefilter)
  */
-public class DatabaseAccessException extends Exception {
+public class DatabaseTableInconsistencyException extends Exception {
 
     private static final long serialVersionUID = -6274875008612771399L;
 
-    public DatabaseAccessException(String str) {
+    public DatabaseTableInconsistencyException(String str) {
         super(str);
-    }
-
-    public DatabaseAccessException(String str, Throwable t) {
-        super(str, t);
     }
 }
