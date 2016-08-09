@@ -25,6 +25,7 @@ import org.knoxcraft.turtle3d.Turtle3D;
  */
 public class JavaPolyCompiler
 {
+    // this name is hard-coded in
     private static final String CLASS_NAME="HelloWorld";
     
     private static final int TOTAL_SUCCESS=0;
@@ -33,35 +34,6 @@ public class JavaPolyCompiler
     private static final int RUNTIME_MESSAGE=3;
     private static final int COMPILE_SUCCESS=4;
     private static final int COMPILE_MESSAGE=5;
-    
-    public static void testThread() {
-        System.out.println("method starting");
-        Thread t=new Thread() {
-            public void run() {
-                System.out.println("about to sleep for 5 seconds");
-                if (true)while(true);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    System.out.println("interrupted");
-                }
-                System.out.println("done sleeping ");
-            }
-        };
-        System.out.println("about to start thread");
-        t.start();
-        System.out.println("t has started, waiting 2 seconds");
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        t.stop();
-        
-        
-    }
     
     /**
      * Return a String array of size 6 representing the outcome of compiling
@@ -110,22 +82,29 @@ public class JavaPolyCompiler
         try {
             ByteArrayClassLoader loader=new ByteArrayClassLoader(null, compiler.getFileManager().getClasses());
             Class<?> cls = loader.loadClass(CLASS_NAME);
-            StoppableThread thread=new StoppableThread(cls.getMethod("main", String[].class));
-            thread.start();
-            boolean success=thread.waitFor(5000);
-            if (!success){
-                result[RUNTIME_SUCCESS]="false";
-                result[RUNTIME_MESSAGE]=thread.getError().toString();
-                result[TOTAL_SUCCESS]="false";
-                result[JSON]="";
-                return result;
-            }
-    
+            // This might not finish due to infinite loops in student code
+            // However, we are launching this code through JavaPoly, 
+            // which has very weak support for Threads at this point
+            // If this call blocks indefinitely, due to an infinite
+            // or really large loop in student code, the student will
+            // need to kill it through the browser, typically by closing
+            // the browser tab or using some other mechanism supported by the
+            // browser.
+            //
+            // Eventually when JavaPoly has more robust support for webworkers,
+            // we will fix this.
+            cls.getMethod("main", String[].class).invoke(null, (Object)new String[]{});
 
+            // We are mapping {Thread => {String=>Turtle3D}} because Turtle3D
+            // usually runs on a multiplayer Minecraft server so we use the
+            // thread that ran the program to identify the code, in case
+            // two users upload turtle scripts at the same time.
+            // This is unnecessary in the browser through JavaPoly, but
+            // we want to use the same classes so we didn't add a new
+            // turtle type.
             Map<Thread,Map<String,Turtle3D>> turtleMap = Turtle3D.turtleMap;
             for (Entry<Thread,Map<String,Turtle3D>> entry : turtleMap.entrySet()){
                 Turtle3D t=entry.getValue().values().iterator().next();
-                //for (Turtle3D t : turtleMap.get(Thread.currentThread()).values()){
                 String json=t.getScript().toJSONString();
                 result[1]=json;
                 result[2]="true";
@@ -138,66 +117,5 @@ public class JavaPolyCompiler
             result[3]=e.toString();
         }
         return result;
-    }
-    private static class StoppableThread extends Thread {
-        private Method method;
-        private boolean done=false;
-        private boolean hasError=false;
-        private Exception error;
-        
-        StoppableThread(Method method){
-            System.out.println("creating thread");
-            this.method=method;
-        }
-        public Exception getError() {
-            return this.error;
-        }
-        public boolean hasError(){
-            return this.hasError;
-        }
-        boolean waitFor(long millis) {
-            // sleep in 100 time unit increments
-            System.out.println("starting thread");
-            long end=System.currentTimeMillis()+millis;
-            while (System.currentTimeMillis()<end) {
-                try {
-                    //System.out.printf("sleeping 100 ms, current %d target %d\n", System.currentTimeMillis(), end);
-                    Thread.sleep(100);
-                    if (done){
-                        System.out.println("return true");
-                        return true;
-                    }
-                } catch (InterruptedException e) {
-                    // ignore
-                }
-            }
-            System.out.println("stopping thread");
-            error=new TimeoutException("Student code took too long, or had an infinite loop");
-            hasError=true;
-            done=true;
-            
-            // totally safe to stop this thread
-            System.out.println("is this thread alive before stop? "+this.isAlive());
-            this.stop();
-            System.out.println("is this thread alive after stop? "+this.isAlive());
-            return false;
-        }
-        public void run() {
-            try {
-                this.method.invoke(null, (Object)new String[]{});
-                done=true;
-            } catch (IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException e)
-            {
-                // ignore
-                hasError=true;
-                error=e;
-            } catch (Error e) {
-                System.out.println("HOLY SHIT thread death");
-                throw e;
-            } finally {
-                System.out.println("thread finally");
-            }
-        }
     }
 }
