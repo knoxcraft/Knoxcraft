@@ -38,6 +38,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent.Join;
 import org.spongepowered.api.event.network.ClientConnectionEvent.Login;
 import org.spongepowered.api.event.world.ChangeWorldWeatherEvent;
 import org.spongepowered.api.event.world.LoadWorldEvent;
@@ -56,7 +57,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 
 @Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft", authors = {
-		"kakoijohn", "mrmoeee", "emhastings", "ppypp", "jspacco" })
+		"kakoijohn", "mrmoeee", "lkasser8", "emhastings", "ppypp", "jspacco" })
 public class TurtlePlugin {
 
 	public static final String ID = "kct";
@@ -410,11 +411,12 @@ public class TurtlePlugin {
 	 * @param loginEvent
 	 */
 	@Listener
-	public void onLogin(Login loginEvent) {
+	public void onJoin(Join joinEvent) {
 		// TODO: verify that this hook related to logging in
 		// TODO prevent breaking blocks, by figuring out equivalent of
 		// setCanBuild(false);
-		log.debug(String.format("player " + loginEvent.getTargetUser().getName()));
+	    log.info("Logging in; checking to see if debug level log works");
+		log.debug(String.format("player " + joinEvent.getTargetEntity().getName()));
 	}
 
 	/**
@@ -429,8 +431,8 @@ public class TurtlePlugin {
 		Weather curWeather;
 		worldWeatherListener.setWeather(Weathers.CLEAR);
 		curWeather = worldWeatherListener.getWeather();
-		log.info(String.format("Weather listener called"));
-		log.info(String.format("current weather = %s ", curWeather.getName()));
+		log.debug(String.format("Weather listener called"));
+		log.debug(String.format("current weather = %s ", curWeather.getName()));
 	}
 
 	/**

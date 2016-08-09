@@ -37,10 +37,75 @@ document.addEventListener("DOMContentLoaded", function(event) {
           postOutcome("compile error: \n"+result[5]);
         }
       }, function(error) {
-        alert("Unexpected error!");
+        alert("Unexpected error! "+error);
       });
     });
   });
+  document.getElementById("test").addEventListener("click", function(){
+    JavaPoly.type('org.knoxcraft.javapoly.JavaPolyCompiler').then(function(JavaPolyCompiler){
+      postOutcome("running");
+      JavaPolyCompiler.testThread().then(function(){
+        postOutcome("done");
+      }, function(err) {
+        console.log(err);
+      });
+    });
+  });
+  document.getElementById("test2").addEventListener("click", function(){
+    var fun=null;
+    setTimeout(function() {
+      console.log("let's kill this thing");
+      if (fun!=null){
+        console.log("killing it");
+        clearTimeout(fun);
+      }
+    }, 3000);
+    fun=setTimeout(function() {
+      //setInterval(function() {console.log("hello");}, 500);
+      console.log("check out this message");
+      while(true) ;
+    }, 1000);
+  });
+
+    // var thefun=null;
+    //
+    // var p=(new Promise(function(resolve, reject) {
+    //   thefun=setTimeout(function() {
+    //     console.log("successfully resolving");
+    //     resolve();
+    //   }, 10000);
+    //   setTimeout(function() {
+    //     console.log("rejecting the promise");
+    //     reject();
+    //   }, 2000);
+    // })).then(function () {
+    //   while(true);
+    //   console.log("Promise succeeded");
+    // }, function () {
+    //   console.log("canceling function");
+    //   clearTimeout(thefun);
+    //   console.log("function canceled");
+    // });
+/*
+    postOutcome("testing stuff");
+    var p1 = new Promise(
+      function(resolve, reject) {
+        postOutcome("running");
+        window.setTimeout(
+                function() {
+                    // We fulfill the promise !
+                    resolve("hello srsly");
+                }, 3000);
+      }
+    );
+    p1.then(function(val) {
+      postOutcome(val);
+    }).catch(function(reason) {
+      postOutcome('rejection');
+      console.log('reason');
+    });
+  });
+  */
 });
 </script>
 </head>
@@ -50,6 +115,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 <p>
   <button type="button" id="compile">compile and run!</button>
 </p>
+<p>
+  <button type="button" id="test">test</button>
+<p>
+<p>
+  <button type="button" id="test2">test2</button>
+<p>
+
 
 <div id="current">
 
