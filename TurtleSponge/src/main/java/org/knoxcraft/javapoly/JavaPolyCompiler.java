@@ -1,10 +1,7 @@
 package org.knoxcraft.javapoly;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeoutException;
 
 import org.knoxcraft.javacompiler.ByteArrayClassLoader;
 import org.knoxcraft.javacompiler.CompilerDiagnostic;
