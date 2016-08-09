@@ -115,6 +115,7 @@ var game = createGame({
   materialFlatColor: false,
   texturePath: '/textures/'
 });
+// TODO: should we attach this to a div?
 game.appendTo(document.body);
 
 // Set origin to RED_WOOL
@@ -138,15 +139,6 @@ game.on('fire', function (target, state) {
   // Purely for debugging purposes
   document.getElementById("looklocation").innerHTML = highlightPos + " (type: " + game.getBlock(highlightPos) + ")";
 })
-
-
-//////////////////////////////////// Setup HTML Page /////////////////////////////////
-
-// Register the HTML buttons to run the relevant scripts
-document.getElementById("runscript").addEventListener("click", runScript);
-document.getElementById("JSONUploadButton").addEventListener('change', parseJSON, false);
-document.getElementById("undo").addEventListener("click", undo);
-document.getElementById("javapolycompile").addEventListener("click", runEmbeddedScript);
 
 
 /////////////////////////////////////Begin Turtle related code/////////////////
@@ -180,10 +172,25 @@ angleMappings[225] = new Array(-1,0,-1);
 angleMappings[270] = new Array(0,0,-1);
 angleMappings[315] = new Array(1,0,-1);
 
+//
+// Helper functions for updating the DOM
+//
+function setStatus(message) {
+  document.getElementById("scriptstatus").innerHTML = message;
+}
+function setMessage(outcome) {
+  // TODO: improve how we post and communicate errors?
+  document.getElementById("message").innerHTML = outcome;
+}
+function running() {
+  setMessage('Java code compiling and running!<br><img src="/images/loading.gif"/><br>');
+}
+
 // Called when user presses JSONUploadButton- begins
 // reading the uploaded file
 function parseJSON(evt) {
-  document.getElementById("scriptstatus").innerHTML = "Loading script...";
+  setStatus("Loading script...");
+  //document.getElementById("scriptstatus").innerHTML = "Loading script...";
   // registers updateJSON to run after the file has been read
   // (since we're not uploading multiple files at once, we can
   // just get the first element in the button's files list)
@@ -196,49 +203,22 @@ function updateJSON(e) {
     // Gets the text from the file reader (which triggered event e)
     var result = e.target.result;
     // Converts the text to a JSON file
-    var json = JSON.parse(result);
-    extractCommandsFromJSON(json);
+    extractCommandsFromJSON(result);
   }
   catch(err) {
-    document.getElementById("scriptstatus").innerHTML = "ERROR READING FILE";
+    setStatus("ERROR READING FILE");
   }
-}
-
-// Call when Compile and Run button is pressed to compile the embedded script in the HTML page
-function runEmbeddedScript() {
-  // JavaPoly.type returns the promise of a function, so you have to pass it another function to
-  // execute when the promise is filled
-  JavaPoly.type('com.javapoly.demo.HomepageDemo').then(function(HomepageDemo){
-    HomepageDemo.compileAndRun(editor.getValue()).then(function(result){
-      // Check if compileAndRun has returned a valid string (the turtle JSON)
-      if (result != null) {
-        try {
-          var json = JSON.parse(result);
-          extractCommandsFromJSON(json);
-          runScript();
-        } catch(err) {
-          window.alert("Received data, but was invalid JSON");
-          document.getElementById("scriptstatus").innerHTML = "Received data, but was invalid JSON";
-        }
-      } else {
-        document.getElementById("scriptstatus").innerHTML = "Could not get turtle data";
-        window.alert("Could not get turtle data");
-      }
-    },
-    function(err){
-      document.getElementById("scriptstatus").innerHTML = "There was an internal error";
-    });
-  }); 
 }
 
 // Called once the JSON has been loaded
-function extractCommandsFromJSON(json) {
+function extractCommandsFromJSON(jsontext) {
+  var json = JSON.parse(jsontext);
   // Sets the current script to be the JSON's list of commands
   curScript = json.commands;
   if (curScript != null) {
-    document.getElementById("scriptstatus").innerHTML = json.scriptname + " has been loaded successfully!";
+    setStatus(json.scriptname + " has been loaded successfully!");
   } else {
-    document.getElementById("scriptstatus").innerHTML = "LOADED JSON BUT COULD NOT FIND COMMANDS! (Did you upload the right JSON file?)";
+    setStatus("LOADED JSON BUT COULD NOT FIND COMMANDS! (Did you upload the right JSON file?)");
   }
 }
 
@@ -334,7 +314,7 @@ function forward(args) {
   } else {
     position[0] += direction[0] * dist;
     position[2] += direction[2] * dist;
-  }   
+  }
 }
 
 function backward(args) {
@@ -386,7 +366,7 @@ function turnCommand(args) {
   if (args.dir === "right") {
     turn(-1 * args.degrees);
   }
-  
+
   if (args.dir === "left") {
     turn(args.degrees);
   }
@@ -417,3 +397,49 @@ function setDirection(args) {
 
 }
 
+//////////////////////////////////// Setup HTML Page /////////////////////////////////
+
+// Register the HTML buttons to run the relevant scripts
+document.addEventListener("DOMContentLoaded", function(event) {
+  // TODO: test DOMContentLoaded with IE8 (does anyone still use IE8?)
+  // DOMContentLoaded may not be supported by IE8
+  document.getElementById("runscript").addEventListener("click", runScript);
+  document.getElementById("JSONUploadButton").addEventListener('change', parseJSON, false);
+  document.getElementById("undo").addEventListener("click", undo);
+  document.getElementById("compileandrun").addEventListener("click", function() {
+    running();
+    JavaPoly.type('org.knoxcraft.javapoly.JavaPolyCompiler').then(function(JavaPolyCompiler){
+      // constants that tell us where things are in the array returned
+      // from the JavaPolyCompiler
+      var TOTAL_SUCCESS=0;
+      var JSON_RESULT=1;
+      var RUNTIME_SUCCESS=2;
+      var RUNTIME_MESSAGE=3;
+      var COMPILE_SUCCESS=4;
+      var COMPILE_MESSAGE=5;
+      var code=editor.getValue();
+      // TODO: someday timeout if this call takes too long
+      JavaPolyCompiler.compileAndRun(code).then(function(result){
+        console.log("result is "+result);
+        if (result[TOTAL_SUCCESS]==='true'){
+          // success
+          //alert("success");
+          // TODO: I hope this is the correct place to send the JSON commands
+          extractCommandsFromJSON(result[JSON_RESULT]);
+          setMessage("successfully compiled and loaded code!");
+        } else if (result[COMPILE_SUCCESS]==='true' && result[RUNTIME_SUCCESS]==="false"){
+          // runtime error
+          console.log(result[RUNTIME_MESSAGE]);
+          setMessage("runtime error:\n"+result[RUNTIME_MESSAGE]);
+        } else {
+          // compiler error
+          console.log(result[RUNTIME_MESSAGE]);
+          setMessage("compile error: \n"+result[COMPILE_MESSAGE]);
+        }
+      }, function(error) {
+        console.log(error);
+        alert("Unexpected error! "+error);
+      });
+    });
+  });
+});

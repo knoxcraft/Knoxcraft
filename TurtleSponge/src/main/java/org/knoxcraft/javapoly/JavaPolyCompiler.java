@@ -26,7 +26,7 @@ public class JavaPolyCompiler
     private static final String CLASS_NAME="HelloWorld";
     
     private static final int TOTAL_SUCCESS=0;
-    private static final int JSON=1;
+    private static final int JSON_RESULT=1;
     private static final int RUNTIME_SUCCESS=2;
     private static final int RUNTIME_MESSAGE=3;
     private static final int COMPILE_SUCCESS=4;
@@ -55,13 +55,14 @@ public class JavaPolyCompiler
     public static String[] compileAndRun(String programText) {
         InMemoryJavaCompiler compiler=new InMemoryJavaCompiler();
         String[] result=new String[6];
+        // total success is false until we are sure everything worked
+        result[TOTAL_SUCCESS]="false";
         compiler.addSourceFile(CLASS_NAME, programText);
         // store the outcome
         boolean outcome=compiler.compile();
         if (!outcome) {
             // didn't compile
-            result[TOTAL_SUCCESS]="false";
-            result[JSON]="";
+            result[JSON_RESULT]="";
             StringBuilder buf=new StringBuilder();
             for (CompilerDiagnostic d : compiler.getCompileResult().getCompilerDiagnosticList()){
                 buf.append(d.toString()+"\n");
@@ -103,9 +104,10 @@ public class JavaPolyCompiler
             for (Entry<Thread,Map<String,Turtle3D>> entry : turtleMap.entrySet()){
                 Turtle3D t=entry.getValue().values().iterator().next();
                 String json=t.getScript().toJSONString();
-                result[1]=json;
-                result[2]="true";
-                result[3]="successfully ran";
+                result[TOTAL_SUCCESS]="true";
+                result[JSON_RESULT]=json;
+                result[RUNTIME_SUCCESS]="true";
+                result[RUNTIME_MESSAGE]="successfully ran";
                 return result;
             }
         } catch (Exception e) {
