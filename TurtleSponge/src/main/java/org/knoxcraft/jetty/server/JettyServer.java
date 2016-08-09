@@ -13,14 +13,13 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JettyServer
 {
     private Server server;
-    private Logger logger=LoggerFactory.getLogger(TurtlePlugin.ID);
+    private Logger logger=LoggerFactory.getLogger(JettyServer.class);
 
     public JettyServer() {
     }
