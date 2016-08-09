@@ -33,39 +33,12 @@ public class KCTJobQueue {
     }
     
     public void undoScript(CommandSource src, int numUndo) {
-//        String senderName = src.getName().toLowerCase();
-//        if (src instanceof Player) {
-//            undoWorkerTurtle.setWorld(((Player) src).getWorld());
-//            
-//            if (!userBuildPools.containsKey(senderName)) {
-//                src.sendMessage(Text.of("You have not executed any scripts to undo!"));
-//            } else { // buffer exists
-//                // get buffer
-//                Stack<Stack<KCTWorldBlockInfo>> undoUserScripts = userBuildPools.get(senderName);
-//
-//                if (undoUserScripts == null) { // buffer empty
-//                    src.sendMessage(Text.of("There were no scripts invoked by the player!"));
-//                } else {
-//                    for (int i = 0; i < numUndo; i++) {
-//                        try {
-//                            Stack<KCTWorldBlockInfo> undoJobStack = undoUserScripts.pop();
-//                            minecraftAsyncExecutor.submit(new Runnable() {
-//                                public void run() {
-////                                    undoWorkerTurtle.executeUndoStack(undoJobStack, minecraftSyncExecutor);
-//                                }
-//                            });
-//                        } catch (EmptyStackException e) {
-//                            src.sendMessage(Text.of("There are no more scripts to undo!"));
-//                            break;
-//                        }   
-//                    }
-//                }
-//            }
-//        }
+        workMap.addUndo(src, numUndo);
     }
     
     public void shutdownExecutor() {
         log.debug("Shutting down Sponge Executors and Threads.");
+        workThread.shutdown();
         minecraftSyncExecutor.shutdown();
         minecraftAsyncExecutor.shutdown();
     }

@@ -1,5 +1,6 @@
 package org.knoxcraft.turtle3d;
 
+import java.util.LinkedList;
 import java.util.Queue;
 
 public class WorkChunk {
@@ -7,6 +8,8 @@ public class WorkChunk {
     private int jobNum;
     private int workChunkNum;
     private int workChunkSize;
+    
+    private boolean isUndoScript;
     
     private Queue<KCTWorldBlockInfo> blockChunk;
     
@@ -16,6 +19,14 @@ public class WorkChunk {
         this.jobNum = jobNum;
         this.workChunkNum = workChunkNum;
         this.workChunkSize = workChunkSize;
+    }
+    
+    public WorkChunk(WorkChunk workChunk) {
+        this.blockChunk = new LinkedList<KCTWorldBlockInfo>(workChunk.blockChunk);
+        this.userName = workChunk.userName;
+        this.jobNum = workChunk.jobNum;
+        this.workChunkNum = workChunk.workChunkNum;
+        this.workChunkSize = workChunk.workChunkSize;
     }
     
     public Queue<KCTWorldBlockInfo> getBlockChunk() {
@@ -34,7 +45,15 @@ public class WorkChunk {
         return this.workChunkNum;
     }
     
-    public int getWorkChunkSize() {
+    public int getWorkChunkMaxSize() {
         return this.workChunkSize;
+    }
+    
+    public boolean isUndoScript() {
+        return isUndoScript;
+    }
+    
+    public void setUndoScript(boolean state) {
+        this.isUndoScript = state;
     }
 }

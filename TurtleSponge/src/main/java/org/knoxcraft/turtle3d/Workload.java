@@ -4,10 +4,17 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Workload {
-    private Queue<WorkChunk> workChunks;
+    private LinkedList<WorkChunk> workChunks;
     
     public Workload() {
         workChunks = new LinkedList<WorkChunk>();
+    }
+    
+    public Workload(Workload workload) {
+        LinkedList<WorkChunk> workChunksCopy = new LinkedList<WorkChunk>();
+        for (WorkChunk chunk : workload.workChunks)
+            workChunksCopy.add(new WorkChunk(chunk));
+        this.workChunks = workChunksCopy;
     }
     
     public void addAll(Queue<WorkChunk> workChunks) {
@@ -26,7 +33,18 @@ public class Workload {
         return workChunks.poll();
     }
     
+    public WorkChunk popWork() {
+        return workChunks.pop();
+    }
+    
     public Queue<WorkChunk> getWorkChunks() {
         return workChunks;
+    }
+    
+    public Workload setAsUndoWork() {
+        for (WorkChunk chunk : workChunks)
+            chunk.setUndoScript(true);
+        
+        return this;
     }
 }

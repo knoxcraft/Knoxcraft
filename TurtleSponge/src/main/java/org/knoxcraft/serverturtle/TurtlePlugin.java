@@ -325,9 +325,10 @@ public class TurtlePlugin {
 	public static KCTScript makeFakeSquare() {
 		KCTScript script = new KCTScript("testscript");
 		// TODO flesh this out to test a number of other commands
-		script.addCommand(KCTCommand.setBlock(KCTBlockTypes.BLUE_WOOL));
-
+		
 		for (int i = 0; i < 5; i++) {
+		    script.addCommand(KCTCommand.setBlock(KCTBlockTypes.BLUE_WOOL));
+		    
 			for (int j = 0; j < 25; j++) {
 				script.addCommand(KCTCommand.forward(50));
 				script.addCommand(KCTCommand.turnLeft(90));
@@ -338,7 +339,9 @@ public class TurtlePlugin {
 				script.addCommand(KCTCommand.forward(1));
 				script.addCommand(KCTCommand.turnRight(90));
 			}
-
+			
+			script.addCommand(KCTCommand.setBlock(KCTBlockTypes.RED_WOOL));
+			
 			script.addCommand(KCTCommand.up(1));
 
 			for (int j = 0; j < 25; j++) {

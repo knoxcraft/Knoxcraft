@@ -1,6 +1,5 @@
 package org.knoxcraft.turtle3d;
 
-import java.util.LinkedList;
 import java.util.Queue;
 
 import org.slf4j.Logger;
@@ -12,7 +11,7 @@ public class WorkThread extends Thread {
     private WorkMap work;
     private boolean done=false;
     private World world;
-    private long sleepTime=200;
+    private long sleepTime = 200;
     private SpongeExecutorService minecraftSyncExecutor;
     private Logger log;
     
@@ -30,16 +29,23 @@ public class WorkThread extends Thread {
     public void run() {
         while (!done) {
 //            log.info("waiting for some work...");
-            Queue<KCTWorldBlockInfo> queue = work.getWork();
+            WorkChunk workChunk = work.getWork();
+            boolean isUndoScript = workChunk.isUndoScript();
+            log.info("Is undo script " + isUndoScript);
+            Queue<KCTWorldBlockInfo> queue = workChunk.getBlockChunk();
 //            log.info("Doing some work.");
 
             minecraftSyncExecutor.submit(new Runnable() {
                 public void run() {
                     while (queue != null && !queue.isEmpty()) {
                         KCTWorldBlockInfo block = queue.poll();
-                        world.setBlock(block.getLoc(), block.getNewBlock());
                         
-//                        log.info("Setting block at: " + block.getLoc());
+                        if (isUndoScript)
+                            world.setBlock(block.getLoc(), block.getOldBlock());
+                        else
+                            world.setBlock(block.getLoc(), block.getNewBlock());
+                        
+//                        log.info("Setting block at: " + block.getNewBlock().getId() + " " + block.getLoc());
                     }
                 }
             });

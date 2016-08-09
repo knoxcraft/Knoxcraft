@@ -44,7 +44,6 @@ public enum TurtleDirection {
 	}
 	
 	public static TurtleDirection getTurtleDirection(Vector3d direction) {
-
         double d = direction.getY() / 360 * 8;
         int x = (int) Math.round(d);
         
@@ -53,29 +52,21 @@ public enum TurtleDirection {
         }
 
         if (x == 0 || x == 8) {
-            return TurtleDirection.NORTH;
-
-        } else if (x == 1) {
-            return TurtleDirection.NORTHEAST;
-
-        } else if (x == 2) {
-            return TurtleDirection.EAST;
-
-        } else if (x == 3) {
-            return TurtleDirection.SOUTHEAST;
-
-        } else if (x == 4) {
             return TurtleDirection.SOUTH;
-
-        } else if (x == 5) {
+        } else if (x == 1) {
             return TurtleDirection.SOUTHWEST;
-
-        } else if (x == 6) {
+        } else if (x == 2) {
             return TurtleDirection.WEST;
-
-        } else if (x == 7) {
+        } else if (x == 3) {
             return TurtleDirection.NORTHWEST;
-
+        } else if (x == 4) {
+            return TurtleDirection.NORTH;
+        } else if (x == 5) {
+            return TurtleDirection.NORTHEAST;
+        } else if (x == 6) {
+            return TurtleDirection.EAST;
+        } else if (x == 7) {
+            return TurtleDirection.SOUTHEAST;
         } else {
             throw new RuntimeException("Direction invalid = " + direction);
         }

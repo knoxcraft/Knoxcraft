@@ -15,6 +15,7 @@ import org.knoxcraft.turtle3d.WorkChunk;
 import org.knoxcraft.turtle3d.Workload;
 import org.slf4j.Logger;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3i;
@@ -38,7 +39,9 @@ public class SpongeTurtle {
     private World world;
     private int workChunkSize;
     private int jobNum;
+    
     private BlockState block = KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.STONE);
+    private boolean blockPlaceMode = true;
     
     private KCTScript script;
     
@@ -58,7 +61,7 @@ public class SpongeTurtle {
         public void add(KCTWorldBlockInfo block) {
             if (blockChunk.size() > workChunkSize) {
                 workload.add(new WorkChunk(new LinkedList<KCTWorldBlockInfo>(blockChunk), senderName, jobNum, chunkNum, workChunkSize));
-                log.info("Adding to queue: " + blockChunk.peek().getLoc());
+//                log.info("Adding to queue: " + blockChunk.peek().getLoc());
                 blockChunk.clear();
                 chunkNum++;
             }
@@ -144,7 +147,8 @@ public class SpongeTurtle {
         for (int i = 1; i <= distance; i++) {
             curLoc = curLoc.add(turtleDirection.direction);
             
-            workChunkManager.add(new KCTWorldBlockInfo(curLoc, block, world.getBlock(curLoc)));
+            if (blockPlaceMode)
+                workChunkManager.add(new KCTWorldBlockInfo(curLoc, block, world.getBlock(curLoc)));
         }
     }
     
@@ -228,6 +232,11 @@ public class SpongeTurtle {
         } else if (commandName.equals(KCTCommand.SETBLOCK)) {
             String blockName = m.get(KCTCommand.BLOCKTYPE).toString();
             block = KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.valueOf(blockName));
+        } else if (commandName.equals(KCTCommand.PLACEBLOCKS)) {
+            blockPlaceMode = Boolean.parseBoolean(m.get(KCTCommand.BLOCKPLACEMODE).toString());
+        } else {
+            log.warn("An unhandled command was passed.");
+            log.warn("Unhandled Command: " + c.getCommandName());
         }
     }
     
