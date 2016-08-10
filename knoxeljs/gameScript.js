@@ -129,6 +129,11 @@ var substack = createPlayer('substack.png');
 substack.possess();
 substack.position.set(0,5,0);
 
+// I believe I can fly!
+var fly = require('voxel-fly');
+var makeFly = fly(game);
+makeFly(game.controls.target());
+
 // highlight blocks when you look at them
 var highlight = require('voxel-highlight')
 var highlightPos
@@ -140,7 +145,7 @@ hl.on('remove', function (voxelPos) { highlightPos = null })
 game.on('fire', function (target, state) {
   // Purely for debugging purposes
   document.getElementById("looklocation").innerHTML = highlightPos + " (type: " + game.getBlock(highlightPos) + ")";
-})
+});
 
 //
 // Create a div containing all of the textures
