@@ -74,6 +74,8 @@ public class TurtlePlugin {
 
 	@Inject
 	private PluginContainer container;
+	
+	private int jobNum = 0;
 
 	//////////////////////////////////////////////////////////////////////////////////
 
@@ -137,9 +139,6 @@ public class TurtlePlugin {
 
 		// set up commands
 		setupCommands();
-
-		jobQueue = new KCTJobQueue(Sponge.getScheduler().createSyncExecutor(this),
-				Sponge.getScheduler().createAsyncExecutor(this), log);
 	}
 	
 	@Listener
@@ -163,6 +162,11 @@ public class TurtlePlugin {
 				}
 				// change minecraftWorld time every 10 minutes.
 			}, 0, 10, TimeUnit.MINUTES);
+			
+			
+			//SETUP JOBQUEUE FOR TURTLE SCRIPT EXECUTOR
+			jobQueue = new KCTJobQueue(Sponge.getScheduler().createSyncExecutor(this),
+	                Sponge.getScheduler().createAsyncExecutor(this), log, world);
 		}
 	}
 	
@@ -284,9 +288,12 @@ public class TurtlePlugin {
 							turtle.setSenderName(playerName);
 							turtle.setLoc(pos);
 							turtle.setWorld(w);
+							turtle.setWorkChunkSize(500);
+							turtle.setJobNum(jobNum++);
 							turtle.setTurtleDirection(d);
 							turtle.setScript(script);
-
+							turtle.executeScript();
+							
 							jobQueue.add(turtle);
 						}
 						return CommandResult.success();
