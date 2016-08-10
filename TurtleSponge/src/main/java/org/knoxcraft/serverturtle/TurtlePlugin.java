@@ -71,6 +71,7 @@ public class TurtlePlugin {
 	private World world;
 
 	private SpongeExecutorService minecraftSyncExecutor;
+	private SpongeExecutorService minecraftAsyncExecutor;
 
 	@Inject
 	private PluginContainer container;
@@ -163,13 +164,12 @@ public class TurtlePlugin {
 				// change minecraftWorld time every 10 minutes.
 			}, 0, 10, TimeUnit.MINUTES);
 			
-			
 			//SETUP JOBQUEUE FOR TURTLE SCRIPT EXECUTOR
-			jobQueue = new KCTJobQueue(Sponge.getScheduler().createSyncExecutor(this),
-	                Sponge.getScheduler().createAsyncExecutor(this), log, world);
+			minecraftSyncExecutor = Sponge.getScheduler().createSyncExecutor(this);  
+			minecraftAsyncExecutor = Sponge.getScheduler().createAsyncExecutor(this); 
+			jobQueue = new KCTJobQueue(minecraftSyncExecutor, log, world);
 		}
 	}
-	
 
 	private void setupCommands() {
 		// List all the scripts
@@ -292,9 +292,10 @@ public class TurtlePlugin {
 							turtle.setJobNum(jobNum++);
 							turtle.setTurtleDirection(d);
 							turtle.setScript(script);
-							turtle.executeScript();
 							
+							turtle.executeScript();
 							jobQueue.add(turtle);
+							
 						}
 						return CommandResult.success();
 					}
@@ -320,6 +321,20 @@ public class TurtlePlugin {
 
 				}).build();
 		Sponge.getCommandManager().register(this, undo, "undo", "un");
+		
+	    CommandSpec cancel = CommandSpec.builder().description(Text.of("Cancel current script")).permission("")
+	             .executor(new CommandExecutor() {
+	                 @Override
+	                 public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+	                     log.debug("Cancel invoked!");
+
+	                     jobQueue.cancelScript(src);
+
+	                     return CommandResult.success();
+	                 }
+
+	             }).build();
+	    Sponge.getCommandManager().register(this, cancel, "cancel", "cn");
 	}
 
 	public static KCTScript makeFakeSquare() {

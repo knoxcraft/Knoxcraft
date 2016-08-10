@@ -31,7 +31,7 @@ public class WorkThread extends Thread {
 //            log.info("waiting for some work...");
             WorkChunk workChunk = work.getWork();
             boolean isUndoScript = workChunk.isUndoScript();
-            log.info("Is undo script " + isUndoScript);
+//            log.info("Is undo script " + isUndoScript);
             Queue<KCTWorldBlockInfo> queue = workChunk.getBlockChunk();
 //            log.info("Doing some work.");
 

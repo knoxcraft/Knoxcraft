@@ -13,15 +13,13 @@ public class KCTJobQueue {
     private WorkMap workMap; // PlayerName->buffer
     
     private SpongeExecutorService minecraftSyncExecutor;
-    private SpongeExecutorService minecraftAsyncExecutor;
     
     private WorkThread workThread;
     
-    public KCTJobQueue(SpongeExecutorService minecraftSyncExecutor, SpongeExecutorService minecraftAsyncExecutor, Logger log, World world) {
+    public KCTJobQueue(SpongeExecutorService minecraftSyncExecutor, Logger log, World world) {
         this.log = log;
         
         this.minecraftSyncExecutor = minecraftSyncExecutor;
-        this.minecraftAsyncExecutor = minecraftAsyncExecutor;
         
         workMap = new WorkMap(log);
         workThread = new WorkThread(workMap, world, minecraftSyncExecutor, log);
@@ -36,10 +34,13 @@ public class KCTJobQueue {
         workMap.addUndo(src, numUndo);
     }
     
+    public void cancelScript(CommandSource src) {
+        workMap.cancel(src);
+    }
+    
     public void shutdownExecutor() {
         log.debug("Shutting down Sponge Executors and Threads.");
         workThread.shutdown();
         minecraftSyncExecutor.shutdown();
-        minecraftAsyncExecutor.shutdown();
     }
 }

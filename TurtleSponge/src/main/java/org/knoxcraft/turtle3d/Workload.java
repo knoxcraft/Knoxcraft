@@ -29,12 +29,24 @@ public class Workload {
         workChunks.add(workChunk);
     }
     
-    public WorkChunk pollWork() {
+    public WorkChunk pollFirst() {
         return workChunks.poll();
     }
     
-    public WorkChunk popWork() {
-        return workChunks.pop();
+    public WorkChunk popLast() {
+        return workChunks.pollLast();
+    }
+    
+    public WorkChunk peekWork() {
+        return workChunks.peek();
+    }
+    
+    public boolean hasWork() {
+        return !workChunks.isEmpty();
+    }
+    
+    public int remainingWorkSize() {
+        return workChunks.size();
     }
     
     public Queue<WorkChunk> getWorkChunks() {
