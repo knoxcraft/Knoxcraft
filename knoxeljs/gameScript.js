@@ -2,6 +2,7 @@
 
 var allMaterials = [];
 var materialNames = {};
+var materialNameToFilename = {};
 materialNames['AIR'] = 0;
 
 // Registers a material
@@ -11,6 +12,7 @@ function addMat(name, filename) {
    * item '1' (air is 0)
    */
   materialNames[name] = allMaterials.length;
+  materialNameToFilename[name]=filename;
 }
 
 addMat("STONE", "stone");
@@ -139,6 +141,31 @@ game.on('fire', function (target, state) {
   // Purely for debugging purposes
   document.getElementById("looklocation").innerHTML = highlightPos + " (type: " + game.getBlock(highlightPos) + ")";
 })
+
+//
+// Create a div containing all of the textures
+//
+function td(val){
+  return '<td>'+val+'</td>';
+}
+function tr(val){
+  return '<tr>'+val+'</tr>';
+}
+function th(val){
+  return '<th>'+val+'</th>';
+}
+function makeTextureTable() {
+  var table="<table border=1>" +tr(th('blocktype')+th('texture'));
+  for (var key in materialNameToFilename) {
+    if (materialNameToFilename.hasOwnProperty(key)){
+      var filename=materialNameToFilename[key]+'.png';
+      table += tr(td(key)+td('<img src="https://knoxcraft.github.io/textures/' +filename+ '" widht="64" height="64"/>'));
+    }
+  }
+  table += "</table>";
+  return table;
+}
+var blocktypes=document.getElementById("blocktypes").innerHTML = makeTextureTable();
 
 
 /////////////////////////////////////Begin Turtle related code/////////////////
