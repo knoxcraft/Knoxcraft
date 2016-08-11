@@ -20,18 +20,16 @@ import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3i;
 
+/**
+ * SpongeTurtle is responsible for taking a turtle script in JSON format and converting it into a
+ * chunk of work that can be run by the WorkThread. 
+ * @author kakoijohn
+ *
+ */
 public class SpongeTurtle {
 
     private Logger log;
 
-    // need to know initial location
-    // vector 3i, or XYZ, get location from turtle plugin, put turtle one block
-    // oin front of player.
-    /*
-     * EXAMPLE CODE Vector3i pos=loc.getBlockPosition(); int x=pos.getX(); int
-     * z=pos.getZ();
-     */
-    // turtle location:relPos
     private Vector3i curLoc;
     // player location:originPos
     private String senderName;
@@ -47,17 +45,31 @@ public class SpongeTurtle {
     
     private WorkChunkManager workChunkManager;
     
+    /**
+     * Private inner class that manages the creation of a Workload object in the correct format that the
+     * WorkThread can use to run its script.
+     * @author kakoijohn
+     *
+     */
     private class WorkChunkManager {
         private int chunkNum;
         private Queue<KCTWorldBlockInfo> blockChunk;
         private Workload workload;
         
+        /**
+         * Constructor
+         */
         public WorkChunkManager() {
             chunkNum = 0;
             blockChunk = new LinkedList<KCTWorldBlockInfo>();
             workload = new Workload();
         }
         
+        /**
+         * Adds a block to the block queue. Once the size of the blockChunk reaches a specified limit,
+         * the work is pushed onto the workload queue and the blockChunk is cleared.
+         * @param block
+         */
         public void add(KCTWorldBlockInfo block) {
             if (blockChunk.size() > workChunkSize) {
                 workload.add(new WorkChunk(new LinkedList<KCTWorldBlockInfo>(blockChunk), senderName, jobNum, chunkNum, workChunkSize));
@@ -69,49 +81,103 @@ public class SpongeTurtle {
             blockChunk.add(block);
         }
         
+        /**
+         * Adds the rest of the blockChunk queue to the Workload regardless of the size of the blockChunk queue.
+         */
         public void addRest() {
             workload.add(new WorkChunk(new LinkedList<KCTWorldBlockInfo>(blockChunk), senderName, jobNum, chunkNum, workChunkSize));
             blockChunk.clear();
             chunkNum++;
         }
         
+        /**
+         * Returns the workload that this class has created.
+         * @return
+         */
         public Workload getWorkload() {
             return this.workload;
         }
     }
     
+    /**
+     * Constructor. Must also set some parameters before calling execute script.
+     * This includes:
+     *   - setLoc(location)
+     *   - setTurtleDirection(direction)
+     *   - setWorld(world)
+     *   - setScript(script)
+     *   - setSenderName(name)
+     *   - setWorkChunkSie(size)
+     *   - setJobNum(jobNum)
+     * After all of these parameters are set, you can call executeScript()
+     * @param logger
+     */
     public SpongeTurtle(Logger logger) {
         this.log = logger;
     }
 
+    /**
+     * Sets the starting location for the turtle script to run.
+     * Normally this defaults to the current position of the player when the invoke command is called.
+     * @param startLocation
+     */
     public void setLoc(Vector3i startLocation) {
         this.curLoc = startLocation;
     }
 
+    /**
+     * Sets the initial heading of the turtle. Directions are all of the cardinal directions
+     * plus the intermediate directions. ie: North, East, South, West, NorthEast, SouthEast, SouthWest, NorthWest.
+     * @param d
+     */
     public void setTurtleDirection(TurtleDirection d) {
         this.dir = d;
     }
 
+    /**
+     * Sets the world that the turtle will be producing the work for.
+     * @param w
+     */
     public void setWorld(World w) {
         this.world = w;
     }
 
+    /**
+     * Sets the user script that the turtle will be running.
+     * @param script
+     */
     public void setScript(KCTScript script) {
         this.script = script;
     }
 
+    /**
+     * Sets the name of the player that invoked the script.
+     * @param name
+     */
     public void setSenderName(String name) {
         this.senderName = name;
     }
     
+    /**
+     * Sets the size of the build chunk queue that is built at one time by the WorkThread
+     * @param size
+     */
     public void setWorkChunkSize(int size) {
         this.workChunkSize = size;
     }
     
+    /**
+     * Sets the unique job number for the latest build.
+     * @param jobNum
+     */
     public void setJobNum(int jobNum) {
         this.jobNum = jobNum;
     }
 
+    /**
+     * Gets the name of the player who created the turtle.
+     * @return
+     */
     public String getSenderName() {
         return this.senderName;
     }
@@ -240,6 +306,12 @@ public class SpongeTurtle {
         }
     }
     
+    /**
+     * Executes the KCTScript and produces a Workload that represents that job in a queue of work to be done.
+     * This work is a queue of blocks to be placed in the world.
+     * @param script A specified script to be run.
+     * @return Workload queue
+     */
     public Workload executeScript(KCTScript script) {
         workChunkManager = new WorkChunkManager();
         
@@ -247,7 +319,7 @@ public class SpongeTurtle {
             try {
                 executeCommand(c);
             } catch (TurtleCommandException e) {
-                log.info("Unable to execute Turtle script:" + script.getScriptName());
+                log.warn("Unable to execute Turtle script:" + script.getScriptName());
                 return null;
             }
         }
@@ -257,10 +329,19 @@ public class SpongeTurtle {
         return workChunkManager.getWorkload(); 
     }
     
+    /**
+     * Executes the KCTScript and produces a Workload that represents that job in a queue of work to be done.
+     * This work is a queue of blocks to be placed in the world.
+     * @return Workload queue
+     */
     public Workload executeScript() {
         return executeScript(this.script);
     }
     
+    /**
+     * Gets the Workload created by executing the script. 
+     * @return
+     */
     public Workload getWorkload() {
         return workChunkManager.getWorkload();
     }

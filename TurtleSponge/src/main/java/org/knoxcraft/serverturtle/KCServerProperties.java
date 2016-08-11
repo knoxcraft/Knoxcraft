@@ -10,12 +10,26 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Class to change the server.properties file to tell the Minecraft server how to format the world.
+ * @author kakoijohn
+ *
+ */
 public class KCServerProperties {
     
+    /**
+     * Constructor
+     */
     public KCServerProperties () {
         
     }
     
+    /**
+     * Loads the current server.properties file.
+     * @return Returns -1 if the file does not exist.
+     *         Returns 0 if the file exists but the world file name is incorrect.
+     *         Returns 1 if the file exists and the proper world file name is there.
+     */
     public int loadServerProperties() {
         File file = new File("server.properties");
         if (!file.exists())
@@ -33,6 +47,9 @@ public class KCServerProperties {
         }
     }
     
+    /**
+     * Creates a server.properties file with the default configurations of a Knoxcraft flat world. 
+     */
     public void createPropertiesFile() {
         ArrayList<String> properties = new ArrayList<String>();
         properties.add("#Minecraft server properties");

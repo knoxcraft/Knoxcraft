@@ -55,6 +55,11 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 
+/**
+ * Sponge plugin to run when the Minecraft server starts up.
+ * @author kakoijohn
+ *
+ */
 @Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft", authors = {
 		"kakoijohn", "mrmoeee", "emhastings", "ppypp", "jspacco" })
 public class TurtlePlugin {
@@ -71,14 +76,12 @@ public class TurtlePlugin {
 	private World world;
 
 	private SpongeExecutorService minecraftSyncExecutor;
-	private SpongeExecutorService minecraftAsyncExecutor;
+//	private SpongeExecutorService minecraftAsyncExecutor;
 
 	@Inject
 	private PluginContainer container;
 	
 	private int jobNum = 0;
-
-	//////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Constructor.
@@ -88,7 +91,8 @@ public class TurtlePlugin {
 	}
 
 	/**
-	 * Called when plugin is disabled.
+	 * Listener for when the server stop event is called.
+	 * We must safely shutdown the Jetty server, the Minecraft Executor, and the WorkThread.
 	 */
 	@Listener
 	public void onServerStop(GameStoppedServerEvent event) {
@@ -96,9 +100,14 @@ public class TurtlePlugin {
 			jettyServer.shutdown();
 		}
 
-		jobQueue.shutdownExecutor();
+		jobQueue.shutdown();
 	}
 	
+	/**
+	 * Game Construction Event. Checks to see if the proper server.properties file exists.
+	 * If it isn't correct, we must replace it with our own configurations.
+	 * @param event
+	 */
 	@Listener
 	public void gameConstructionEvent(GameConstructionEvent event) {
 	    //first event in the plugin lifecycle
@@ -117,6 +126,10 @@ public class TurtlePlugin {
 	    }
 	}
 
+	/**
+	 * On Server Start Event. We must start the Jetty server and set up the user commands.
+	 * @param event
+	 */
 	@Listener
 	public void onServerStart(GameStartedServerEvent event) {
 		// Hey! The server has started!
@@ -142,6 +155,14 @@ public class TurtlePlugin {
 		setupCommands();
 	}
 	
+	/**
+	 * On World Load Event. During this time, the weather of the world is set to clear,
+	 * the time is reset to 0, and an event is scheduled to happen every 1/2 of a Minecraft day
+	 * to reset the time so it will never become nighttime.
+	 * The KCTJobQueue is also initialized in this step creating a Worker thread that waits on the
+	 * consumer to put work on the queue.
+	 * @param event
+	 */
 	@Listener
 	public void onWorldLoad(LoadWorldEvent event) {
 		if (event.getTargetWorld().getDimension().getType() == DimensionTypes.OVERWORLD) {
@@ -152,25 +173,36 @@ public class TurtlePlugin {
 
 			// BRIGHT SUNNY DAY (12000 = sun set)
 			world.getProperties().setWorldTime(0);
-			log.info(String.format("currenttime " + world.getProperties().getWorldTime()));
+			log.info(String.format("Currenttime: " + world.getProperties().getWorldTime()));
 
-			// TIME CHANGE SCHEDULER > NOTE MAYBE PUT IN ONSERVERSTART
+			// TIME CHANGE SCHEDULER 
 			minecraftSyncExecutor = Sponge.getScheduler().createSyncExecutor(this);
 			minecraftSyncExecutor.scheduleWithFixedDelay(new Runnable() {
 				public void run() {
 					world.getProperties().setWorldTime(0);
-					log.info(String.format("timechange" + world.getProperties().getWorldTime()));
+					log.info(String.format("Timechange: " + world.getProperties().getWorldTime()));
 				}
-				// change minecraftWorld time every 10 minutes.
+				// change minecraftWorld time every 10 minutes
 			}, 0, 10, TimeUnit.MINUTES);
 			
 			//SETUP JOBQUEUE FOR TURTLE SCRIPT EXECUTOR
-			minecraftSyncExecutor = Sponge.getScheduler().createSyncExecutor(this);  
-			minecraftAsyncExecutor = Sponge.getScheduler().createAsyncExecutor(this); 
 			jobQueue = new KCTJobQueue(minecraftSyncExecutor, log, world);
 		}
 	}
 
+	/**
+	 * All of the Commands available in game for the players. 
+	 * List of all commands and what they do:
+	 *   - /scripts /ls
+	 *     lists all of the scripts available to the player to invoke.
+	 *   - /invoke /in [script name] (optional [player name])
+	 *     Invokes a turtle script. Creates a new turtle, executes the script, and adds the
+	 *     work to the work queue.
+	 *   - /undo /un (optional [number to undo])
+	 *     Undoes the previous script or the last [x] number of scripts if specified.
+	 *   - /cancel /cn
+	 *     Cancels the currently queued work for the player that called the command.
+	 */
 	private void setupCommands() {
 		// List all the scripts
 		CommandSpec listScripts = CommandSpec.builder().description(Text.of("List Knoxcraft Turtle Scripts"))
@@ -322,7 +354,7 @@ public class TurtlePlugin {
 				}).build();
 		Sponge.getCommandManager().register(this, undo, "undo", "un");
 		
-	    CommandSpec cancel = CommandSpec.builder().description(Text.of("Cancel current script")).permission("")
+	    CommandSpec cancel = CommandSpec.builder().description(Text.of("Cancel currently queued work")).permission("")
 	             .executor(new CommandExecutor() {
 	                 @Override
 	                 public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
