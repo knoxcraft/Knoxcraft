@@ -56,7 +56,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 
 @Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft", authors = {
-		"kakoijohn", "mrmoeee", "lkasser8", "emhastings", "ppypp", "jspacco" })
+		"kakoijohn", "mrmoeee", "stringnotfound", "emhastings", "ppypp", "jspacco" })
 public class TurtlePlugin {
 
 	public static final String ID = "kct";
