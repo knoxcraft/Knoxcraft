@@ -35,14 +35,11 @@
 
 package org.knoxcraft.database;
 
-import java.io.IOException;
-
 import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 
 /**
  * Database Configuration settings
@@ -94,107 +91,77 @@ public class DatabaseConfiguration
     private CommentedConfigurationNode config;
     private Logger log=LoggerFactory.getLogger(TurtlePlugin.ID);
     
-    public static void configureDefaultDatabase(CommentedConfigurationNode config) {
-
-        CommentedConfigurationNode defaultValues=null;
-        try {
-            defaultValues=HoconConfigurationLoader.builder().build().load();
-        } catch (IOException e) {
-            // ignore; this exception cannot actually happen because we are not reading a file
-            // we just want an empty, default set of values
-        }        
-        defaultValues.getNode(convert("knoxcraft.db")).setComment(
-                "Configuration settings for the database\n"+
+    private void addConfigSetting(String path, String value) {
+        addConfigSetting(path, value, null);
+    }
+    
+    private void addConfigSetting(String path, String value, String comment) {
+        CommentedConfigurationNode node=config.getNode(convert(path));
+        if (node.isVirtual()) {
+            node=node.setValue(value);
+            if (comment!=null){
+                node.setComment(comment);
+            }
+        }
+    }
+    
+    /**
+     * Ensure that we plug in default settings, if they don't exist.
+     * @param config
+     */
+    private void configureDefaultDatabase(CommentedConfigurationNode config) {
+        CommentedConfigurationNode topLevel=config.getNode(convert("knoxcraft.db"));
+        if (topLevel.isVirtual() || !topLevel.getComment().isPresent()) {
+            topLevel.setComment("Configuration settings for the database\n"+
                 "For more settings explanations see following websites:\n"+
                 "http://javatech.org/2007/11/c3p0-connectionpool-configuration-rules-of-thumb\n"+
                 "https://community.jboss.org/wiki/HowToConfigureTheC3P0ConnectionPool");
-        defaultValues.getNode(convert(DB_TYPE)).setValue("xml").setComment(
-                "the type of the DB (xml or mysql)\n"+
+        }
+        addConfigSetting(DB_TYPE,"xml", "the type of the DB (xml or mysql)\n"+
                 "SQLite and H2 support are coming soon\n"+
                 "xml format will store XML files in forge/db");
-        defaultValues.getNode(convert(DB_HOST)).setValue("localhost");
-        defaultValues.getNode(convert(DB_NAME)).setValue("knoxcraft")
-            .setComment("Name of the database");
-        defaultValues.getNode(convert(DB_FOLDER)).setValue("db").
-            setComment("Folder where XML files stored. Path relative to Forge home. Ignored when db.type is mysql.");
-        defaultValues.getNode(convert(DB_FILE)).setValue("knoxcraft.db").
-            setComment("File where DB is store. Only relevant for SQLite and H2. Path relative to Forge home.");
-        defaultValues.getNode(convert(DB_USERNAME)).setValue("root");
-        defaultValues.getNode(convert(DB_PASSWORD)).setValue("root");
-        defaultValues.getNode(convert(DB_PORT)).setValue("8889");
+        addConfigSetting(DB_HOST,"localhost");
+        addConfigSetting(DB_NAME,"knoxcraft","Name of the database");
+        addConfigSetting(DB_FOLDER,"db","Folder where XML files stored. Path relative to Forge home. Ignored when db.type is mysql.");
+        addConfigSetting(DB_FILE,"knoxcraft.db","File where DB is store. Only relevant for SQLite and H2. Path relative to Forge home.");
+        addConfigSetting(DB_USERNAME,"root");
+        addConfigSetting(DB_PASSWORD,"root");
+        addConfigSetting(DB_PORT,"8889");
         // everything below here was basically copied from Canarymod's DB layer
         // it's using C3P0 connectino pooling, which I don't really understand
-        defaultValues.getNode(convert(MAX_CONNECTIONS)).setValue("5");
-        defaultValues.getNode(convert(ACQUIRE_INCREMENT)).setValue("5")
-            .setComment("Determines how many connections at a time c3p0 will try to acquire when pool is exhausted");
-        defaultValues.getNode(convert(MAX_CONNECTION_IDLE_TIME)).setValue("900")
-            .setComment("Determines how long idle connections can stay in the connection pool before removed");
-        defaultValues.getNode(convert(MAX_EXCESS_CONNECTIONS_IDLE_TIME)).setValue("1800")
-            .setComment("Time until the connection pool will be culled down to min-connection-pool-size. Set 0 to not enforce pool shrinking");
-        defaultValues.getNode(convert(MAX_CONNECTION_POOL_SIZE)).setValue("10")
-            .setComment("The maximum allowed number of pooled connections. More for larger servers");
-        defaultValues.getNode(convert(MIN_CONNECTION_POOL_SIZE)).setValue("3")
-            .setComment("The minimum amount of connections allowed. More means more memory usage but takes away some impact from creating new connections");
-        defaultValues.getNode(convert(NUM_HELPER_THREADS)).setValue("4")
-            .setComment("Amount of threads that will perform slow JDBC operations (closing idle connections, returning connections to pool etc");
-        defaultValues.getNode(convert(RETURN_CONNECTION_TIMEOUT)).setValue("900").
-            setComment("Defines a time a connection can remain checked out. After that it will be forced back into the connection pool");
-        defaultValues.getNode(convert(CONNECTION_TEST_FREQUENCY)).setValue("0").
-            setComment("No idea what this does");
-        defaultValues.getNode(convert(MAX_CACHED_STATEMENTS)).setValue("50").
-            setComment("Number of max cached statements on all connections. (Roughly 5 * expected pooled connections)");
-        defaultValues.getNode(convert(MAX_CACHED_STATEMENTS_PER_CONNECTION)).setValue("5").
-            setComment("Number of max cached statements on a single connection");
-        defaultValues.getNode(convert(STATEMENT_CACHE_CLOSE_THREADS)).setValue("1").
-            setComment("Number of threads to use when closing statements is deferred (happens when parent connection is still in use)");
-        defaultValues.getNode(convert(BANS_TABLE_NAME)).setValue("ban").
-            setComment("The name to use for the Bans table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-        defaultValues.getNode(convert(GROUPS_TABLE_NAME)).setValue("group").
-            setComment("The name to use for the Groups table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present");
-        defaultValues.getNode(convert(KITS_TABLE_NAME)).setValue("kits").
-            setComment("The name to use for the Kits table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-        defaultValues.getNode(convert(OPERATORS_TABLE_NAME)).setValue("operators").
-            setComment("The name to use for the Operators table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-        defaultValues.getNode(convert(PERMISSIONS_TABLE_NAME)).setValue("permissions").
-            setComment("The name to use for the Permissions table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-        defaultValues.getNode(convert(PLAYERS_TABLE_NAME)).setValue("players").
-            setComment("The name to use for the Players table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-        defaultValues.getNode(convert(RESERVELIST_TABLE_NAME)).setValue("reservelist").
-            setComment("The name to use for the ReserveList table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-        defaultValues.getNode(convert(WARPS_TABLE_NAME)).setValue("warps").
-            setComment("The name to use for the Warps table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-        defaultValues.getNode(convert(WHITELIST_TABLE_NAME)).setValue("whitelist").
-            setComment("The name to use for the WhiteList table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-        
-        // Make sure we have a complete and correct set of defaults
-        config.mergeValuesFrom(defaultValues);
+        addConfigSetting(MAX_CONNECTIONS,"5");
+        addConfigSetting(ACQUIRE_INCREMENT,"5","Determines how many connections at a time c3p0 will try to acquire when pool is exhausted");
+        addConfigSetting(MAX_CONNECTION_IDLE_TIME,"900","Determines how long idle connections can stay in the connection pool before removed");
+        addConfigSetting(MAX_EXCESS_CONNECTIONS_IDLE_TIME,"1800","Time until the connection pool will be culled down to min-connection-pool-size. Set 0 to not enforce pool shrinking");
+        addConfigSetting(MAX_CONNECTION_POOL_SIZE,"10","The maximum allowed number of pooled connections. More for larger servers");
+        addConfigSetting(MIN_CONNECTION_POOL_SIZE,"3","The minimum amount of connections allowed. More means more memory usage but takes away some impact from creating new connections");
+        addConfigSetting(NUM_HELPER_THREADS,"4","Amount of threads that will perform slow JDBC operations (closing idle connections, returning connections to pool etc");
+        addConfigSetting(RETURN_CONNECTION_TIMEOUT,"900","Defines a time a connection can remain checked out. After that it will be forced back into the connection pool");
+        addConfigSetting(CONNECTION_TEST_FREQUENCY,"0","No idea what this does");
+        addConfigSetting(MAX_CACHED_STATEMENTS,"50","Number of max cached statements on all connections. (Roughly 5 * expected pooled connections)");
+        addConfigSetting(MAX_CACHED_STATEMENTS_PER_CONNECTION,"5","Number of max cached statements on a single connection");
+        addConfigSetting(STATEMENT_CACHE_CLOSE_THREADS,"1","Number of threads to use when closing statements is deferred (happens when parent connection is still in use)");
+        addConfigSetting(BANS_TABLE_NAME,"ban","The name to use for the Bans table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        addConfigSetting(GROUPS_TABLE_NAME,"group","The name to use for the Groups table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present");
+        addConfigSetting(KITS_TABLE_NAME,"kits","The name to use for the Kits table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        addConfigSetting(OPERATORS_TABLE_NAME,"operators","The name to use for the Operators table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        addConfigSetting(PERMISSIONS_TABLE_NAME,"permissions","The name to use for the Permissions table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        addConfigSetting(PLAYERS_TABLE_NAME,"players","The name to use for the Players table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        addConfigSetting(RESERVELIST_TABLE_NAME,"reservelist","The name to use for the ReserveList table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        addConfigSetting(WARPS_TABLE_NAME,"warps","The name to use for the Warps table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        addConfigSetting(WHITELIST_TABLE_NAME,"whitelist","The name to use for the WhiteList table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
     }
     
     public DatabaseConfiguration(CommentedConfigurationNode configNode) {
         // TODO: merge the parameter with the default values so that we have correct
         // default values for everything
         this.config=configNode;
+        configureDefaultDatabase(configNode);
     }
     
     public static Object[] convert(String path) {
         return path.split("\\.");
     }
-
-//    private DatabaseConfiguration(String path) {
-//        this.cfg = new Properties();
-//        try {
-//            File test = new File(path);
-//            if (test.exists()){
-//                this.cfg.load(new FileInputStream(test));
-//            } else {
-//                // TODO: log that we can't find the DB configuration
-//                log.info(String.format("Could not find the database configuration at %s, creating default.", path));
-//            }
-//        } catch (IOException e) {
-//            log.error(String.format("Cannot load database configuration from %s, creating default.", path));
-//        }
-//        verifyConfig();
-//    }
 
     /**
      * Get the type of datasource being used (MySQL, SQLite, XML, or 

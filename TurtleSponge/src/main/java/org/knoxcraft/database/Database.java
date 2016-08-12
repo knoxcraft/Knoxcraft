@@ -99,18 +99,6 @@ public abstract class Database {
             // TODO create instance
         }
         return instance;
-
-//        // TODO: read Sponge configuration properties
-//        DatabaseConfiguration config=DatabaseConfiguration.getDbConfig();
-//        String dataSourceType=config.getDataSourceType();
-//        Database ret = Database.Type.getDatabaseFromType(dataSourceType);
-//        if (ret != null) {
-//            return ret;
-//        }
-//        else {
-//            log.warn("Database type " + dataSourceType + " is not available, falling back to XML! Fix your server.cfg");
-//            return XmlDatabase.getInstance();
-//        }
     }
 
     /**

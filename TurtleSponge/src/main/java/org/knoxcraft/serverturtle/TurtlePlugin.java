@@ -228,15 +228,9 @@ public class TurtlePlugin {
 
         // ensure we have correct database defaults
         // will add any config values that are missing
-        DatabaseConfiguration.configureDefaultDatabase(knoxcraftConfig);
+        Database.configure(knoxcraftConfig);
         
-        // TODO: set other default configuration settings using this syntax:
-        // addConfigSetting(path, value)
-        // or
-        // addConfigSetting(path, value, comment)
-        // path should be a path separated by dots starting at knoxcraft, so
-        // for example knoxcraft.max-blocks
-        // Also, set up a constant String for the keys like knoxcraft.max-blocks
+        // set other default configuration settings using this syntax:
         addConfigSetting(WORK_CHUNK_SIZE, "500", "Number of blocks to build at a time. Larger values will lag and eventually crash the server. 500 seems to work.");
         addConfigSetting(SLEEP_TIME, "200", "Number of millis to wait between building chunks of blocks. Shorter values are more likely to lag and eventually crash the server. 200 seems to work.");
         
