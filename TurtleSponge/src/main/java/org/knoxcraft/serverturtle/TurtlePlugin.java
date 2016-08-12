@@ -73,6 +73,8 @@ import static org.knoxcraft.database.DatabaseConfiguration.convert;
 		"kakoijohn", "mrmoeee", "stringnotfound", "emhastings", "ppypp", "jspacco" })
 public class TurtlePlugin {
 
+    private static final String SLEEP_TIME = "knoxcraft.sleepTime";
+    private static final String WORK_CHUNK_SIZE = "knoxcraft.workChunkSize";
     public static final String ID = "knoxcraft";
 	private static final String PLAYER_NAME = "playerName";
 	private static final String SCRIPT_NAME = "scriptName";
@@ -86,7 +88,6 @@ public class TurtlePlugin {
 	private World world;
 
 	private SpongeExecutorService minecraftSyncExecutor;
-//	private SpongeExecutorService minecraftAsyncExecutor;
 
 	@Inject
 	private PluginContainer container;
@@ -102,12 +103,9 @@ public class TurtlePlugin {
     // The in-memory version of the knoxcraft configuration file
     private CommentedConfigurationNode knoxcraftConfig;
 
-//	@Inject
-//	@ConfigDir(sharedRoot = false)
-//	private Path privateConfigDir;
-	
-	private long sleepTime = 200;
-	private int workChunkSize = 500;
+    // configured in config/knoxcraft.conf
+	private long sleepTime;
+	private int workChunkSize;
 	private int jobNum = 0;
 
 	/**
@@ -177,7 +175,7 @@ public class TurtlePlugin {
 		
 		// read configuration parameters
 		try {
-		    loadConfig();
+		    loadOrCreateConfigFile();
 		} catch (IOException e) {
 		    log.error("Unable to create or load knoxcraft config file!");
 		    // TODO: set up a default
@@ -192,6 +190,14 @@ public class TurtlePlugin {
 		// set up commands
 		setupCommands();
 		
+		// read config files and set up instance variables
+		readConfigFile();
+		
+	}
+	
+	private void readConfigFile() {
+	    this.workChunkSize=knoxcraftConfig.getNode(WORK_CHUNK_SIZE).getInt();
+	    this.sleepTime=knoxcraftConfig.getNode(SLEEP_TIME).getInt();
 	}
 	
 	/**
@@ -201,7 +207,7 @@ public class TurtlePlugin {
 	 * 
 	 * @return
 	 */
-	private void loadConfig() throws IOException
+	private void loadOrCreateConfigFile() throws IOException
 	{
 	    // Check for config file config/knoxcraft.conf
 	    File knoxcraftConfigFile = new File(this.configDir, "knoxcraft.conf");
@@ -231,6 +237,8 @@ public class TurtlePlugin {
         // path should be a path separated by dots starting at knoxcraft, so
         // for example knoxcraft.max-blocks
         // Also, set up a constant String for the keys like knoxcraft.max-blocks
+        addConfigSetting(WORK_CHUNK_SIZE, "500", "Number of blocks to build at a time. Larger values will lag and eventually crash the server. 500 seems to work.");
+        addConfigSetting(SLEEP_TIME, "200", "Number of millis to wait between building chunks of blocks. Shorter values are more likely to lag and eventually crash the server. 200 seems to work.");
         
         // now save the configuration file, in case we changed anything
         this.knoxcraftConfigLoader.save(this.knoxcraftConfig);
@@ -390,9 +398,6 @@ public class TurtlePlugin {
 							log.warn(String.format("player %s cannot find script %s", playerName, scriptName));
 							src.sendMessage(
 									Text.of(String.format("%s, you have no script named %s", playerName, scriptName)));
-							// FIXME: remove this fake square
-							script = makeFakeSquare();
-							// return CommandResult.success();
 						}
 
 						SpongeTurtle turtle = new SpongeTurtle(log);
@@ -408,10 +413,10 @@ public class TurtlePlugin {
 							Vector3d headRotation = player.getHeadRotation();
 							Vector3d rotation = player.getRotation();
 
-							log.info("headRotation=" + headRotation);
-							log.info("rotation=" + rotation);
+							log.debug("headRotation=" + headRotation);
+							log.debug("rotation=" + rotation);
 							TurtleDirection d = TurtleDirection.getTurtleDirection(rotation);
-							log.info("pos= " + pos);
+							log.debug("pos= " + pos);
 
 							turtle.setSenderName(playerName);
 							turtle.setLoc(pos);
