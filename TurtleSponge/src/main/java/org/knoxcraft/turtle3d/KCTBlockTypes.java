@@ -1,5 +1,10 @@
 package org.knoxcraft.turtle3d;
 
+/**
+ * Enum listing all of the Minecraft blocks.
+ * @author kakoijohn
+ *
+ */
 public enum KCTBlockTypes {
 	AIR,
 	STONE,

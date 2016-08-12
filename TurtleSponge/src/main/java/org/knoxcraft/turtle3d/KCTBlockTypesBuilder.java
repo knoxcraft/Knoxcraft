@@ -24,6 +24,18 @@ import org.spongepowered.api.data.type.StoneTypes;
 import org.spongepowered.api.data.type.TreeTypes;
 import org.spongepowered.api.data.type.WallTypes;
 
+/**
+ * Static class to create a BlockState and KCTBlockType for all of the existing Minecraft blocks.
+ * This needed to be done because Sponge abstracts some of the blocks in Minecraft with modifiers
+ * to a Key of a specific type. 
+ * For example: Stone has the id 1:0 and granite has the id 1:1. Sponge does not allow you to
+ * find the block by its 1:1 identifier, instead we must find the block with a key value pair 
+ * specific to those set of blocks.
+ * This means we cannot easily get any block that isn't the default state
+ * of a block unless we create this placeholder class. 
+ * @author kakoijohn
+ *
+ */
 public final class KCTBlockTypesBuilder {
 	private static class Metadata {
 		private BlockState block;

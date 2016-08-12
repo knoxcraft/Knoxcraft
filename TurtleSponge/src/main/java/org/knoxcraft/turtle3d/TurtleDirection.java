@@ -6,6 +6,8 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 
 /**
+ * A class that follows the same format for Sponge Directions but simplified. 
+ * Turtles only need the cardinal and intermediate 45 degree directions in order to operate.
  * @author kakoijohn
  *
  */
@@ -35,16 +37,26 @@ public enum TurtleDirection {
 	    this.division = division;
 	}
 	
+	/**
+	 * @param val
+	 * @return the TurtleDirection enum that corresponds to that value.
+	 */
 	public static TurtleDirection valueOf(int val) {
 	    return TurtleDirection.values()[val];
 	}
 	
+	/**
+	 * @return the integer value of the current direction.
+	 */
 	public int getIntValue() {
 	    return ordinal();
 	}
 	
+	/**
+	 * @param direction
+	 * @return the turtle direction closest to the direction vector.
+	 */
 	public static TurtleDirection getTurtleDirection(Vector3d direction) {
-
         double d = direction.getY() / 360 * 8;
         int x = (int) Math.round(d);
         
@@ -53,29 +65,21 @@ public enum TurtleDirection {
         }
 
         if (x == 0 || x == 8) {
-            return TurtleDirection.NORTH;
-
-        } else if (x == 1) {
-            return TurtleDirection.NORTHEAST;
-
-        } else if (x == 2) {
-            return TurtleDirection.EAST;
-
-        } else if (x == 3) {
-            return TurtleDirection.SOUTHEAST;
-
-        } else if (x == 4) {
             return TurtleDirection.SOUTH;
-
-        } else if (x == 5) {
+        } else if (x == 1) {
             return TurtleDirection.SOUTHWEST;
-
-        } else if (x == 6) {
+        } else if (x == 2) {
             return TurtleDirection.WEST;
-
-        } else if (x == 7) {
+        } else if (x == 3) {
             return TurtleDirection.NORTHWEST;
-
+        } else if (x == 4) {
+            return TurtleDirection.NORTH;
+        } else if (x == 5) {
+            return TurtleDirection.NORTHEAST;
+        } else if (x == 6) {
+            return TurtleDirection.EAST;
+        } else if (x == 7) {
+            return TurtleDirection.SOUTHEAST;
         } else {
             throw new RuntimeException("Direction invalid = " + direction);
         }
@@ -96,6 +100,12 @@ public enum TurtleDirection {
 		return TurtleDirection.valueOf(newDir);
 	}
 	
+	/**
+	 * turns the facing left or right and the number of turns in 45 degree increments
+	 * @param left
+	 * @param units
+	 * @return the new Direction
+	 */
 	public TurtleDirection turn(boolean left, int units) {
 		int currentDir = this.getIntValue();
 		if (left) {
