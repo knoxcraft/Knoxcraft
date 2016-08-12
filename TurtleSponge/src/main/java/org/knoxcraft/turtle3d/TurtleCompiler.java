@@ -217,10 +217,10 @@ public class TurtleCompiler
         URL jar = src.getLocation();
         String extraClasspath=jar.toString().replaceAll(".*file:", "").replaceAll("!.*", "");
         
-        log.info(String.format("Adding Sponge jarfile to classpath of in-memory compiler: %s", extraClasspath));
+        log.debug(String.format("Adding Sponge jarfile to classpath of in-memory compiler: %s", extraClasspath));
         compiler.setExtraClasspath(extraClasspath);
         compiler.addSourceFile(className, source);
-        log.trace("source file:\n"+source);
+        log.debug("source file:\n"+source);
         //String driverName="Driver"+System.currentTimeMillis();
         String driverName="Driver";
         String driver=String.format(
@@ -264,9 +264,11 @@ public class TurtleCompiler
             Map<String,Turtle3D> map=turtleMap.get(t);
             if (map != null)  {
                 for (String turtleName : map.keySet()) {           
-                    log.warn("turtleName: "+turtleName);
+                    log.debug("turtleName: "+turtleName);
                     Turtle3D turtle=map.get(turtleName);
-                    return turtle.getScript().toJSONString();
+                    String json=turtle.getScript().toJSONString();
+                    log.debug("\n\n"+json+"\n\n");
+                    return json;
                 }
             }
             throw new TurtleException("Unable to find any KnoxCraft Turtle code to return");
