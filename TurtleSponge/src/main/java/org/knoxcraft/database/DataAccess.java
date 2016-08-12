@@ -50,8 +50,6 @@ import org.knoxcraft.database.exceptions.DatabaseWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
-
 /**
  * Handle the layout and creation of tables
  *

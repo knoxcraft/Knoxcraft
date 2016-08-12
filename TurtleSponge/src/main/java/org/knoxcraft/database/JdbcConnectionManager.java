@@ -75,7 +75,7 @@ public class JdbcConnectionManager {
      * @throws SQLException
      */
     private JdbcConnectionManager(SQLType type) throws SQLException {
-        DatabaseConfiguration cfg = DatabaseConfiguration.getDbConfig();
+        DatabaseConfiguration cfg = Database.getDbConfig();
         cpds = new ComboPooledDataSource();
         this.type = type;
         if (type.usesJDBCManager()) {
@@ -137,7 +137,7 @@ public class JdbcConnectionManager {
      * @throws DatabaseAccessException
      */
     private static JdbcConnectionManager getInstance() throws DatabaseAccessException {
-        DatabaseConfiguration config=DatabaseConfiguration.getDbConfig();
+        DatabaseConfiguration config=Database.getDbConfig();
         String dataSourceType=config.getDataSourceType();
         if (instance == null) {
             try {
@@ -170,7 +170,7 @@ public class JdbcConnectionManager {
                 }
                 // TODO: read from the appropriate file, if it exists
                 // Getting SQLite to work has been a huge hack
-                DatabaseConfiguration cfg = DatabaseConfiguration.getDbConfig();
+                DatabaseConfiguration cfg = Database.getDbConfig();
                 String dataSourceType=cfg.getDataSourceType();
                 if (dataSourceType.equals(Database.SQLITE)) {
                     cman.nonManaged=DriverManager.getConnection(cfg.getDatabaseUrl(Database.SQLITE));

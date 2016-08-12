@@ -59,8 +59,7 @@ import org.knoxcraft.database.exceptions.DatabaseReadException;
 import org.knoxcraft.database.exceptions.DatabaseTableInconsistencyException;
 import org.knoxcraft.database.exceptions.DatabaseWriteException;
 import org.slf4j.Logger;
-
-import com.google.inject.Inject;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents access to a MySQL database
@@ -70,8 +69,8 @@ import com.google.inject.Inject;
  * @author Jason Jones (darkdiplomat)
  */
 public class MySQLDatabase extends Database {
-    @Inject
-    private Logger log;
+
+    private Logger log=LoggerFactory.getLogger(MySQLDatabase.class);
 
     private static MySQLDatabase instance;
     private final String LIST_REGEX = "\u00B6";

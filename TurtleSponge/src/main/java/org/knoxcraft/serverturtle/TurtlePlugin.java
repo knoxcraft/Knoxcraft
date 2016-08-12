@@ -1,5 +1,7 @@
 package org.knoxcraft.serverturtle;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -11,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.knoxcraft.database.DataAccess;
 import org.knoxcraft.database.Database;
+import org.knoxcraft.database.DatabaseConfiguration;
 import org.knoxcraft.database.exceptions.DatabaseReadException;
 import org.knoxcraft.database.exceptions.DatabaseWriteException;
 import org.knoxcraft.database.tables.KCTScriptAccess;
@@ -32,13 +35,13 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent.Join;
-import org.spongepowered.api.event.network.ClientConnectionEvent.Login;
 import org.spongepowered.api.event.world.ChangeWorldWeatherEvent;
 import org.spongepowered.api.event.world.LoadWorldEvent;
 import org.spongepowered.api.plugin.Plugin;
@@ -55,11 +58,15 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
+
 @Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft", authors = {
 		"kakoijohn", "mrmoeee", "stringnotfound", "emhastings", "ppypp", "jspacco" })
 public class TurtlePlugin {
 
-	public static final String ID = "kct";
+    public static final String ID = "knoxcraft";
 	private static final String PLAYER_NAME = "playerName";
 	private static final String SCRIPT_NAME = "scriptName";
 	private static final String NUM_UNDO = "numUndo";
@@ -74,6 +81,21 @@ public class TurtlePlugin {
 
 	@Inject
 	private PluginContainer container;
+	
+    // The configuration folder for this plugin
+    @Inject
+    @ConfigDir(sharedRoot = true)
+    private File configDir;
+
+    // The config manager for the knoxcraft file
+    private ConfigurationLoader<CommentedConfigurationNode> knoxcraftConfigLoader;
+
+    // The in-memory version of the knoxcraft configuration file
+    private CommentedConfigurationNode knoxcraftConfig;
+
+//	@Inject
+//	@ConfigDir(sharedRoot = false)
+//	private Path privateConfigDir;
 	
 	private int jobNum = 0;
 
@@ -133,12 +155,81 @@ public class TurtlePlugin {
 
 		log.info("Enabling " + container.getName() + " Version " + container.getVersion());
 		log.info("Authored by " + container.getAuthors());
+		
+		// read configuration parameters
+		try {
+		    loadConfig();
+		} catch (IOException e) {
+		    log.error("Unable to create or load knoxcraft config file!");
+		    // TODO: set up a default
+		}
+		
+		// configure the Database, once we have loaded a valid configuration file
+		Database.configure(knoxcraftConfig);
 
 		// Look up previously submitted scripts from the DB
 		lookupFromDB();
 
 		// set up commands
 		setupCommands();
+	}
+	
+	
+	
+	/**
+	 * Load the configuration properties from config/knoxcraft.conf in HOCON format.
+	 * 
+	 * If not config file exists, create one with default values.
+	 * 
+	 * @return
+	 */
+	private void loadConfig() throws IOException
+	{
+	    // Check for config file config/knoxcraft.conf
+	    File knoxcraftConfigFile = new File(this.configDir, "knoxcraft.conf");
+        this.knoxcraftConfigLoader = 
+                HoconConfigurationLoader.builder().setFile(knoxcraftConfigFile).build();
+        
+        // Create the folder if it does not exist
+        if (!this.configDir.isDirectory()) {
+            this.configDir.mkdirs();
+        }
+
+        // Create the config file if it does not exist
+        if (!knoxcraftConfigFile.isFile()) {
+            knoxcraftConfigFile.createNewFile();
+        }
+        // now load the knoxcraft config file
+        this.knoxcraftConfig = this.knoxcraftConfigLoader.load();
+
+        // ensure we have correct database defaults
+        // will add any config values that are missing
+        DatabaseConfiguration.configureDefaultDatabase(knoxcraftConfig);
+        
+        // TODO: set other default configuration settings using this syntax:
+        // addConfigSetting(path, value)
+        // or
+        // addConfigSetting(path, value, comment)
+        // path should be a path separated by dots starting at knoxcraft, so
+        // for example knoxcraft.max-blocks
+        // Also, set up a constant String for the keys like knoxcraft.max-blocks
+        
+        // now save the configuration file, in case we changed anything
+        this.knoxcraftConfigLoader.save(this.knoxcraftConfig);
+	}
+	
+	private void addConfigSetting(String path, String value) {
+	    addConfigSetting(path, value, null);
+	}
+	
+	private void addConfigSetting(String path, String value, String comment) {
+	    CommentedConfigurationNode node=knoxcraftConfig.getNode(path);
+	    if (node.isVirtual()) {
+	        node=node.getNode(path).setValue(value);
+	        if (comment!=null){
+	            node.setComment(comment);
+	        }
+	    }
 	}
 	
 	@Listener

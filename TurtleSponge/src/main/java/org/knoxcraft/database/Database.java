@@ -49,6 +49,8 @@ import org.knoxcraft.database.xml.XmlDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+
 
 /**
  * A database representation, used to store any kind of data
@@ -65,62 +67,50 @@ public abstract class Database {
     
     private static Logger log=LoggerFactory.getLogger(Database.class);
     
-    /**
-     * The datasource type
-     *
-     * @author chris
-     */
-    public static class Type {
-        private static HashMap<String, Database> registeredDatabases = new HashMap<String, Database>();
-
-        public static void registerDatabase(String name, Database db) throws DatabaseException {
-            if (registeredDatabases.containsKey(name)) {
-                throw new DatabaseException(name + " cannot be registered. Type already exists");
-            }
-            registeredDatabases.put(name, db);
-            log.info(String.format("Registered %s Database", name));
+    private static Database instance;
+    private static DatabaseConfiguration dbConfig;
+    
+    public static void configure(CommentedConfigurationNode config) {
+        if (instance!=null) {
+            // only configure the DB once
+            return;
         }
-
-        public static Database getDatabaseFromType(String name) {
-            return registeredDatabases.get(name);
-        }
-
-        static {
-            try {
-                // read from server config file
-                DatabaseConfiguration config=DatabaseConfiguration.getDbConfig();
-                String dbname = config.getDataSourceType();
-                if (XML.equalsIgnoreCase(dbname)) {
-                    Database.Type.registerDatabase(XML, XmlDatabase.getInstance());
-                }
-                else if (MYSQL.equalsIgnoreCase(dbname)) {
-                    Database.Type.registerDatabase(MYSQL, MySQLDatabase.getInstance());
-                }
-                else if (SQLITE.equalsIgnoreCase(dbname)) {
-                    Database.Type.registerDatabase(SQLITE, SQLiteDatabase.getInstance());
-                }
-                else if (H2.equalsIgnoreCase(dbname)) {
-                    Database.Type.registerDatabase(H2, H2Database.getInstance());
-                }
-            }
-            catch (Exception e) {
-                log.error("Exception occurred while trying to prepare databases!", e);
-            }
+        dbConfig=new DatabaseConfiguration(config);
+        String dbType=dbConfig.getDataSourceType();
+        if (dbType.equals(MYSQL)){
+            instance=MySQLDatabase.getInstance();
+        } else if (dbType.equals(XML)){
+            instance=XmlDatabase.getInstance();
+        } else if (dbType.equals(SQLITE) || dbType.equals(H2)){
+            log.warn("Support for SQLite and H2 doesn't work. Defaulting to XML database");
+            instance=XmlDatabase.getInstance();
         }
     }
-
+    
+    public static DatabaseConfiguration getDbConfig() {
+        if (dbConfig==null){
+            throw new IllegalStateException("Database has not been configured! Call Database.configure() with a ConfigurationNode before calling this method");
+        }
+        return dbConfig;
+    }
+    
     public static Database get() {
-        // TODO: read Sponge configuration properties
-        DatabaseConfiguration config=DatabaseConfiguration.getDbConfig();
-        String dataSourceType=config.getDataSourceType();
-        Database ret = Database.Type.getDatabaseFromType(dataSourceType);
-        if (ret != null) {
-            return ret;
+        if (instance==null) {
+            // TODO create instance
         }
-        else {
-            log.warn("Database type " + dataSourceType + " is not available, falling back to XML! Fix your server.cfg");
-            return XmlDatabase.getInstance();
-        }
+        return instance;
+
+//        // TODO: read Sponge configuration properties
+//        DatabaseConfiguration config=DatabaseConfiguration.getDbConfig();
+//        String dataSourceType=config.getDataSourceType();
+//        Database ret = Database.Type.getDatabaseFromType(dataSourceType);
+//        if (ret != null) {
+//            return ret;
+//        }
+//        else {
+//            log.warn("Database type " + dataSourceType + " is not available, falling back to XML! Fix your server.cfg");
+//            return XmlDatabase.getInstance();
+//        }
     }
 
     /**

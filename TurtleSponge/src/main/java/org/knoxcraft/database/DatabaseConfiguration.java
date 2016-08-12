@@ -35,14 +35,14 @@
 
 package org.knoxcraft.database;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Properties;
 
 import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 
 /**
  * Database Configuration settings
@@ -53,133 +53,156 @@ import org.slf4j.LoggerFactory;
  */
 public class DatabaseConfiguration
 {
+    public static final String DB_TYPE = "knoxcraft.db.type";
+    public static final String DB_FILE = "knoxcraft.db.file";
+    public static final String DB_FOLDER = "knoxcraft.db.folder";
+    public static final String DB_NAME = "knoxcraft.db.name";
+    public static final String DB_HOST = "knoxcraft.db.host";
+    public static final String DB_PORT= "knoxcraft.db.port";
+    public static final String DB_PASSWORD = "knoxcraft.db.password";
+    public static final String DB_USERNAME = "knoxcraft.db.username";
+    
+    // table names (no DB_ in the title)
+    public static final String WHITELIST_TABLE_NAME = "knoxcraft.db.whitelist-table-name";
+    public static final String WARPS_TABLE_NAME = "knoxcraft.db.warps-table-name";
+    public static final String RESERVELIST_TABLE_NAME = "knoxcraft.db.reservelist-table-name";
+    public static final String PLAYERS_TABLE_NAME = "knoxcraft.db.players-table-name";
+    public static final String PERMISSIONS_TABLE_NAME = "knoxcraft.db.permissions-table-name";
+    public static final String OPERATORS_TABLE_NAME = "knoxcraft.db.operators-table-name";
+    public static final String KITS_TABLE_NAME = "knoxcraft.db.kits-table-name";
+    public static final String GROUPS_TABLE_NAME = "knoxcraft.db.groups-table-name";
+    public static final String BANS_TABLE_NAME = "knoxcraft.db.bans-table-name";
+    // connection pool configuration information (also not prefixed with DB_)
+    public static final String STATEMENT_CACHE_CLOSE_THREADS = "knoxcraft.db.statement-cache-close-threads";
+    public static final String MAX_CACHED_STATEMENTS_PER_CONNECTION = "knoxcraft.db.max-cached-statements-per-connection";
+    public static final String MAX_CACHED_STATEMENTS = "knoxcraft.db.max-cached-statements";
+    public static final String CONNECTION_TEST_FREQUENCY = "knoxcraft.db.connection-test-frequency";
+    public static final String RETURN_CONNECTION_TIMEOUT = "knoxcraft.db.return-connection-timeout";
+    public static final String NUM_HELPER_THREADS = "knoxcraft.db.num-helper-threads";
+    public static final String MIN_CONNECTION_POOL_SIZE = "knoxcraft.db.min-connection-pool-size";
+    public static final String MAX_CONNECTION_POOL_SIZE = "knoxcraft.db.max-connection-pool-size";
+    public static final String MAX_EXCESS_CONNECTIONS_IDLE_TIME = "knoxcraft.db.max-excess-connections-idle-time";
+    public static final String MAX_CONNECTION_IDLE_TIME = "knoxcraft.db.max-connection-idle-time";
+    public static final String ACQUIRE_INCREMENT = "knoxcraft.db.acquire-increment";
+    public static final String MAX_CONNECTIONS = "knoxcraft.db.maxConnections";
+    
     // TODO: subclass of properties that saves data and also produces comments
     // Should we use something like this?
     // https://docs.spongepowered.org/master/en/plugin/configuration/loaders.html
-    private Properties cfg;
+    //private Properties cfg;
+    
+    private CommentedConfigurationNode config;
     private Logger log=LoggerFactory.getLogger(TurtlePlugin.ID);
     
-    private static DatabaseConfiguration instance;
-    
-    public static DatabaseConfiguration getDbConfig() {
-        // TODO: figure out path from config file somehow?
-        if (instance==null){
-            String path="config" +File.separatorChar+"db.cfg";
-            instance=new DatabaseConfiguration(path);
-        }
-        return instance;
-    }
+    public static void configureDefaultDatabase(CommentedConfigurationNode config) {
 
-    private DatabaseConfiguration(String path) {
-        this.cfg = new Properties();
+        CommentedConfigurationNode defaultValues=null;
         try {
-            File test = new File(path);
-            if (test.exists()){
-                this.cfg.load(new FileInputStream(test));
-            } else {
-                // TODO: log that we can't find the DB configuration
-                log.info(String.format("Could not find the database configuration at %s, creating default.", path));
-            }
+            defaultValues=HoconConfigurationLoader.builder().build().load();
         } catch (IOException e) {
-            log.error(String.format("Cannot load database configuration from %s, creating default.", path));
-        }
-        verifyConfig();
-    }
-
-    /**
-     * Creates the default configuration
-     */
-    private void verifyConfig() {
-        // TODO: read from file, if it doesn't exist
+            // ignore; this exception cannot actually happen because we are not reading a file
+            // we just want an empty, default set of values
+        }        
+        defaultValues.getNode(convert("knoxcraft.db")).setComment(
+                "Configuration settings for the database\n"+
+                "For more settings explanations see following websites:\n"+
+                "http://javatech.org/2007/11/c3p0-connectionpool-configuration-rules-of-thumb\n"+
+                "https://community.jboss.org/wiki/HowToConfigureTheC3P0ConnectionPool");
+        defaultValues.getNode(convert(DB_TYPE)).setValue("xml").setComment(
+                "the type of the DB (xml or mysql)\n"+
+                "SQLite and H2 support are coming soon\n"+
+                "xml format will store XML files in forge/db");
+        defaultValues.getNode(convert(DB_HOST)).setValue("localhost");
+        defaultValues.getNode(convert(DB_NAME)).setValue("knoxcraft")
+            .setComment("Name of the database");
+        defaultValues.getNode(convert(DB_FOLDER)).setValue("db").
+            setComment("Folder where XML files stored. Path relative to Forge home. Ignored when db.type is mysql.");
+        defaultValues.getNode(convert(DB_FILE)).setValue("knoxcraft.db").
+            setComment("File where DB is store. Only relevant for SQLite and H2. Path relative to Forge home.");
+        defaultValues.getNode(convert(DB_USERNAME)).setValue("root");
+        defaultValues.getNode(convert(DB_PASSWORD)).setValue("root");
+        defaultValues.getNode(convert(DB_PORT)).setValue("8889");
+        // everything below here was basically copied from Canarymod's DB layer
+        // it's using C3P0 connectino pooling, which I don't really understand
+        defaultValues.getNode(convert(MAX_CONNECTIONS)).setValue("5");
+        defaultValues.getNode(convert(ACQUIRE_INCREMENT)).setValue("5")
+            .setComment("Determines how many connections at a time c3p0 will try to acquire when pool is exhausted");
+        defaultValues.getNode(convert(MAX_CONNECTION_IDLE_TIME)).setValue("900")
+            .setComment("Determines how long idle connections can stay in the connection pool before removed");
+        defaultValues.getNode(convert(MAX_EXCESS_CONNECTIONS_IDLE_TIME)).setValue("1800")
+            .setComment("Time until the connection pool will be culled down to min-connection-pool-size. Set 0 to not enforce pool shrinking");
+        defaultValues.getNode(convert(MAX_CONNECTION_POOL_SIZE)).setValue("10")
+            .setComment("The maximum allowed number of pooled connections. More for larger servers");
+        defaultValues.getNode(convert(MIN_CONNECTION_POOL_SIZE)).setValue("3")
+            .setComment("The minimum amount of connections allowed. More means more memory usage but takes away some impact from creating new connections");
+        defaultValues.getNode(convert(NUM_HELPER_THREADS)).setValue("4")
+            .setComment("Amount of threads that will perform slow JDBC operations (closing idle connections, returning connections to pool etc");
+        defaultValues.getNode(convert(RETURN_CONNECTION_TIMEOUT)).setValue("900").
+            setComment("Defines a time a connection can remain checked out. After that it will be forced back into the connection pool");
+        defaultValues.getNode(convert(CONNECTION_TEST_FREQUENCY)).setValue("0").
+            setComment("No idea what this does");
+        defaultValues.getNode(convert(MAX_CACHED_STATEMENTS)).setValue("50").
+            setComment("Number of max cached statements on all connections. (Roughly 5 * expected pooled connections)");
+        defaultValues.getNode(convert(MAX_CACHED_STATEMENTS_PER_CONNECTION)).setValue("5").
+            setComment("Number of max cached statements on a single connection");
+        defaultValues.getNode(convert(STATEMENT_CACHE_CLOSE_THREADS)).setValue("1").
+            setComment("Number of threads to use when closing statements is deferred (happens when parent connection is still in use)");
+        defaultValues.getNode(convert(BANS_TABLE_NAME)).setValue("ban").
+            setComment("The name to use for the Bans table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        defaultValues.getNode(convert(GROUPS_TABLE_NAME)).setValue("group").
+            setComment("The name to use for the Groups table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present");
+        defaultValues.getNode(convert(KITS_TABLE_NAME)).setValue("kits").
+            setComment("The name to use for the Kits table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        defaultValues.getNode(convert(OPERATORS_TABLE_NAME)).setValue("operators").
+            setComment("The name to use for the Operators table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        defaultValues.getNode(convert(PERMISSIONS_TABLE_NAME)).setValue("permissions").
+            setComment("The name to use for the Permissions table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        defaultValues.getNode(convert(PLAYERS_TABLE_NAME)).setValue("players").
+            setComment("The name to use for the Players table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        defaultValues.getNode(convert(RESERVELIST_TABLE_NAME)).setValue("reservelist").
+            setComment("The name to use for the ReserveList table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        defaultValues.getNode(convert(WARPS_TABLE_NAME)).setValue("warps").
+            setComment("The name to use for the Warps table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
+        defaultValues.getNode(convert(WHITELIST_TABLE_NAME)).setValue("whitelist").
+            setComment("The name to use for the WhiteList table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
         
-//        cfg.clearHeader();
-//        cfg.addHeaderLines(
-//                "For more settings explanations see following websites ...",
-//                "http://javatech.org/2007/11/c3p0-connectionpool-configuration-rules-of-thumb/",
-//                "https://community.jboss.org/wiki/HowToConfigureTheC3P0ConnectionPool?_sscc=t"
-//                          );
-//
-//        cfg.getProperty("name", "canarymod");
-//        cfg.getProperty("host", "localhost");
-//        cfg.getProperty("username", "admin");
-//        cfg.getProperty("password", "admin");
-//        getInt(cfg, "port", 3306);
-//        getInt(cfg, "maxConnections", 5);
-//
-//        // c3p0 settings
-//
-//        getInt(cfg, "acquire-increment", 5);
-//        cfg.setComments("acquire-increment", "Determines how many connections at a time c3p0 will try to acquire when the pool is exhausted.");
-//
-//        getInt(cfg, "max-connection-idle-time", 900); //15 minutes
-//        cfg.setComments("max-connection-idle-time", "Determines how long idle connections can stay in the connection pool before they are removed.");
-//
-//        getInt(cfg, "max-excess-connections-idle-time", 1800); // 30 minutes
-//        cfg.setComments("max-excess-connections-idle-time", "Time until the connection pool will be culled down to min-connection-pool-size. Set 0 to not enforce pool shrinking.");
-//
-//        getInt(cfg, "max-connection-pool-size", 10);
-//        cfg.setComments("max-connection-pool-size", "The maximum allowed number of pooled connections. More for larger servers");
-//
-//        getInt(cfg, "min-connection-pool-size", 3);
-//        cfg.setComments("min-connection-pool-size", "The minimum amount of connections allowed. More means more memory usage but takes away some impact from creating new connections.");
-//
-//        getInt(cfg, "num-helper-threads", 4);
-//        cfg.setComments("num-helper-threads", "Amount of threads that will perform slow JDBC operations (closing idle connections, returning connections to pool etc)");
-//
-//        getInt(cfg, "return-connection-timeout", 900); //15 minutes
-//        cfg.setComments("return-connection-timeout", "Defines a time a connection can remain checked out. After that it will be forced back into the connection pool.");
-//
-//        getInt(cfg, "connection-test-frequency", 0); // 60 minutes
-//        cfg.setComments("idle-connection-test-frequency", "Every this amount of seconds idle connections will be checked for validity. Set 0 to turn off");
-//
-//        getInt(cfg, "max-cached-statements", 50);
-//        cfg.setComments("max-cached-statements", "Number of max cached statements on all connections. (Roughly 5 * expected pooled connections)");
-//
-//        getInt(cfg, "max-statements-per-connection", 5);
-//        cfg.setComments("max-statements-per-connection", "Number of max cached statements on a single connection.");
-//
-//        getInt(cfg, "statement-cache-close-threads", 1);
-//        cfg.setComments("statement-cache-close-threads", "Number of threads to use when closing statements is deferred (happens when parent connection is still in use)");
-//
-//        // Table Naming Schemes...
-//        cfg.getProperty("bans-table-name", "ban");
-//        cfg.setComments("bans-table-name", "The name to use for the Bans table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-//
-//        cfg.getProperty("groups-table-name", "group");
-//        cfg.setComments("groups-table-name", "The name to use for the Groups table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-//
-//        cfg.getProperty("kits-table-name", "kit");
-//        cfg.setComments("kits-table-name", "The name to use for the Kits table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-//
-//        cfg.getProperty("operators-table-name", "operators");
-//        cfg.setComments("operators-table-name", "The name to use for the Operators table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-//
-//        cfg.getProperty("permissions-table-name", "permission");
-//        cfg.setComments("permissions-table-name", "The name to use for the Permissions table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-//
-//        cfg.getProperty("players-table-name", "player");
-//        cfg.setComments("players-table-name", "The name to use for the Permissions table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-//
-//        cfg.getProperty("reservelist-table-name", "reservelist");
-//        cfg.setComments("reservelist-table-name", "The name to use for the ReserveList table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-//
-//        cfg.getProperty("warps-table-name", "warp");
-//        cfg.setComments("warps-table-name", "The name to use for the Warps table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-//
-//        cfg.getProperty("whitelist-table-name", "whitelist");
-//        cfg.setComments("whitelist-table-name", "The name to use for the WhiteList table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
-//        //
-//
-//        cfg.save();
+        // Make sure we have a complete and correct set of defaults
+        config.mergeValuesFrom(defaultValues);
     }
     
+    public DatabaseConfiguration(CommentedConfigurationNode configNode) {
+        // TODO: merge the parameter with the default values so that we have correct
+        // default values for everything
+        this.config=configNode;
+    }
+    
+    public static Object[] convert(String path) {
+        return path.split("\\.");
+    }
+
+//    private DatabaseConfiguration(String path) {
+//        this.cfg = new Properties();
+//        try {
+//            File test = new File(path);
+//            if (test.exists()){
+//                this.cfg.load(new FileInputStream(test));
+//            } else {
+//                // TODO: log that we can't find the DB configuration
+//                log.info(String.format("Could not find the database configuration at %s, creating default.", path));
+//            }
+//        } catch (IOException e) {
+//            log.error(String.format("Cannot load database configuration from %s, creating default.", path));
+//        }
+//        verifyConfig();
+//    }
+
     /**
      * Get the type of datasource being used (MySQL, SQLite, XML, or 
      * (once we add support for it) H2.
      * @return
      */
     public String getDataSourceType() {
-        return cfg.getProperty("dbtype", Database.SQLITE);
+        return getString(DB_TYPE);
     }
 
     /**
@@ -199,8 +222,16 @@ public class DatabaseConfiguration
         return "jdbc:" + driver + "://" + getDatabaseHost() + ((port == 0) ? "" : (":" + port)) + "/" + getDatabaseName();
     }
     
+    // private helper/convenience methods
+    private int getInt(String key) {
+        return config.getNode(convert(key)).getInt();
+    }
+    private String getString(String key) {
+        return config.getNode(convert(key)).getString();
+    }
+    
     public String getDatabaseFile() {
-        return cfg.getProperty("dbfile", "db/knoxcraft.db");
+        return getString(DB_FILE);
     }
 
     /**
@@ -209,13 +240,10 @@ public class DatabaseConfiguration
      * @return database host
      */
     public String getDatabaseHost() {
-        return cfg.getProperty("host", "localhost");
+        return getString(DB_HOST);
     }
     
-    private static int getInt(Properties prop, String key, int defaultVal) {
-        String val=prop.getProperty(key, ""+defaultVal);
-        return Integer.parseInt(val);
-    }
+   
     
     /**
      * Get the database port
@@ -223,7 +251,7 @@ public class DatabaseConfiguration
      * @return The configured port or 0
      */
     public int getDatabasePort() {
-        return getInt(cfg, "port", 0);
+        return getInt(DB_PORT);
     }
 
     /**
@@ -232,7 +260,7 @@ public class DatabaseConfiguration
      * @return database name
      */
     public String getDatabaseName() {
-        return cfg.getProperty("name", "canarymod");
+        return getString(DB_NAME);
     }
 
     /**
@@ -242,7 +270,7 @@ public class DatabaseConfiguration
      * @return database username
      */
     public String getDatabaseUser() {
-        return cfg.getProperty("username");
+        return getString(DB_USERNAME);
     }
 
     /**
@@ -252,7 +280,7 @@ public class DatabaseConfiguration
      * @return database password
      */
     public String getDatabasePassword() {
-        return cfg.getProperty("password");
+        return getString(DB_PASSWORD);
     }
 
     /**
@@ -264,7 +292,7 @@ public class DatabaseConfiguration
      * @return database maximum connections
      */
     public int getDatabaseMaxConnections() {
-        return getInt(cfg, "maxConnections", -1);
+        return getInt(MAX_CONNECTIONS);
     }
 
     /**
@@ -274,7 +302,7 @@ public class DatabaseConfiguration
      * @return config for max cached statements
      */
     public int getMaxCachedStatements() {
-        return getInt(cfg, "max-cached-statements", 50);
+        return getInt(MAX_CACHED_STATEMENTS);
     }
 
     /**
@@ -285,7 +313,7 @@ public class DatabaseConfiguration
      * @return config for max num of pooled statements per connection
      */
     public int getMaxCachedStatementsPerConnection() {
-        return getInt(cfg, "max-statements-per-connection", 5);
+        return getInt(MAX_CACHED_STATEMENTS_PER_CONNECTION);
     }
 
     /**
@@ -295,7 +323,7 @@ public class DatabaseConfiguration
      * @return config num of threads used to defer closing statements
      */
     public int getNumStatementCloseThreads() {
-        return getInt(cfg, "statement-cache-close-threads", 1);
+        return getInt(STATEMENT_CACHE_CLOSE_THREADS);
     }
 
     /**
@@ -304,7 +332,7 @@ public class DatabaseConfiguration
      * @return connection re-check interval
      */
     public int getConnectionTestFrequency() {
-        return getInt(cfg, "connection-test-frequency", 3600);
+        return getInt(CONNECTION_TEST_FREQUENCY);
     }
 
     /**
@@ -313,7 +341,7 @@ public class DatabaseConfiguration
      * @return num of seconds a connection can stay checked out
      */
     public int getReturnConnectionTimeout() {
-        return getInt(cfg, "return-connection-timeout", 900);
+        return getInt(RETURN_CONNECTION_TIMEOUT);
     }
 
     /**
@@ -323,7 +351,7 @@ public class DatabaseConfiguration
      * @return num of threads to use for heavy JDBC operations
      */
     public int getNumHelperThreads() {
-        return getInt(cfg, "num-helper-threads", 4);
+        return getInt(NUM_HELPER_THREADS);
     }
 
     /**
@@ -332,7 +360,7 @@ public class DatabaseConfiguration
      * @return min amount of connections
      */
     public int getMinPoolSize() {
-        return getInt(cfg, "min-connection-pool-size", 3);
+        return getInt(MIN_CONNECTION_POOL_SIZE);
     }
 
     /**
@@ -341,7 +369,7 @@ public class DatabaseConfiguration
      * @return max allowed connections in pool
      */
     public int getMaxPoolSize() {
-        return getInt(cfg, "max-connection-pool-size", 10);
+        return getInt(MAX_CONNECTION_POOL_SIZE);
     }
 
     /**
@@ -352,7 +380,7 @@ public class DatabaseConfiguration
      * @return seconds to keep excess connections
      */
     public int getMaxExcessConnectionsIdleTime() {
-        return getInt(cfg, "max-excess-connections-idle-time", 1800);
+        return getInt(MAX_EXCESS_CONNECTIONS_IDLE_TIME);
     }
 
     /**
@@ -361,7 +389,7 @@ public class DatabaseConfiguration
      * @return connections to acquire
      */
     public int getAcquireIncrement() {
-        return getInt(cfg, "acquire-increment", 5);
+        return getInt(ACQUIRE_INCREMENT);
     }
 
     /**
@@ -370,42 +398,42 @@ public class DatabaseConfiguration
      * @return keep-alive time of connections in pool
      */
     public int getMaxConnectionIdleTime() {
-        return getInt(cfg, "max-connection-idle-time", 900);
+        return getInt(MAX_CONNECTION_IDLE_TIME);
     }
 
     public String getBansTableName() {
-        return cfg.getProperty("bans-table-name", "ban");
+        return getString(BANS_TABLE_NAME);
     }
 
     public String getGroupsTableName() {
-        return cfg.getProperty("groups-table-name", "group");
+        return getString(GROUPS_TABLE_NAME);
     }
 
     public String getKitsTableName() {
-        return cfg.getProperty("kits-table-name", "kit");
+        return getString(KITS_TABLE_NAME);
     }
 
     public String getOpertatorsTableName() {
-        return cfg.getProperty("operators-table-name", "operators");
+        return getString(OPERATORS_TABLE_NAME);
     }
 
     public String getPermissionsTableName() {
-        return cfg.getProperty("permissions-table-name", "permission");
+        return getString(PERMISSIONS_TABLE_NAME);
     }
 
     public String getPlayersTableName() {
-        return cfg.getProperty("players-table-name", "player");
+        return getString(PLAYERS_TABLE_NAME);
     }
 
     public String getReservelistTableName() {
-        return cfg.getProperty("reservelist-table-name", "reservelist");
+        return getString(RESERVELIST_TABLE_NAME);
     }
 
     public String getWarpsTableName() {
-        return cfg.getProperty("warps-table-name", "warp");
+        return getString(WARPS_TABLE_NAME);
     }
 
     public String getWhitelistTableName() {
-        return cfg.getProperty("whitelist-table-name", "whitelist");
+        return getString(WHITELIST_TABLE_NAME);
     }
 }
