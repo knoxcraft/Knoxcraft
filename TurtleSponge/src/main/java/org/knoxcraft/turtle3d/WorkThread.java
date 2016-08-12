@@ -33,6 +33,7 @@ public class WorkThread extends Thread {
      * Constructor
      * @param work This should be passed the same instance of the WorkMap class used in adding jobs.
      * @param world The current Minecraft world to place the blocks in.
+     * @param sleepTime Time for the thread sleep after each work cycle.
      * @param minecraftSyncExecutor The Sync Executor is important for placing blocks in the world because
      * Minecraft is inherently single threaded. This means that if we are running a separate thread and want to
      * make changes to the world, we must first sync that thread with the main Minecraft thread in order to
@@ -40,9 +41,10 @@ public class WorkThread extends Thread {
      * Sponge.getScheduler().createSyncExecutor(this);
      * @param log
      */
-    public WorkThread(WorkMap work, World world, SpongeExecutorService minecraftSyncExecutor, Logger log) {
+    public WorkThread(WorkMap work, World world, long sleepTime, SpongeExecutorService minecraftSyncExecutor, Logger log) {
         this.work = work;
         this.world = world;
+        this.sleepTime = sleepTime;
         this.minecraftSyncExecutor = minecraftSyncExecutor;
         this.log = log;
     }
