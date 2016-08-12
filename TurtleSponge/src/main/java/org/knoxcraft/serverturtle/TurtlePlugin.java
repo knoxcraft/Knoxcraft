@@ -65,8 +65,8 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import static org.knoxcraft.database.DatabaseConfiguration.convert;
 
 /**
- * Sponge plugin to run when the Minecraft server starts up.
- * @author kakoijohn
+ * Sponge Knoxcraft plugin to run when the Minecraft server starts up.
+ * @author mrmoeee jspacco kakoijohn 
  *
  */
 @Plugin(id = TurtlePlugin.ID, name = "TurtlePlugin", version = "0.2", description = "Knoxcraft Turtles Plugin for Minecraft", authors = {
