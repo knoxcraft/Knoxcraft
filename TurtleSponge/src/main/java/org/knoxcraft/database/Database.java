@@ -70,6 +70,15 @@ public abstract class Database {
     private static Database instance;
     private static DatabaseConfiguration dbConfig;
     
+    /**
+     * Configure the database. The parameter should contain configuration
+     * settings; if not this method will add a set of defaults.
+     * 
+     * This method should only be called once to configure database support.
+     * Subsequent calls are ignored.
+     * 
+     * @param config
+     */
     public static void configure(CommentedConfigurationNode config) {
         if (instance!=null) {
             // only configure the DB once
@@ -87,6 +96,19 @@ public abstract class Database {
         }
     }
     
+    /**
+     * Return the DatabaseConfiguration, which is a wrapper over the CommentedConfigurationNode
+     * that keeps the code compatible with the DB layer from Canarymod that we are using.
+     * 
+     * {@link #configure(CommentedConfigurationNode)} must be called before this method.
+     * 
+     * In the future, the {@link DatabaseConfiguration} may be phased out in favor
+     * of a single configuration object, or direct use of the {@link CommentedConfigurationNode}.
+     * 
+     * In the very distant future, this entire layer should be replaced with Hibernate.
+     * 
+     * @return
+     */
     public static DatabaseConfiguration getDbConfig() {
         if (dbConfig==null){
             throw new IllegalStateException("Database has not been configured! Call Database.configure() with a ConfigurationNode before calling this method");
@@ -94,9 +116,17 @@ public abstract class Database {
         return dbConfig;
     }
     
+    /**
+     * Get a reference to the database layer. This method returns a subclass.
+     * 
+     * {@link #configure(CommentedConfigurationNode)} should be called before this method.
+     * 
+     * 
+     * @return
+     */
     public static Database get() {
         if (instance==null) {
-            // TODO create instance
+            throw new IllegalStateException("Cannot get() the database before calling configure().");
         }
         return instance;
     }
