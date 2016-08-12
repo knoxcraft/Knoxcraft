@@ -83,19 +83,16 @@ public class DatabaseConfiguration
     public static final String ACQUIRE_INCREMENT = "knoxcraft.db.acquire-increment";
     public static final String MAX_CONNECTIONS = "knoxcraft.db.maxConnections";
     
-    // TODO: subclass of properties that saves data and also produces comments
-    // Should we use something like this?
-    // https://docs.spongepowered.org/master/en/plugin/configuration/loaders.html
-    //private Properties cfg;
-    
     private CommentedConfigurationNode config;
     private Logger log=LoggerFactory.getLogger(TurtlePlugin.ID);
     
-    private void addConfigSetting(String path, String value) {
+    private void addConfigSetting(String path, Object value) {
         addConfigSetting(path, value, null);
     }
     
-    private void addConfigSetting(String path, String value, String comment) {
+    private void addConfigSetting(String path, Object value, String comment) {
+        // add the given value to the given path, but only if the given path
+        // does not already have a value
         CommentedConfigurationNode node=config.getNode(convert(path));
         if (node.isVirtual()) {
             node=node.setValue(value);
@@ -112,7 +109,8 @@ public class DatabaseConfiguration
     private void configureDefaultDatabase(CommentedConfigurationNode config) {
         CommentedConfigurationNode topLevel=config.getNode(convert("knoxcraft.db"));
         if (topLevel.isVirtual() || !topLevel.getComment().isPresent()) {
-            topLevel.setComment("Configuration settings for the database\n"+
+            topLevel.setComment("NOTE: Currently the configuration file framework doesn't keep these in order\n"+
+                "Configuration settings for the database\n"+
                 "For more settings explanations see following websites:\n"+
                 "http://javatech.org/2007/11/c3p0-connectionpool-configuration-rules-of-thumb\n"+
                 "https://community.jboss.org/wiki/HowToConfigureTheC3P0ConnectionPool");
@@ -126,21 +124,21 @@ public class DatabaseConfiguration
         addConfigSetting(DB_FILE,"knoxcraft.db","File where DB is store. Only relevant for SQLite and H2. Path relative to Forge home.");
         addConfigSetting(DB_USERNAME,"root");
         addConfigSetting(DB_PASSWORD,"root");
-        addConfigSetting(DB_PORT,"8889");
+        addConfigSetting(DB_PORT,8889);
         // everything below here was basically copied from Canarymod's DB layer
         // it's using C3P0 connectino pooling, which I don't really understand
-        addConfigSetting(MAX_CONNECTIONS,"5");
-        addConfigSetting(ACQUIRE_INCREMENT,"5","Determines how many connections at a time c3p0 will try to acquire when pool is exhausted");
-        addConfigSetting(MAX_CONNECTION_IDLE_TIME,"900","Determines how long idle connections can stay in the connection pool before removed");
-        addConfigSetting(MAX_EXCESS_CONNECTIONS_IDLE_TIME,"1800","Time until the connection pool will be culled down to min-connection-pool-size. Set 0 to not enforce pool shrinking");
-        addConfigSetting(MAX_CONNECTION_POOL_SIZE,"10","The maximum allowed number of pooled connections. More for larger servers");
-        addConfigSetting(MIN_CONNECTION_POOL_SIZE,"3","The minimum amount of connections allowed. More means more memory usage but takes away some impact from creating new connections");
-        addConfigSetting(NUM_HELPER_THREADS,"4","Amount of threads that will perform slow JDBC operations (closing idle connections, returning connections to pool etc");
-        addConfigSetting(RETURN_CONNECTION_TIMEOUT,"900","Defines a time a connection can remain checked out. After that it will be forced back into the connection pool");
-        addConfigSetting(CONNECTION_TEST_FREQUENCY,"0","No idea what this does");
-        addConfigSetting(MAX_CACHED_STATEMENTS,"50","Number of max cached statements on all connections. (Roughly 5 * expected pooled connections)");
-        addConfigSetting(MAX_CACHED_STATEMENTS_PER_CONNECTION,"5","Number of max cached statements on a single connection");
-        addConfigSetting(STATEMENT_CACHE_CLOSE_THREADS,"1","Number of threads to use when closing statements is deferred (happens when parent connection is still in use)");
+        addConfigSetting(MAX_CONNECTIONS,5);
+        addConfigSetting(ACQUIRE_INCREMENT,5,"Determines how many connections at a time c3p0 will try to acquire when pool is exhausted");
+        addConfigSetting(MAX_CONNECTION_IDLE_TIME,900,"Determines how long idle connections can stay in the connection pool before removed");
+        addConfigSetting(MAX_EXCESS_CONNECTIONS_IDLE_TIME,1800,"Time until the connection pool will be culled down to min-connection-pool-size. Set 0 to not enforce pool shrinking");
+        addConfigSetting(MAX_CONNECTION_POOL_SIZE,10,"The maximum allowed number of pooled connections. More for larger servers");
+        addConfigSetting(MIN_CONNECTION_POOL_SIZE,3,"The minimum amount of connections allowed. More means more memory usage but takes away some impact from creating new connections");
+        addConfigSetting(NUM_HELPER_THREADS,4,"Amount of threads that will perform slow JDBC operations (closing idle connections, returning connections to pool etc");
+        addConfigSetting(RETURN_CONNECTION_TIMEOUT,900,"Defines a time a connection can remain checked out. After that it will be forced back into the connection pool");
+        addConfigSetting(CONNECTION_TEST_FREQUENCY,0,"No idea what this does");
+        addConfigSetting(MAX_CACHED_STATEMENTS,50,"Number of max cached statements on all connections. (Roughly 5 * expected pooled connections)");
+        addConfigSetting(MAX_CACHED_STATEMENTS_PER_CONNECTION,5,"Number of max cached statements on a single connection");
+        addConfigSetting(STATEMENT_CACHE_CLOSE_THREADS,1,"Number of threads to use when closing statements is deferred (happens when parent connection is still in use)");
         addConfigSetting(BANS_TABLE_NAME,"ban","The name to use for the Bans table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
         addConfigSetting(GROUPS_TABLE_NAME,"group","The name to use for the Groups table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present");
         addConfigSetting(KITS_TABLE_NAME,"kits","The name to use for the Kits table. NOTE: Changing this here will require you to manually change the name of the table in the database (if present)");
