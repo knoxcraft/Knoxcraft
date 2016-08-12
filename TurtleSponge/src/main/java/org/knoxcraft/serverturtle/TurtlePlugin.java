@@ -62,6 +62,8 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
+import static org.knoxcraft.database.DatabaseConfiguration.convert;
+
 /**
  * Sponge plugin to run when the Minecraft server starts up.
  * @author kakoijohn
@@ -186,6 +188,7 @@ public class TurtlePlugin {
 
 		// set up commands
 		setupCommands();
+		
 	}
 	
 	/**
@@ -235,9 +238,9 @@ public class TurtlePlugin {
 	}
 	
 	private void addConfigSetting(String path, String value, String comment) {
-	    CommentedConfigurationNode node=knoxcraftConfig.getNode(path);
+	    CommentedConfigurationNode node=knoxcraftConfig.getNode(convert(path));
 	    if (node.isVirtual()) {
-	        node=node.getNode(path).setValue(value);
+	        node=node.setValue(value);
 	        if (comment!=null){
 	            node.setComment(comment);
 	        }
