@@ -77,6 +77,7 @@ public class TurtlePlugin {
 	private static final String PLAYER_NAME = "playerName";
 	private static final String SCRIPT_NAME = "scriptName";
 	private static final String NUM_UNDO = "numUndo";
+	private static final String ARE_YOU_SURE = "no";
 	private JettyServer jettyServer;
 	@Inject
 	private Logger log;
@@ -105,6 +106,8 @@ public class TurtlePlugin {
 //	@ConfigDir(sharedRoot = false)
 //	private Path privateConfigDir;
 	
+	private long sleepTime = 200;
+	private int workChunkSize = 500;
 	private int jobNum = 0;
 
 	/**
@@ -278,7 +281,7 @@ public class TurtlePlugin {
 			}, 0, 10, TimeUnit.MINUTES);
 			
 			//SETUP JOBQUEUE FOR TURTLE SCRIPT EXECUTOR
-			jobQueue = new KCTJobQueue(minecraftSyncExecutor, log, world);
+			jobQueue = new KCTJobQueue(minecraftSyncExecutor, log, world, sleepTime);
 		}
 	}
 
@@ -363,6 +366,7 @@ public class TurtlePlugin {
 						Optional<String> optScriptName = args.getOne(SCRIPT_NAME);
 						if (!optScriptName.isPresent()) {
 							src.sendMessage(Text.of("No script name provided! You must invoke a script by name"));
+							return CommandResult.success();
 						}
 
 						String scriptName = optScriptName.get();
@@ -412,7 +416,7 @@ public class TurtlePlugin {
 							turtle.setSenderName(playerName);
 							turtle.setLoc(pos);
 							turtle.setWorld(w);
-							turtle.setWorkChunkSize(500);
+							turtle.setWorkChunkSize(workChunkSize);
 							turtle.setJobNum(jobNum++);
 							turtle.setTurtleDirection(d);
 							turtle.setScript(script);
@@ -459,6 +463,35 @@ public class TurtlePlugin {
 
 	             }).build();
 	    Sponge.getCommandManager().register(this, cancel, "cancel", "cn");
+	    
+        CommandSpec killAll = CommandSpec.builder().description(Text.of("Kill all queued work")).permission("")
+                .arguments(GenericArguments.onlyOne(GenericArguments.bool(Text.of(ARE_YOU_SURE))))
+                .executor(new CommandExecutor() {
+                    @Override
+                    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+                        Optional<String> optAreYouSure = args.getOne(ARE_YOU_SURE);
+                        if (!optAreYouSure.isPresent()) {
+                            src.sendMessage(Text.of("You must say \"/killall yes\" in order to confirm clearing the entire queue!"));
+                            src.sendMessage(Text.of("Once you have cleared the queue, you cannot take this back!"));
+                            return CommandResult.success();
+                        }
+                        
+                        String areYouSure = optAreYouSure.get();
+                        
+                        if (areYouSure.equalsIgnoreCase("yes")) {
+                            log.debug("Kill All invoked!");
+
+                            jobQueue.killAll();
+                        } else {
+                            src.sendMessage(Text.of("You must say \"/killall yes\" in order to confirm clearing the entire queue!"));
+                            src.sendMessage(Text.of("Once you have cleared the queue, you cannot take this back!"));
+                        }
+                        
+                        return CommandResult.success();
+                    }
+
+                }).build();
+        Sponge.getCommandManager().register(this, killAll, "killAll", "killall");
 	}
 
 	public static KCTScript makeFakeSquare() {

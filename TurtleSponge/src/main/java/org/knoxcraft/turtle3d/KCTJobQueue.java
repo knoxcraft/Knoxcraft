@@ -29,14 +29,15 @@ public class KCTJobQueue {
      * Sync Executor syncs with the main Minecraft thread and world.setblock() methods can be called.
      * @param log
      * @param world
+     * @param sleepTime
      */
-    public KCTJobQueue(SpongeExecutorService minecraftSyncExecutor, Logger log, World world) {
+    public KCTJobQueue(SpongeExecutorService minecraftSyncExecutor, Logger log, World world, long sleepTime) {
         this.log = log;
 
         this.minecraftSyncExecutor = minecraftSyncExecutor;
         
         workMap = new WorkMap(log);
-        workThread = new WorkThread(workMap, world, minecraftSyncExecutor, log);
+        workThread = new WorkThread(workMap, world, sleepTime, minecraftSyncExecutor, log);
         workThread.start();
     }
     
@@ -64,6 +65,13 @@ public class KCTJobQueue {
      */
     public void cancelScript(CommandSource src) {
         workMap.cancel(src);
+    }
+    
+    /**
+     * Clears all queues in WorkMap. 
+     */
+    public void killAll() {
+        workMap.killAll();
     }
     
     /**

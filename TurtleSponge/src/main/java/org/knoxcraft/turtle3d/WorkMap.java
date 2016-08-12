@@ -145,6 +145,22 @@ public class WorkMap {
         this.notifyAll();
     }
     
+    public synchronized void killAll() {
+        for (int i = 0; i < workList.size(); i++) {
+            Workload userWork = workList.get(i);
+            while (userWork.pollFirst() != null)
+                log.debug("Killing work...");
+        }
+        
+        for (Stack<Workload> userArchive : workArchive.values()) {
+            while (!userArchive.isEmpty()) {
+                userArchive.pop();
+            }
+        }
+        
+        log.info("Finished clearing all queues.");
+    }
+    
     /**
      * A blocking call that must wait for a notify by the other synchronized methods of addWork() addUndo() 
      * and cancel() to complete before it can take any work away from the list.
