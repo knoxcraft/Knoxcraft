@@ -38,6 +38,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
@@ -196,6 +197,7 @@ public class TurtlePlugin {
 	}
 	
 	private void readConfigFile() {
+	    // Read values out of config files and set instance variables.
 	    this.workChunkSize=knoxcraftConfig.getNode(WORK_CHUNK_SIZE).getInt();
 	    this.sleepTime=knoxcraftConfig.getNode(SLEEP_TIME).getInt();
 	}
@@ -203,9 +205,10 @@ public class TurtlePlugin {
 	/**
 	 * Load the configuration properties from config/knoxcraft.conf in HOCON format.
 	 * 
-	 * If not config file exists, create one with default values.
+	 * If no config file exists, create one with default values.
 	 * 
-	 * @return
+	 * XXX NOTE: this method also configured the database, which is a bit sloppy.
+	 * 
 	 */
 	private void loadOrCreateConfigFile() throws IOException
 	{
@@ -223,6 +226,7 @@ public class TurtlePlugin {
         if (!knoxcraftConfigFile.isFile()) {
             knoxcraftConfigFile.createNewFile();
         }
+        
         // now load the knoxcraft config file
         this.knoxcraftConfig = this.knoxcraftConfigLoader.load();
 
@@ -231,18 +235,18 @@ public class TurtlePlugin {
         Database.configure(knoxcraftConfig);
         
         // set other default configuration settings using this syntax:
-        addConfigSetting(WORK_CHUNK_SIZE, "500", "Number of blocks to build at a time. Larger values will lag and eventually crash the server. 500 seems to work.");
-        addConfigSetting(SLEEP_TIME, "200", "Number of millis to wait between building chunks of blocks. Shorter values are more likely to lag and eventually crash the server. 200 seems to work.");
+        addConfigSetting(WORK_CHUNK_SIZE, 500, "Number of blocks to build at a time. Larger values will lag and eventually crash the server. 500 seems to work.");
+        addConfigSetting(SLEEP_TIME, 200, "Number of millis to wait between building chunks of blocks. Shorter values are more likely to lag and eventually crash the server. 200 seems to work.");
         
         // now save the configuration file, in case we changed anything
         this.knoxcraftConfigLoader.save(this.knoxcraftConfig);
 	}
 	
-	private void addConfigSetting(String path, String value) {
+	private void addConfigSetting(String path, Object value) {
 	    addConfigSetting(path, value, null);
 	}
 	
-	private void addConfigSetting(String path, String value, String comment) {
+	private void addConfigSetting(String path, Object value, String comment) {
 	    CommentedConfigurationNode node=knoxcraftConfig.getNode(convert(path));
 	    if (node.isVirtual()) {
 	        node=node.setValue(value);
@@ -374,7 +378,7 @@ public class TurtlePlugin {
 						String scriptName = optScriptName.get();
 						String playerName = src.getName().toLowerCase();
 
-						log.info("playername ==" + playerName);
+						log.debug("playername ==" + playerName);
 						Optional<String> optPlayerName = args.getOne(PLAYER_NAME);
 						if (optPlayerName.isPresent()) {
 							playerName = optPlayerName.get();
@@ -392,6 +396,7 @@ public class TurtlePlugin {
 							log.warn(String.format("player %s cannot find script %s", playerName, scriptName));
 							src.sendMessage(
 									Text.of(String.format("%s, you have no script named %s", playerName, scriptName)));
+							return CommandResult.success();
 						}
 
 						SpongeTurtle turtle = new SpongeTurtle(log);
@@ -429,7 +434,8 @@ public class TurtlePlugin {
 				}).build();
 		Sponge.getCommandManager().register(this, invokeScript, "invoke", "in");
 
-		CommandSpec undo = CommandSpec.builder().description(Text.of("Undo the previous script")).permission("")
+		CommandSpec undo = CommandSpec.builder().description(Text.of("Undo the previous script"))
+		        .permission("")
 				.arguments(GenericArguments.optional(GenericArguments.integer(Text.of(NUM_UNDO))))
 				.executor(new CommandExecutor() {
 					@Override
@@ -449,8 +455,9 @@ public class TurtlePlugin {
 				}).build();
 		Sponge.getCommandManager().register(this, undo, "undo", "un");
 		
-	    CommandSpec cancel = CommandSpec.builder().description(Text.of("Cancel currently queued work")).permission("")
-	             .executor(new CommandExecutor() {
+	    CommandSpec cancel = CommandSpec.builder().description(Text.of("Cancel currently queued work"))
+	            .permission("")
+	            .executor(new CommandExecutor() {
 	                 @Override
 	                 public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 	                     log.debug("Cancel invoked!");
@@ -463,23 +470,18 @@ public class TurtlePlugin {
 	             }).build();
 	    Sponge.getCommandManager().register(this, cancel, "cancel", "cn");
 	    
-        CommandSpec killAll = CommandSpec.builder().description(Text.of("Kill all queued work")).permission("")
-                .arguments(GenericArguments.onlyOne(GenericArguments.bool(Text.of(ARE_YOU_SURE))))
+	    // requires op permission
+        CommandSpec killAll = CommandSpec.builder().description(Text.of("Kill all queued work"))
+                .permission("minecraft.command.op")
+                .arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of(ARE_YOU_SURE))))
                 .executor(new CommandExecutor() {
                     @Override
                     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
                         Optional<String> optAreYouSure = args.getOne(ARE_YOU_SURE);
-                        if (!optAreYouSure.isPresent()) {
-                            src.sendMessage(Text.of("You must say \"/killall yes\" in order to confirm clearing the entire queue!"));
-                            src.sendMessage(Text.of("Once you have cleared the queue, you cannot take this back!"));
-                            return CommandResult.success();
-                        }
-                        
-                        String areYouSure = optAreYouSure.get();
-                        
-                        if (areYouSure.equalsIgnoreCase("yes")) {
-                            log.debug("Kill All invoked!");
 
+                        if (optAreYouSure.isPresent() && optAreYouSure.get().equals("yes")) {
+                            log.warn("Killing all invoked scripts, and emptying the undo stack.");
+                            src.sendMessage(Text.of("Clearing the entire build queue, and the undo queue!"));
                             jobQueue.killAll();
                         } else {
                             src.sendMessage(Text.of("You must say \"/killall yes\" in order to confirm clearing the entire queue!"));
@@ -587,6 +589,11 @@ public class TurtlePlugin {
 
 	// Listeners
 
+	@Listener
+	public void onSendCommand(SendCommandEvent event) {
+	    log.info(String.format("Command event listener: %s %s", event.getCommand(), event.getArguments()));
+	}
+	
 	/**
 	 * @param loginEvent
 	 */
@@ -622,7 +629,7 @@ public class TurtlePlugin {
 	 */
 	@Listener
 	public void uploadJSON(KCTUploadHook event) {
-		log.debug("Hook called!");
+		log.debug("KCTUploadHook called!");
 		// add scripts to manager and db
 		Collection<KCTScript> list = event.getScripts();
 		for (KCTScript script : list) {
