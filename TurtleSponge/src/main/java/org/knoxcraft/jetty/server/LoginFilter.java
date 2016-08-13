@@ -11,16 +11,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
-
-import com.google.inject.Inject;
+import org.slf4j.LoggerFactory;
 
 
 
 public class LoginFilter extends DefaultFilter
 {
     public static final String USER_SESSION="userSession";
-    @Inject
-    private Logger logger;
+    private Logger log=LoggerFactory.getLogger(LoginFilter.class);
     
     public LoginFilter() {
     }
