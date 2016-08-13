@@ -1,5 +1,7 @@
 package org.knoxcraft.serverturtle;
 
+import static org.knoxcraft.database.DatabaseConfiguration.convert;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -11,16 +13,17 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
+
 import org.knoxcraft.database.DataAccess;
 import org.knoxcraft.database.Database;
-import org.knoxcraft.database.DatabaseConfiguration;
 import org.knoxcraft.database.exceptions.DatabaseReadException;
 import org.knoxcraft.database.exceptions.DatabaseWriteException;
 import org.knoxcraft.database.tables.KCTScriptAccess;
 import org.knoxcraft.hooks.KCTUploadHook;
 import org.knoxcraft.jetty.server.JettyServer;
-import org.knoxcraft.turtle3d.KCTBlockTypes;
-import org.knoxcraft.turtle3d.KCTCommand;
 import org.knoxcraft.turtle3d.KCTJobQueue;
 import org.knoxcraft.turtle3d.KCTScript;
 import org.knoxcraft.turtle3d.TurtleCompiler;
@@ -38,6 +41,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
@@ -58,12 +62,6 @@ import org.spongepowered.api.world.weather.Weathers;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
-
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-
-import static org.knoxcraft.database.DatabaseConfiguration.convert;
 
 /**
  * Sponge Knoxcraft plugin to run when the Minecraft server starts up.
@@ -142,12 +140,12 @@ public class TurtlePlugin {
 	    //we must change the file to the correct format.
 	    int result = kcProperties.loadServerProperties();
 	    if (result == 1)
-	        log.info("Correct server.properties file loaded.");
+	        log.debug("Correct server.properties file loaded.");
 	    else if (result == 0) {
-	        log.info("Incorrect server.properties file. Replacing with new file.");
+	        log.debug("Incorrect server.properties file. Replacing with new file.");
 	        kcProperties.createPropertiesFile();
 	    } else if (result == -1) {
-	        log.info("No server.properties file found. Creating new one.");
+	        log.debug("No server.properties file found. Creating new one.");
 	        kcProperties.createPropertiesFile();
 	    }
 	}
@@ -274,14 +272,14 @@ public class TurtlePlugin {
 
 			// BRIGHT SUNNY DAY (12000 = sun set)
 			world.getProperties().setWorldTime(0);
-			log.info(String.format("Currenttime: " + world.getProperties().getWorldTime()));
+			log.debug(String.format("Currenttime: " + world.getProperties().getWorldTime()));
 
 			// TIME CHANGE SCHEDULER 
 			minecraftSyncExecutor = Sponge.getScheduler().createSyncExecutor(this);
 			minecraftSyncExecutor.scheduleWithFixedDelay(new Runnable() {
 				public void run() {
 					world.getProperties().setWorldTime(0);
-					log.info(String.format("Timechange: " + world.getProperties().getWorldTime()));
+					log.debug(String.format("Timechange: " + world.getProperties().getWorldTime()));
 				}
 				// change minecraftWorld time every 10 minutes
 			}, 0, 10, TimeUnit.MINUTES);
@@ -569,8 +567,8 @@ public class TurtlePlugin {
 	}
 
 	/**
-	 * TODO: Fix this hook. This doesn't seem to get called. I would like to
-	 * shut rain off every time it starts raining.
+	 * Weather Change Event Listener
+	 * Changes weather to clear any time the weather change event is called.
 	 * 
 	 * @param hook
 	 */
@@ -582,6 +580,24 @@ public class TurtlePlugin {
 		curWeather = worldWeatherListener.getWeather();
 		log.debug(String.format("Weather listener called"));
 		log.debug(String.format("current weather = %s ", curWeather.getName()));
+	}
+	
+	/**
+	 * Block Change Event Listener
+	 * Stop any non-op player from breaking blocks in the world.
+	 * @param event
+	 */
+	@Listener
+	public void blockChangeEvent(ChangeBlockEvent event) {
+	    if (event.getCause().root() instanceof Player) {
+	        Player player = (Player) event.getCause().root();
+//	        log.info("A player attempted to change a block.");
+	        
+	        if (!player.hasPermission("minecraft.command.op")) {
+	            //if the player does not have the proper op permission, cancel the block break event. 
+	            event.setCancelled(true);
+	        }
+	    }
 	}
 
 	/**

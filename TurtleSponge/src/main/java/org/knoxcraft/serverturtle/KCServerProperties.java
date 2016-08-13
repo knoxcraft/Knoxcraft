@@ -59,7 +59,7 @@ public class KCServerProperties {
         properties.add("generator-settings=");
         properties.add("force-gamemode=false");
         properties.add("allow-nether=true");
-        properties.add("gamemode=2");
+        properties.add("gamemode=1");
         properties.add("broadcast-console-to-ops=true");
         properties.add("enable-query=false");
         properties.add("player-idle-timeout=0");
@@ -73,7 +73,7 @@ public class KCServerProperties {
         properties.add("level-type=FLAT");
         properties.add("hardcore=false");
         properties.add("enable-command-block=false");
-        properties.add("max-players=20");
+        properties.add("max-players=60");
         properties.add("network-compression-threshold=256");
         properties.add("max-world-size=29999984");
         properties.add("server-port=25565");
