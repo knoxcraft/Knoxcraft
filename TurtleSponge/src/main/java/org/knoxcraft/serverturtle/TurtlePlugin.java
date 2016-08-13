@@ -428,6 +428,7 @@ public class TurtlePlugin {
 							turtle.executeScript();
 							jobQueue.add(turtle);
 							
+							src.sendMessage(Text.of("Building " + script.getScriptName() + "!"));
 						}
 						return CommandResult.success();
 					}

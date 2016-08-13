@@ -87,6 +87,8 @@ public class WorkMap {
                     src.sendMessage(Text.of("You attempted to invoke " + numUndo + " scripts. You only have " + i + "!"));
                     break;
                 }
+                
+                src.sendMessage(Text.of("Undoing: " + undoWork.peekWork().getJobName() + " With Job#: " + undoWork.peekWork().getJobNum()));
 //                log.info("Undo Work Size: " + undoWork.getWorkChunks().peek().getBlockChunk().size());
                 int index = userWorkMap.get(playerName);
                 workList.get(index).addAll(undoWork);
@@ -141,6 +143,8 @@ public class WorkMap {
         } else {
             src.sendMessage(Text.of("You don't have any scripts currently running!"));
         }
+        
+        src.sendMessage(Text.of("Cancelled all queued jobs!"));
         
         this.notifyAll();
     }

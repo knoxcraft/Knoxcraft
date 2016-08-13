@@ -72,7 +72,7 @@ public class SpongeTurtle {
          */
         public void add(KCTWorldBlockInfo block) {
             if (blockChunk.size() > workChunkSize) {
-                workload.add(new WorkChunk(new LinkedList<KCTWorldBlockInfo>(blockChunk), senderName, jobNum, chunkNum, workChunkSize));
+                workload.add(new WorkChunk(new LinkedList<KCTWorldBlockInfo>(blockChunk), script.getScriptName(), senderName, jobNum, chunkNum, workChunkSize));
 //                log.info("Adding to queue: " + blockChunk.peek().getLoc());
                 blockChunk.clear();
                 chunkNum++;
@@ -85,7 +85,7 @@ public class SpongeTurtle {
          * Adds the rest of the blockChunk queue to the Workload regardless of the size of the blockChunk queue.
          */
         public void addRest() {
-            workload.add(new WorkChunk(new LinkedList<KCTWorldBlockInfo>(blockChunk), senderName, jobNum, chunkNum, workChunkSize));
+            workload.add(new WorkChunk(new LinkedList<KCTWorldBlockInfo>(blockChunk), script.getScriptName(), senderName, jobNum, chunkNum, workChunkSize));
             blockChunk.clear();
             chunkNum++;
         }

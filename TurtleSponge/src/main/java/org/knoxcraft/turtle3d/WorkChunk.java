@@ -11,6 +11,7 @@ import java.util.Queue;
  */
 public class WorkChunk {
     private String userName;
+    private String jobName;
     private int jobNum;
     private int workChunkNum;
     private int workChunkSize;
@@ -27,8 +28,9 @@ public class WorkChunk {
      * @param workChunkNum
      * @param workChunkSize
      */
-    public WorkChunk(Queue<KCTWorldBlockInfo> blockChunk, String userName, int jobNum, int workChunkNum, int workChunkSize) {
+    public WorkChunk(Queue<KCTWorldBlockInfo> blockChunk, String jobName, String userName, int jobNum, int workChunkNum, int workChunkSize) {
         this.blockChunk = blockChunk;
+        this.jobName = jobName;
         this.userName = userName;
         this.jobNum = jobNum;
         this.workChunkNum = workChunkNum;
@@ -53,6 +55,10 @@ public class WorkChunk {
     
     public String getUserName() {
         return this.userName;
+    }
+    
+    public String getJobName() {
+        return this.jobName;
     }
     
     public int getJobNum() {
