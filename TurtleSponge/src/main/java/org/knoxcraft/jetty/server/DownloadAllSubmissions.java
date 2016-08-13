@@ -60,7 +60,7 @@ public class DownloadAllSubmissions extends HttpServlet
                     extension="py";
                 }
                 ZipEntry entry=new ZipEntry(
-                        String.format("%s/%s.%s", scriptAccess.playerName, scriptAccess.scriptName, extension));
+                        String.format("submissions/%s/%s.%s", scriptAccess.playerName, scriptAccess.scriptName, extension));
                 zip.putNextEntry(entry);
                 IOUtils.copy(new ByteArrayInputStream(scriptAccess.source.getBytes()), zip);
                 zip.closeEntry();
