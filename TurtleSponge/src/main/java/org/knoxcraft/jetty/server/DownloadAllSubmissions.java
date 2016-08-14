@@ -1,12 +1,25 @@
 package org.knoxcraft.jetty.server;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
+import org.knoxcraft.database.DataAccess;
+import org.knoxcraft.database.Database;
+import org.knoxcraft.database.exceptions.DatabaseReadException;
+import org.knoxcraft.database.tables.KCTScriptAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +38,6 @@ public class DownloadAllSubmissions extends HttpServlet
     throws ServletException, IOException
     {
         // FIXME: translate to Sponge
-        /*
         try {
             OutputStream out=response.getOutputStream();
             ZipOutputStream zip=new ZipOutputStream(out);
@@ -48,7 +60,7 @@ public class DownloadAllSubmissions extends HttpServlet
                     extension="py";
                 }
                 ZipEntry entry=new ZipEntry(
-                        String.format("%s/%s.%s", scriptAccess.playerName, scriptAccess.scriptName, extension));
+                        String.format("submissions/%s/%s.%s", scriptAccess.playerName, scriptAccess.scriptName, extension));
                 zip.putNextEntry(entry);
                 IOUtils.copy(new ByteArrayInputStream(scriptAccess.source.getBytes()), zip);
                 zip.closeEntry();
@@ -61,6 +73,5 @@ public class DownloadAllSubmissions extends HttpServlet
         } catch (IOException e){
             logger.error("Zip error", e);
         }
-        */
     }
 }

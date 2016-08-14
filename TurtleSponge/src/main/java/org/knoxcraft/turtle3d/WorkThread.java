@@ -3,7 +3,7 @@ package org.knoxcraft.turtle3d;
 import java.util.Queue;
 
 import org.slf4j.Logger;
-import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.world.World;
 
@@ -25,7 +25,13 @@ public class WorkThread extends Thread {
     private WorkMap work;
     private boolean done=false;
     private World world;
+    
+    //Defaults changed at runtime automatically. Do not use this as a reference for what is actually here.
+    //Go into config/knoxcraft.conf to change these values.
     private long sleepTime = 200;
+    private int minBuildHeight = 3;
+    private int maxBuildHeight = 256;
+    
     private SpongeExecutorService minecraftSyncExecutor;
     private Logger log;
     
@@ -41,10 +47,13 @@ public class WorkThread extends Thread {
      * Sponge.getScheduler().createSyncExecutor(this);
      * @param log
      */
-    public WorkThread(WorkMap work, World world, long sleepTime, SpongeExecutorService minecraftSyncExecutor, Logger log) {
+    public WorkThread(WorkMap work, World world, long sleepTime, int minBuildHeight, int maxBuildHeight, 
+            SpongeExecutorService minecraftSyncExecutor, Logger log) {
         this.work = work;
         this.world = world;
         this.sleepTime = sleepTime;
+        this.minBuildHeight = minBuildHeight;
+        this.maxBuildHeight = maxBuildHeight;
         this.minecraftSyncExecutor = minecraftSyncExecutor;
         this.log = log;
     }
@@ -71,10 +80,17 @@ public class WorkThread extends Thread {
                     while (queue != null && !queue.isEmpty()) {
                         KCTWorldBlockInfo block = queue.poll();
                         
+                        BlockState minecraftBlock;
+                        
                         if (isUndoScript)
-                            world.setBlock(block.getLoc(), block.getOldBlock());
+                            minecraftBlock = block.getOldBlock();
                         else
-                            world.setBlock(block.getLoc(), block.getNewBlock());
+                            minecraftBlock = block.getNewBlock();
+                        
+                        if (block.getLoc().getY() < maxBuildHeight && block.getLoc().getY() > minBuildHeight)
+                            world.setBlock(block.getLoc(), minecraftBlock);
+                        else
+                            log.debug("Player attempted to build above or below allowed height. " + block.getLoc());
                         
 //                        log.info("Setting block at: " + block.getNewBlock().getId() + " " + block.getLoc());
                     }

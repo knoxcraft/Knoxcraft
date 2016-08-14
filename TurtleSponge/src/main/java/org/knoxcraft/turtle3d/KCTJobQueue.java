@@ -31,13 +31,14 @@ public class KCTJobQueue {
      * @param world
      * @param sleepTime
      */
-    public KCTJobQueue(SpongeExecutorService minecraftSyncExecutor, Logger log, World world, long sleepTime) {
+    public KCTJobQueue(SpongeExecutorService minecraftSyncExecutor, 
+            Logger log, World world, long sleepTime, int minBuildHeight, int maxBuildHeight) {
         this.log = log;
 
         this.minecraftSyncExecutor = minecraftSyncExecutor;
         
         workMap = new WorkMap(log);
-        workThread = new WorkThread(workMap, world, sleepTime, minecraftSyncExecutor, log);
+        workThread = new WorkThread(workMap, world, sleepTime, minBuildHeight, maxBuildHeight, minecraftSyncExecutor, log);
         workThread.start();
     }
     

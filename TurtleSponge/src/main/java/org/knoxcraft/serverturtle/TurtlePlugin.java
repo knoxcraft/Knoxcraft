@@ -74,6 +74,9 @@ public class TurtlePlugin {
 
     private static final String SLEEP_TIME = "knoxcraft.sleepTime";
     private static final String WORK_CHUNK_SIZE = "knoxcraft.workChunkSize";
+    private static final String MIN_BUILD_HEIGHT = "knoxcraft.minBuildHeight";
+    private static final String MAX_BUILD_HEIGHT = "knoxcraft.maxBuildHeight";
+    private static final String MAX_JOB_SIZE = "knoxcraft.maxJobSize";
     public static final String ID = "knoxcraft";
 	private static final String PLAYER_NAME = "playerName";
 	private static final String SCRIPT_NAME = "scriptName";
@@ -105,6 +108,10 @@ public class TurtlePlugin {
     // configured in config/knoxcraft.conf
 	private long sleepTime;
 	private int workChunkSize;
+	private int minBuildHeight = 3;
+	private int maxBuildHeight = 256;
+	private int maxJobSize = 1000;
+	
 	private int jobNum = 0;
 
 	/**
@@ -198,6 +205,9 @@ public class TurtlePlugin {
 	    // Read values out of config files and set instance variables.
 	    this.workChunkSize=knoxcraftConfig.getNode(WORK_CHUNK_SIZE).getInt();
 	    this.sleepTime=knoxcraftConfig.getNode(SLEEP_TIME).getInt();
+	    this.minBuildHeight = knoxcraftConfig.getNode(MIN_BUILD_HEIGHT).getInt();
+	    this.maxBuildHeight = knoxcraftConfig.getNode(MAX_BUILD_HEIGHT).getInt();
+	    this.maxJobSize = knoxcraftConfig.getNode(MAX_JOB_SIZE).getInt();
 	}
 	
 	/**
@@ -235,6 +245,9 @@ public class TurtlePlugin {
         // set other default configuration settings using this syntax:
         addConfigSetting(WORK_CHUNK_SIZE, 500, "Number of blocks to build at a time. Larger values will lag and eventually crash the server. 500 seems to work.");
         addConfigSetting(SLEEP_TIME, 200, "Number of millis to wait between building chunks of blocks. Shorter values are more likely to lag and eventually crash the server. 200 seems to work.");
+        addConfigSetting(MIN_BUILD_HEIGHT, 3, "Minimum build height for a flat world. This prevents structures being built underneath the ground and breaking through the bedrock. 3 seems to work.");
+        addConfigSetting(MAX_BUILD_HEIGHT, 256, "Maximum build height allowed. 256 is the default for Minecraft build height.");
+        addConfigSetting(MAX_JOB_SIZE, 1000, "Maximum number of blocks allowed to be built by invoking a single script. If you do not want a limit, set this value to -1.");
         
         // now save the configuration file, in case we changed anything
         this.knoxcraftConfigLoader.save(this.knoxcraftConfig);
@@ -285,7 +298,7 @@ public class TurtlePlugin {
 			}, 0, 10, TimeUnit.MINUTES);
 			
 			//SETUP JOBQUEUE FOR TURTLE SCRIPT EXECUTOR
-			jobQueue = new KCTJobQueue(minecraftSyncExecutor, log, world, sleepTime);
+			jobQueue = new KCTJobQueue(minecraftSyncExecutor, log, world, sleepTime, minBuildHeight, maxBuildHeight);
 		}
 	}
 
@@ -424,9 +437,16 @@ public class TurtlePlugin {
 							turtle.setScript(script);
 							
 							turtle.executeScript();
-							jobQueue.add(turtle);
 							
-							src.sendMessage(Text.of("Building " + script.getScriptName() + "!"));
+							if (maxJobSize == -1 || turtle.getJobSize() < maxJobSize) {
+							    jobQueue.add(turtle);
+	                            src.sendMessage(Text.of("Building " + script.getScriptName() + "!"));
+	                            log.info(turtle.getJobSize() + "");
+							} else {
+							    src.sendMessage(Text.of("Your script is too big!"));
+							    src.sendMessage(Text.of("Max block size: " + maxJobSize + " User script size: " + turtle.getJobSize()));
+							}
+							
 						}
 						return CommandResult.success();
 					}

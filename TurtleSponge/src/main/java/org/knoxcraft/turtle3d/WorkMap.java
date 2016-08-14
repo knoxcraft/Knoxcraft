@@ -88,7 +88,7 @@ public class WorkMap {
                     break;
                 }
                 
-                src.sendMessage(Text.of("Undoing: " + undoWork.peekWork().getJobName() + " With Job#: " + undoWork.peekWork().getJobNum()));
+                src.sendMessage(Text.of("Undoing: " + undoWork.peekFirst().getJobName() + " With Job#: " + undoWork.peekFirst().getJobNum()));
 //                log.info("Undo Work Size: " + undoWork.getWorkChunks().peek().getBlockChunk().size());
                 int index = userWorkMap.get(playerName);
                 workList.get(index).addAll(undoWork);
@@ -124,11 +124,11 @@ public class WorkMap {
                     int workChunkNum = cancelChunk.getWorkChunkNum();
                     
                     for (Workload archiveWork : workArchive.get(playerName)) {
-                        if (archiveWork.peekWork().getJobNum() == curJobNum && workChunkNum == 0) {
+                        if (archiveWork.peekFirst().getJobNum() == curJobNum && workChunkNum == 0) {
                             //if the build has not started, we just remove it completely
                             workArchive.get(playerName).pop();
                             break;
-                        } else if (archiveWork.peekWork().getJobNum() == curJobNum) {
+                        } else if (archiveWork.peekFirst().getJobNum() == curJobNum) {
                             //if the build has started, we must remove the remaining unbuilt archive work.
 //                            log.info("Chunk Num: " + workChunkNum + " Work Size: " + archiveWork.remainingWorkSize());
                             int remainingWork = archiveWork.remainingWorkSize();

@@ -23,8 +23,10 @@
 		<servlet-name>DownloadAllSubmissions</servlet-name>
 		<servlet-class>org.knoxcraft.jetty.server.DownloadAllSubmissions</servlet-class>
 	</servlet>
-	
-	
+	<servlet>
+		<servlet-name>KCTInstructorView</servlet-name>
+		<servlet-class>org.knoxcraft.jetty.server.KCTInstructorView</servlet-class>
+	</servlet>
 	<!-- 
 	This has to be done in code so that we can look up java.io.tmpdir 
 	to try to be Windows compatible.
@@ -42,6 +44,10 @@
 	<servlet-mapping>
 		<servlet-name>DownloadAllSubmissions</servlet-name>
 		<url-pattern>/admin/download</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>KCTInstructorView</servlet-name>
+		<url-pattern>/admin/index.jsp</url-pattern>
 	</servlet-mapping>
 
 	<filter>

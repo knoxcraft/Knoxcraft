@@ -15,7 +15,6 @@ import org.knoxcraft.turtle3d.WorkChunk;
 import org.knoxcraft.turtle3d.Workload;
 import org.slf4j.Logger;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3i;
@@ -96,6 +95,14 @@ public class SpongeTurtle {
          */
         public Workload getWorkload() {
             return this.workload;
+        }
+        
+        /**
+         * return the size of the workload queue
+         * @return
+         */
+        public int getJobSize() {
+            return (workload.remainingWorkSize() - 1) * workChunkSize + workload.peekLast().getQueueSize();
         }
     }
     
@@ -212,9 +219,13 @@ public class SpongeTurtle {
     private void move(int distance, TurtleDirection turtleDirection) {
         for (int i = 1; i <= distance; i++) {
             curLoc = curLoc.add(turtleDirection.direction);
+            try {
+                if (blockPlaceMode)
+                    workChunkManager.add(new KCTWorldBlockInfo(curLoc, block, world.getBlock(curLoc)));
+            } catch (Exception e) {
+                log.debug(e.getMessage());
+            }
             
-            if (blockPlaceMode)
-                workChunkManager.add(new KCTWorldBlockInfo(curLoc, block, world.getBlock(curLoc)));
         }
     }
     
@@ -344,5 +355,13 @@ public class SpongeTurtle {
      */
     public Workload getWorkload() {
         return workChunkManager.getWorkload();
+    }
+    
+    /**
+     * Get the number of blocks the script will create.
+     * @return
+     */
+    public int getJobSize() {
+        return workChunkManager.getJobSize();
     }
 }

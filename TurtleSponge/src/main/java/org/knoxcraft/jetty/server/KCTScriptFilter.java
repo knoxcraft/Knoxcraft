@@ -1,6 +1,11 @@
 package org.knoxcraft.jetty.server;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -8,15 +13,20 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.knoxcraft.database.DataAccess;
+import org.knoxcraft.database.Database;
+import org.knoxcraft.database.exceptions.DatabaseReadException;
+import org.knoxcraft.database.tables.KCTScriptAccess;
+import org.knoxcraft.turtle3d.KCTScript;
+import org.knoxcraft.turtle3d.TurtleCompiler;
+import org.knoxcraft.turtle3d.TurtleException;
 import org.slf4j.Logger;
-
-import com.google.inject.Inject;
+import org.slf4j.LoggerFactory;
 
 //@WebFilter("/RequestLoggingFilter")
 public class KCTScriptFilter extends DefaultFilter
 {
-    @Inject
-    private Logger logger;
+    private Logger log=LoggerFactory.getLogger(KCTScriptFilter.class);
 
     public KCTScriptFilter() {
     }
@@ -26,8 +36,7 @@ public class KCTScriptFilter extends DefaultFilter
     throws IOException, ServletException 
     {
         HttpServletRequest req = (HttpServletRequest) request;
-        // FIXME: translate to Sponge
-        /*
+
         KCTScriptAccess data=new KCTScriptAccess();
         List<DataAccess> results=new LinkedList<DataAccess>();
         Map<String,KCTScriptAccess> mostRecentScripts=new HashMap<String,KCTScriptAccess>();
@@ -46,7 +55,7 @@ public class KCTScriptFilter extends DefaultFilter
                         mostRecentScripts.put(key,scriptAccess);
                     }
                 }
-                logger.trace(String.format("from DB: player %s has script %s at time %d%n", 
+                log.trace(String.format("from DB: player %s has script %s at time %d%n", 
                         scriptAccess.playerName, scriptAccess.scriptName, scriptAccess.timestamp));
             }
             
@@ -63,17 +72,16 @@ public class KCTScriptFilter extends DefaultFilter
                     script.setPlayerName(scriptAccess.playerName);
 
                     allScripts.put(entry.getKey(), script);
-                    logger.info(String.format("Loaded script %s for player %s", 
+                    log.info(String.format("Loaded script %s for player %s", 
                             scriptAccess.scriptName, scriptAccess.playerName));
                 } catch (TurtleException e){
-                    logger.error("Internal Server error", e);
+                    log.error("Internal Server error", e);
                 }
             }
             req.setAttribute("scripts", allScripts);
         } catch (DatabaseReadException e) {
-            logger.error("cannot read DB", e);
+            log.error("cannot read DB", e);
         }
-        */
         chain.doFilter(request, response);
     }
 

@@ -25,7 +25,6 @@ public class AdminAccess extends DataAccess
 
     @Override
     public DataAccess getInstance() {
-        // TODO Auto-generated method stub
         return new AdminAccess();
     }
 

@@ -73,6 +73,10 @@ public class WorkChunk {
         return this.workChunkSize;
     }
     
+    public int getQueueSize() {
+        return blockChunk.size();
+    }
+    
     /**
      * @return true if the flag isUndoScript is true.
      */

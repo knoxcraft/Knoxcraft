@@ -79,8 +79,16 @@ public class Workload {
      * Retrieves, but does not remove, the head (first element) of this queue.
      * @return
      */
-    public WorkChunk peekWork() {
-        return workChunks.peek();
+    public WorkChunk peekFirst() {
+        return workChunks.peekFirst();
+    }
+    
+    /**
+     * Retrieves, but does not remove, the last element of this list, or returns null if this list is empty.
+     * @return
+     */
+    public WorkChunk peekLast() {
+        return workChunks.peekLast();
     }
     
     /**
