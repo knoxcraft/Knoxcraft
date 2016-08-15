@@ -43,6 +43,7 @@ public class WorkChunk {
      */
     public WorkChunk(WorkChunk workChunk) {
         this.blockChunk = new LinkedList<KCTWorldBlockInfo>(workChunk.blockChunk);
+        this.jobName = workChunk.jobName;
         this.userName = workChunk.userName;
         this.jobNum = workChunk.jobNum;
         this.workChunkNum = workChunk.workChunkNum;

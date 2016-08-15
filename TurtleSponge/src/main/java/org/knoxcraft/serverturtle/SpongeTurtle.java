@@ -29,6 +29,7 @@ public class SpongeTurtle {
 
     private Logger log;
 
+    private Vector3i startLoc;
     private Vector3i curLoc;
     // player location:originPos
     private String senderName;
@@ -76,7 +77,6 @@ public class SpongeTurtle {
                 blockChunk.clear();
                 chunkNum++;
             }
-            
             blockChunk.add(block);
         }
         
@@ -129,6 +129,7 @@ public class SpongeTurtle {
      * @param startLocation
      */
     public void setLoc(Vector3i startLocation) {
+        this.startLoc = startLocation;
         this.curLoc = startLocation;
     }
 
@@ -306,6 +307,12 @@ public class SpongeTurtle {
                 distance = toInt(m.get(KCTCommand.DIST));
             }
             move(distance, TurtleDirection.DOWN);
+        } else if (commandName.equals(KCTCommand.SETPOSITION)) {
+            //set a new position for the turtle.
+            int posX = Integer.parseInt(m.get(KCTCommand.X).toString());
+            int posY = Integer.parseInt(m.get(KCTCommand.Y).toString());
+            int posZ = Integer.parseInt(m.get(KCTCommand.Z).toString());
+            curLoc = startLoc.add(new Vector3i(posX, posY, posZ));
         } else if (commandName.equals(KCTCommand.SETBLOCK)) {
             String blockName = m.get(KCTCommand.BLOCKTYPE).toString();
             block = KCTBlockTypesBuilder.getBlockState(KCTBlockTypes.valueOf(blockName));

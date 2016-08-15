@@ -48,7 +48,7 @@ public class WorkMap {
      * blocks to be placed and the world positions.
      */
     public synchronized void addWork(String playerName, Workload workload) {
-        log.info("Work is being added...");
+        log.debug("Work is being added...");
         if (!userWorkMap.containsKey(playerName)) {
             userWorkMap.put(playerName, nextIndex);
             
@@ -88,7 +88,7 @@ public class WorkMap {
                     break;
                 }
                 
-                src.sendMessage(Text.of("Undoing: " + undoWork.peekFirst().getJobName() + " With Job#: " + undoWork.peekFirst().getJobNum()));
+                src.sendMessage(Text.of("Undoing: " + undoWork.peekFirst().getJobName() + ", With Job#: " + undoWork.peekFirst().getJobNum()));
 //                log.info("Undo Work Size: " + undoWork.getWorkChunks().peek().getBlockChunk().size());
                 int index = userWorkMap.get(playerName);
                 workList.get(index).addAll(undoWork);
@@ -162,7 +162,7 @@ public class WorkMap {
             }
         }
         
-        log.info("Finished clearing all queues.");
+        log.debug("Finished clearing all queues.");
     }
     
     /**
