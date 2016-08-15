@@ -99,9 +99,6 @@ public class TurtlePlugin {
     @ConfigDir(sharedRoot = true)
     private File configDir;
 
-    // The config manager for the knoxcraft file
-    private ConfigurationLoader<CommentedConfigurationNode> knoxcraftConfigLoader;
-
     // The in-memory version of the knoxcraft configuration file
     private CommentedConfigurationNode knoxcraftConfig;
 
@@ -186,41 +183,15 @@ public class TurtlePlugin {
 		    log.error("Unable to create or load knoxcraft config file!");
 		    // TODO: set up a default
 		}
-		
-		// configure the Database, once we have loaded a valid configuration file
-		Database.configure(knoxcraftConfig);
 
 		// Look up previously submitted scripts from the DB
 		lookupFromDB();
 
 		// set up commands
 		setupCommands();
-		
-		// read config files and set up instance variables
-		readConfigFile();
-		
 	}
 	
-	private void readConfigFile() {
-	    // Read values out of config files and set instance variables.
-	    this.workChunkSize=knoxcraftConfig.getNode(WORK_CHUNK_SIZE).getInt();
-	    this.sleepTime=knoxcraftConfig.getNode(SLEEP_TIME).getInt();
-	    this.minBuildHeight = knoxcraftConfig.getNode(MIN_BUILD_HEIGHT).getInt();
-	    this.maxBuildHeight = knoxcraftConfig.getNode(MAX_BUILD_HEIGHT).getInt();
-	    this.maxJobSize = knoxcraftConfig.getNode(MAX_JOB_SIZE).getInt();
-	    
-	    this.workChunkSize = 500;
-	    this.sleepTime = 200;
-	    this.minBuildHeight = 3;
-	    this.maxBuildHeight = 256;
-	    this.maxJobSize = -1;
-	    
-	    log.info(workChunkSize + "");
-	    log.info(sleepTime + "");
-	    log.info(minBuildHeight + "");
-	    log.info(maxBuildHeight + "");
-	    log.info(maxJobSize + "");
-	}
+	
 	
 	/**
 	 * Load the configuration properties from config/knoxcraft.conf in HOCON format.
@@ -234,7 +205,7 @@ public class TurtlePlugin {
 	{
 	    // Check for config file config/knoxcraft.conf
 	    File knoxcraftConfigFile = new File(this.configDir, "knoxcraft.conf");
-        this.knoxcraftConfigLoader = 
+        ConfigurationLoader<CommentedConfigurationNode> knoxcraftConfigLoader = 
                 HoconConfigurationLoader.builder().setFile(knoxcraftConfigFile).build();
         
         // Create the folder if it does not exist
@@ -248,13 +219,14 @@ public class TurtlePlugin {
         }
         
         // now load the knoxcraft config file
-        this.knoxcraftConfig = this.knoxcraftConfigLoader.load();
+        this.knoxcraftConfig = knoxcraftConfigLoader.load();
 
         // ensure we have correct database defaults
         // will add any config values that are missing
         Database.configure(knoxcraftConfig);
         
         // set other default configuration settings using this syntax:
+        // if a node with the given value already exists, it will NOT overwrite it
         addConfigSetting(WORK_CHUNK_SIZE, 500, "Number of blocks to build at a time. Larger values will lag and eventually crash the server. 500 seems to work.");
         addConfigSetting(SLEEP_TIME, 200, "Number of millis to wait between building chunks of blocks. Shorter values are more likely to lag and eventually crash the server. 200 seems to work.");
         addConfigSetting(MIN_BUILD_HEIGHT, 3, "Minimum build height for a flat world. This prevents structures being built underneath the ground and breaking through the bedrock. 3 seems to work.");
@@ -262,20 +234,43 @@ public class TurtlePlugin {
         addConfigSetting(MAX_JOB_SIZE, -1, "Maximum number of blocks allowed to be built by invoking a single script. If you do not want a limit, set this value to -1.");
         
         // now save the configuration file, in case we changed anything
-        this.knoxcraftConfigLoader.save(this.knoxcraftConfig);
+        knoxcraftConfigLoader.save(this.knoxcraftConfig);
+        
+        // finally, load our values into instance variables
+        this.workChunkSize = readIntConfigSetting(WORK_CHUNK_SIZE);
+        this.sleepTime = readIntConfigSetting(SLEEP_TIME);
+        this.minBuildHeight = readIntConfigSetting(MIN_BUILD_HEIGHT);
+        this.maxBuildHeight = readIntConfigSetting(MAX_BUILD_HEIGHT);
+        this.maxJobSize = readIntConfigSetting(MAX_JOB_SIZE);
+        
+        log.info(WORK_CHUNK_SIZE+" = "+workChunkSize);
+        log.info(SLEEP_TIME+" = "+sleepTime);
+        log.info(MIN_BUILD_HEIGHT+" = "+minBuildHeight);
+        log.info(MAX_BUILD_HEIGHT+" = "+maxBuildHeight);
+        log.info(MAX_JOB_SIZE+" = "+maxJobSize);
 	}
 	
-	private void addConfigSetting(String path, Object value) {
+	private int readIntConfigSetting(String path) {
+        return knoxcraftConfig.getNode(convert(path)).getInt();
+    }
+	private String readStringConfigSetting(String path) {
+        return knoxcraftConfig.getNode(convert(path)).getString();
+    }
+
+    private void addConfigSetting(String path, Object value) {
 	    addConfigSetting(path, value, null);
 	}
 	
 	private void addConfigSetting(String path, Object value, String comment) {
 	    CommentedConfigurationNode node=knoxcraftConfig.getNode(convert(path));
 	    if (node.isVirtual()) {
+	        log.trace("it's virtual! "+path+" "+value);
 	        node=node.setValue(value);
 	        if (comment!=null){
 	            node.setComment(comment);
 	        }
+	    } else {
+	        log.trace("NOT virtual! "+path+" "+value);
 	    }
 	}
 	
