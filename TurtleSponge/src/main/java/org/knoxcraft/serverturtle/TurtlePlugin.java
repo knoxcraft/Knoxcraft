@@ -108,9 +108,9 @@ public class TurtlePlugin {
     // configured in config/knoxcraft.conf
 	private long sleepTime;
 	private int workChunkSize;
-	private int minBuildHeight = 3;
-	private int maxBuildHeight = 256;
-	private int maxJobSize = 1000;
+	private int minBuildHeight;
+	private int maxBuildHeight;
+	private int maxJobSize;
 	
 	private int jobNum = 0;
 
