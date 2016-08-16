@@ -393,7 +393,7 @@ public class TurtlePlugin {
 							src.sendMessage(Text.of("No script name provided! You must invoke a script by name"));
 							return CommandResult.success();
 						}
-
+						
 						String scriptName = optScriptName.get();
 						String playerName = src.getName().toLowerCase();
 
@@ -617,11 +617,21 @@ public class TurtlePlugin {
 	 */
 	@Listener
 	public void blockChangeEvent(ChangeBlockEvent event) {
+	    try {
+	        log.info("Block Changed: " + event.getCause().root().toString());
+	    } catch (Exception e) {
+	        log.info(e.getMessage());
+	    }
 	    if (event.getCause().root() instanceof Player) {
 	        Player player = (Player) event.getCause().root();
 //	        log.info("A player attempted to change a block.");
 	        
+//	        for (Entry<String, Object> entry : event.getCause().getNamedCauses().entrySet()) {
+//	            log.info(entry.getKey() + " " + entry.getValue());
+//	        }
+	        
 	        if (!player.hasPermission("minecraft.command.op")) {
+	            log.info("Player blocked.");
 	            //if the player does not have the proper op permission, cancel the block break event. 
 	            event.setCancelled(true);
 	        }
