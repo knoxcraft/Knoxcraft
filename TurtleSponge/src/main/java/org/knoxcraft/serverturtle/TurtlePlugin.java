@@ -326,7 +326,7 @@ public class TurtlePlugin {
 	private void setupCommands() {
 		// List all the scripts
 		CommandSpec listScripts = CommandSpec.builder().description(Text.of("List Knoxcraft Turtle Scripts"))
-				.permission("").arguments(GenericArguments.optional(GenericArguments.string(Text.of(PLAYER_NAME))))
+				.permission("minecraft.command.me").arguments(GenericArguments.optional(GenericArguments.string(Text.of(PLAYER_NAME))))
 				.executor(new CommandExecutor() {
 					@Override
 					public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
@@ -382,7 +382,7 @@ public class TurtlePlugin {
 
 		// Invoke a script
 		CommandSpec invokeScript = CommandSpec.builder().description(Text.of("Invoke a Knoxcraft Turtle Script"))
-				.permission("")
+				.permission("minecraft.command.me")
 				.arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of(SCRIPT_NAME))),
 						GenericArguments.optional(GenericArguments.string(Text.of(PLAYER_NAME))))
 				.executor(new CommandExecutor() {
@@ -462,7 +462,7 @@ public class TurtlePlugin {
 		Sponge.getCommandManager().register(this, invokeScript, "invoke", "in");
 
 		CommandSpec undo = CommandSpec.builder().description(Text.of("Undo the previous script"))
-		        .permission("")
+		        .permission("minecraft.command.me")
 				.arguments(GenericArguments.optional(GenericArguments.integer(Text.of(NUM_UNDO))))
 				.executor(new CommandExecutor() {
 					@Override
@@ -483,7 +483,7 @@ public class TurtlePlugin {
 		Sponge.getCommandManager().register(this, undo, "undo", "un");
 		
 	    CommandSpec cancel = CommandSpec.builder().description(Text.of("Cancel currently queued work"))
-	            .permission("")
+	            .permission("minecraft.command.me")
 	            .executor(new CommandExecutor() {
 	                 @Override
 	                 public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
