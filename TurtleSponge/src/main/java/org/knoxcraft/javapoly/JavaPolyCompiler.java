@@ -22,9 +22,6 @@ import org.knoxcraft.turtle3d.Turtle3D;
  */
 public class JavaPolyCompiler
 {
-    // this name is hard-coded in
-    private static final String CLASS_NAME="HelloWorld";
-    
     private static final int TOTAL_SUCCESS=0;
     private static final int JSON_RESULT=1;
     private static final int RUNTIME_SUCCESS=2;
@@ -52,12 +49,12 @@ public class JavaPolyCompiler
      * @param programText
      * @return
      */
-    public static String[] compileAndRun(String programText) {
+    public static String[] compileAndRun(String className, String programText) {
         InMemoryJavaCompiler compiler=new InMemoryJavaCompiler();
         String[] result=new String[6];
         // total success is false until we are sure everything worked
         result[TOTAL_SUCCESS]="false";
-        compiler.addSourceFile(CLASS_NAME, programText);
+        compiler.addSourceFile(className, programText);
         // store the outcome
         boolean outcome=compiler.compile();
         if (!outcome) {
@@ -79,7 +76,7 @@ public class JavaPolyCompiler
 
         try {
             ByteArrayClassLoader loader=new ByteArrayClassLoader(null, compiler.getFileManager().getClasses());
-            Class<?> cls = loader.loadClass(CLASS_NAME);
+            Class<?> cls = loader.loadClass(className);
             // This might not finish due to infinite loops in student code
             // However, we are launching this code through JavaPoly, 
             // which has very weak support for Threads at this point
