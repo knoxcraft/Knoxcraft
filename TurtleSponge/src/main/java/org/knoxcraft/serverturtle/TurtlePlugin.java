@@ -152,6 +152,14 @@ public class TurtlePlugin {
 	        log.debug("No server.properties file found. Creating new one.");
 	        kcProperties.createPropertiesFile();
 	    }
+	    
+        // read configuration parameters
+        try {
+            loadOrCreateConfigFile();
+        } catch (IOException e) {
+            log.error("Unable to create or load knoxcraft config file!");
+            // TODO: set up a default
+        }
 	}
 
 	/**
@@ -175,14 +183,6 @@ public class TurtlePlugin {
 
 		log.info("Enabling " + container.getName() + " Version " + container.getVersion());
 		log.info("Authored by " + container.getAuthors());
-		
-		// read configuration parameters
-		try {
-		    loadOrCreateConfigFile();
-		} catch (IOException e) {
-		    log.error("Unable to create or load knoxcraft config file!");
-		    // TODO: set up a default
-		}
 
 		// Look up previously submitted scripts from the DB
 		lookupFromDB();
@@ -253,6 +253,7 @@ public class TurtlePlugin {
 	private int readIntConfigSetting(String path) {
         return knoxcraftConfig.getNode(convert(path)).getInt();
     }
+	
 	private String readStringConfigSetting(String path) {
         return knoxcraftConfig.getNode(convert(path)).getString();
     }
@@ -450,8 +451,8 @@ public class TurtlePlugin {
 	                            src.sendMessage(Text.of("Building " + script.getScriptName() + "!"));
 	                            log.debug("Job Size: " + turtle.getJobSize());
 							} else {
-							    src.sendMessage(Text.of("Your script is too big!"));
-							    src.sendMessage(Text.of("Max block size: " + maxJobSize + ", User script size: " + turtle.getJobSize()));
+							    src.sendMessage(Text.of("Your script places too many blocks!"));
+							    src.sendMessage(Text.of("Max number of blocks: " + maxJobSize + ", Your block count: " + turtle.getJobSize()));
 							}
 							
 						}
