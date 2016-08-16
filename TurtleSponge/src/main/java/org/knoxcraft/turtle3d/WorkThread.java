@@ -86,11 +86,11 @@ public class WorkThread extends Thread {
                             minecraftBlock = block.getOldBlock();
                         else
                             minecraftBlock = block.getNewBlock();
-                        log.info(minBuildHeight + " " + maxBuildHeight);
+                        
                         if (block.getLoc().getY() < maxBuildHeight && block.getLoc().getY() > minBuildHeight)
                             world.setBlock(block.getLoc(), minecraftBlock);
                         else
-                            log.info("Player attempted to build above or below allowed height. " + block.getLoc());
+                            log.debug("Player attempted to build above or below allowed height. " + block.getLoc());
                         
 //                        log.info("Setting block at: " + block.getNewBlock().getId() + " " + block.getLoc());
                     }
