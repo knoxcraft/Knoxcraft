@@ -4,6 +4,8 @@ import java.util.Queue;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.world.World;
 
@@ -66,6 +68,12 @@ public class WorkThread extends Thread {
         this.done=true;
     }
     
+    private static class OurCause {
+        private OurCause(){
+        }
+    }
+    private static final OurCause INVOKED=new OurCause();
+    
     public void run() {
         while (!done) {
 //            log.info("waiting for some work...");
@@ -88,7 +96,13 @@ public class WorkThread extends Thread {
                             minecraftBlock = block.getNewBlock();
                         
                         if (block.getLoc().getY() < maxBuildHeight && block.getLoc().getY() > minBuildHeight)
-                            world.setBlock(block.getLoc(), minecraftBlock);
+                            try {
+                                log.info("Before World set block");
+                                world.setBlock(block.getLoc(), minecraftBlock, true, Cause.of(NamedCause.of("INVOKED", INVOKED)));
+                                log.info("After world set block");
+                            } catch (Exception e) {
+                                log.info(e.getMessage());
+                            }
                         else
                             log.debug("Player attempted to build above or below allowed height. " + block.getLoc());
                         
