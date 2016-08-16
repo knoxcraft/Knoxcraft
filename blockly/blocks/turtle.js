@@ -4,7 +4,7 @@
 var helpURL = 'https://sites.google.com/a/knox.edu/knoxcraft/student-guide-blockly#help';
 
 /**
-*  Initialize the turtle.  
+*  Initialize the turtle.
 *  Edit at https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#z9w74y
 */
 Blockly.Blocks['turtle_init'] = {
@@ -20,8 +20,8 @@ Blockly.Blocks['turtle_init'] = {
   }
 };
 
-/** 
-*  Move the turtle forward, back, left, right, up, down.  
+/**
+*  Move the turtle forward, back, left, right, up, down.
 *  Edit at https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#fnnmk8
 */
 Blockly.Blocks['turtle_move'] = {
@@ -88,7 +88,7 @@ Blockly.Blocks['turtle_setblocktype'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("set block type to")
-        .appendField(new Blockly.FieldTextInput("name or id number"), "type");
+        .appendField(new Blockly.FieldTextInput("name or id number"), "blockType");
     this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -476,6 +476,7 @@ function blockOptions() {
     options.push(['chain_command_block', '"CHAIN_COMMAND_BLOCK"']);
     options.push(['frosted_ice', '"FROSTED_ICE"']);
     options.push(['structure_block', '"STRUCTURE_BLOCK"']);
+    return options;
 }
 
 
@@ -484,7 +485,7 @@ Blockly.Blocks['turtle_setblocktype2'] = {
     var dropdown = new Blockly.FieldDropdown(blockOptions);
     this.appendDummyInput()
         .appendField("set block type to")
-        .appendField(dropdown, 'type');
+        .appendField(dropdown, 'blockType');
     this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
