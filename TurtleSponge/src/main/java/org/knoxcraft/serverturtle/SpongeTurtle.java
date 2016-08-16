@@ -15,6 +15,7 @@ import org.knoxcraft.turtle3d.WorkChunk;
 import org.knoxcraft.turtle3d.Workload;
 import org.slf4j.Logger;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3i;
@@ -32,6 +33,7 @@ public class SpongeTurtle {
     private Vector3i startLoc;
     private Vector3i curLoc;
     // player location:originPos
+    private Player player;
     private String senderName;
     private TurtleDirection dir;
     private World world;
@@ -72,7 +74,7 @@ public class SpongeTurtle {
          */
         public void add(KCTWorldBlockInfo block) {
             if (blockChunk.size() > workChunkSize) {
-                workload.add(new WorkChunk(new LinkedList<KCTWorldBlockInfo>(blockChunk), script.getScriptName(), senderName, jobNum, chunkNum, workChunkSize));
+                workload.add(new WorkChunk(new LinkedList<KCTWorldBlockInfo>(blockChunk), script.getScriptName(), player, jobNum, chunkNum, workChunkSize));
 //                log.info("Adding to queue: " + blockChunk.peek().getLoc());
                 blockChunk.clear();
                 chunkNum++;
@@ -84,7 +86,7 @@ public class SpongeTurtle {
          * Adds the rest of the blockChunk queue to the Workload regardless of the size of the blockChunk queue.
          */
         public void addRest() {
-            workload.add(new WorkChunk(new LinkedList<KCTWorldBlockInfo>(blockChunk), script.getScriptName(), senderName, jobNum, chunkNum, workChunkSize));
+            workload.add(new WorkChunk(new LinkedList<KCTWorldBlockInfo>(blockChunk), script.getScriptName(), player, jobNum, chunkNum, workChunkSize));
             blockChunk.clear();
             chunkNum++;
         }
@@ -370,5 +372,9 @@ public class SpongeTurtle {
      */
     public int getJobSize() {
         return workChunkManager.getJobSize();
+    }
+
+    public void setPlayer(Player player) {
+        this.player=player;
     }
 }

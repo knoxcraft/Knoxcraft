@@ -1,11 +1,16 @@
 package org.knoxcraft.turtle3d;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
+import org.knoxcraft.serverturtle.TurtlePlugin;
 import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.world.World;
 
@@ -68,20 +73,22 @@ public class WorkThread extends Thread {
         this.done=true;
     }
     
-    private static class OurCause {
-        private OurCause(){
+    private static class CommandLineCause {
+        private CommandLineCause(){
         }
     }
-    private static final OurCause INVOKED=new OurCause();
+    private static final CommandLineCause COMMAND_LINE_CAUSE=new CommandLineCause();
+    public static final String COMMAND_LINE="COMMANDLINE";
     
     public void run() {
         while (!done) {
-//            log.info("waiting for some work...");
+            log.trace("waiting for some work...");
             WorkChunk workChunk = work.getWork();
             boolean isUndoScript = workChunk.isUndoScript();
-//            log.info("Is undo script " + isUndoScript);
+            log.debug("Is undo script " + isUndoScript);
             Queue<KCTWorldBlockInfo> queue = workChunk.getBlockChunk();
-//            log.info("Doing some work.");
+            
+            log.trace("Doing some work.");
 
             minecraftSyncExecutor.submit(new Runnable() {
                 public void run() {
@@ -97,16 +104,25 @@ public class WorkThread extends Thread {
                         
                         if (block.getLoc().getY() < maxBuildHeight && block.getLoc().getY() > minBuildHeight)
                             try {
-                                log.info("Before World set block");
-                                world.setBlock(block.getLoc(), minecraftBlock, true, Cause.of(NamedCause.of("INVOKED", INVOKED)));
-                                log.info("After world set block");
+                                log.trace("Before World set block");
+                                // The cause needs to have the plugin container as the root
+                                // https://forums.spongepowered.org/t/root-of-setblock/11292/14
+                                PluginContainer pluginContainer=Sponge.getPluginManager().getPlugin(TurtlePlugin.ID).get();
+                                List<NamedCause> causeList=new LinkedList<>();
+                                causeList.add(NamedCause.of(TurtlePlugin.ID, pluginContainer));
+                                causeList.add(NamedCause.of(COMMAND_LINE, COMMAND_LINE_CAUSE));
+                                
+                                
+                                Cause cause=Cause.builder().addAll(causeList).build();
+                                world.setBlock(block.getLoc(), minecraftBlock, false, cause);
+                                log.trace("After world set block");
                             } catch (Exception e) {
-                                log.info(e.getMessage());
+                                log.error(e.getMessage());
                             }
-                        else
+                        else {
                             log.debug("Player attempted to build above or below allowed height. " + block.getLoc());
-                        
-//                        log.info("Setting block at: " + block.getNewBlock().getId() + " " + block.getLoc());
+                        }
+                        log.trace("Setting block at: " + block.getNewBlock().getId() + " " + block.getLoc());
                     }
                 }
             });
@@ -114,7 +130,8 @@ public class WorkThread extends Thread {
             try {
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
-                // TODO: log, but should be safe to ignore
+                // but should be safe to ignore, but log anyway
+                log.warn("WorkThread woke up while sleeping. Not necessarily an error, but still a bit strange");
             }
             
         }

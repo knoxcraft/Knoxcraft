@@ -3,6 +3,8 @@ package org.knoxcraft.turtle3d;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.spongepowered.api.entity.living.player.Player;
+
 /**
  * Class that holds the chunk of work to be done and the metadata about the work.
  * The only class that builds these workChunks is the inner class WorkChunkManager in SpongeTurtle. 
@@ -10,6 +12,7 @@ import java.util.Queue;
  *
  */
 public class WorkChunk {
+    private Player player;
     private String userName;
     private String jobName;
     private int jobNum;
@@ -20,18 +23,21 @@ public class WorkChunk {
     
     private Queue<KCTWorldBlockInfo> blockChunk;
     
+   
     /**
      * Constructor
-     * @param blockChunk queue of KCTWorldBlockInfo blocks
-     * @param userName 
+     * @param blockChunk
+     * @param jobName
+     * @param player
      * @param jobNum
      * @param workChunkNum
      * @param workChunkSize
      */
-    public WorkChunk(Queue<KCTWorldBlockInfo> blockChunk, String jobName, String userName, int jobNum, int workChunkNum, int workChunkSize) {
+    public WorkChunk(Queue<KCTWorldBlockInfo> blockChunk, String jobName, Player player, int jobNum, int workChunkNum, int workChunkSize) {
         this.blockChunk = blockChunk;
         this.jobName = jobName;
-        this.userName = userName;
+        this.player = player;
+        this.userName = player.getName();
         this.jobNum = jobNum;
         this.workChunkNum = workChunkNum;
         this.workChunkSize = workChunkSize;
@@ -44,6 +50,7 @@ public class WorkChunk {
     public WorkChunk(WorkChunk workChunk) {
         this.blockChunk = new LinkedList<KCTWorldBlockInfo>(workChunk.blockChunk);
         this.jobName = workChunk.jobName;
+        this.player = workChunk.player;
         this.userName = workChunk.userName;
         this.jobNum = workChunk.jobNum;
         this.workChunkNum = workChunk.workChunkNum;
@@ -54,6 +61,9 @@ public class WorkChunk {
         return this.blockChunk;
     }
     
+    public Player getPlayer() {
+        return this.player;
+    }
     public String getUserName() {
         return this.userName;
     }

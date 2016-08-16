@@ -436,6 +436,8 @@ public class TurtlePlugin {
 							TurtleDirection d = TurtleDirection.getTurtleDirection(rotation);
 							log.debug("pos= " + pos);
 
+							// FIXME make a constructor instead of a bunch of setter methods?
+							turtle.setPlayer(player);
 							turtle.setSenderName(playerName);
 							turtle.setLoc(pos);
 							turtle.setWorld(w);
@@ -617,11 +619,7 @@ public class TurtlePlugin {
 	 */
 	@Listener
 	public void blockChangeEvent(ChangeBlockEvent event) {
-	    try {
-	        log.info("Block Changed: " + event.getCause().root().toString());
-	    } catch (Exception e) {
-	        log.info(e.getMessage());
-	    }
+	    log.trace("Block Changed: " + event.getCause().root().toString());
 	    if (event.getCause().root() instanceof Player) {
 	        Player player = (Player) event.getCause().root();
 //	        log.info("A player attempted to change a block.");
