@@ -54,24 +54,24 @@ public class TestJavapoly
     public void testM2() throws Exception {
         String json=inMemoryCompile("HelloWorld2.java");
     }
-    static void compileAndRun(String filename) throws Exception {
+    static void compileAndRun(String className, String filename) throws Exception {
         String script=IOUtils.toString(new FileInputStream(testFile(filename)));
-        String[] result=JavaPolyCompiler.compileAndRun(script);
+        String[] result=JavaPolyCompiler.compileAndRun(className, script);
         for (int i=0; i<result.length; i++){
             System.out.printf("%d => %s\n", i, result[i]);
         }
     }
     @Test
     public void testJP1() throws Exception {
-        compileAndRun("HelloWorld1.java");
+        compileAndRun("HelloWorld", "HelloWorld1.java");
     }
     @Test
     public void testJP2() throws Exception {
-        compileAndRun("HelloWorld2.java");
+        compileAndRun("HelloWorld", "HelloWorld2.java");
     }
     @Test
     public void testInfiniteLoop() throws Exception {
-        compileAndRun("HelloWorldInfiniteLoop.java");
+        compileAndRun("HelloWorld", "HelloWorldInfiniteLoop.java");
     }
     @Test
     public void threadDeath() throws InterruptedException {
