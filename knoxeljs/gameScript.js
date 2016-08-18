@@ -243,7 +243,7 @@ function updateJSON(e) {
 }
 
 // Called once the JSON has been loaded
-function extractCommandsFromJSON(jsontext) {
+var extractCommandsFromJSON = function(jsontext) {
   var json = JSON.parse(jsontext);
   // Sets the current script to be the JSON's list of commands
   curScript = json.commands;
@@ -262,7 +262,7 @@ function readFile(file, onLoadCallback){
 }
 
 // Executes the commands stored in curScript
-function runScript() {
+var runScript = function() {
   if (curScript === null) {
     window.alert("There is no loaded script!");
     return;
@@ -424,54 +424,71 @@ function setPosition(args) {
   position[2] = args.z;
 }
 
-// Direction? Is it just a degree?
-function setDirection(args) {
+function setupBlocklyKnoxelPage(runscriptbutton, undobutton){
+  document.addEventListener("DOMContentLoaded", function(event) {
+    // TODO: test DOMContentLoaded with IE8 (does anyone still use IE8?)
+    // DOMContentLoaded may not be supported by IE8
+    if (runscript!=null){
+      document.getElementById(runscript).addEventListener("click", runScript);
+    }
+    if (undobutton!=null) {
+      document.getElementById(undo).addEventListener("click", undo);
+    }
+    // TODO: set the blockly button to put code into the local var
 
+  });
 }
 
-//////////////////////////////////// Setup HTML Page /////////////////////////////////
+//////////////////////////////////// functions to Setup HTML Page /////////////
 
-// Register the HTML buttons to run the relevant scripts
-document.addEventListener("DOMContentLoaded", function(event) {
-  // TODO: test DOMContentLoaded with IE8 (does anyone still use IE8?)
-  // DOMContentLoaded may not be supported by IE8
-  document.getElementById("runscript").addEventListener("click", runScript);
-  document.getElementById("JSONUploadButton").addEventListener('change', parseJSON, false);
-  document.getElementById("undo").addEventListener("click", undo);
-  document.getElementById("compileandrun").addEventListener("click", function() {
-    running();
-    JavaPoly.type('org.knoxcraft.javapoly.JavaPolyCompiler').then(function(JavaPolyCompiler){
-      // constants that tell us where things are in the array returned
-      // from the JavaPolyCompiler
-      var TOTAL_SUCCESS=0;
-      var JSON_RESULT=1;
-      var RUNTIME_SUCCESS=2;
-      var RUNTIME_MESSAGE=3;
-      var COMPILE_SUCCESS=4;
-      var COMPILE_MESSAGE=5;
-      var code=editor.getValue();
-      // TODO: someday timeout if this call takes too long
-      JavaPolyCompiler.compileAndRun(code).then(function(result){
-        console.log("result is "+result);
-        if (result[TOTAL_SUCCESS]==='true'){
-          // success
-          //alert("success");
-          // TODO: I hope this is the correct place to send the JSON commands
-          extractCommandsFromJSON(result[JSON_RESULT]);
-          setMessage("successfully compiled and loaded code!");
-        } else if (result[COMPILE_SUCCESS]==='true' && result[RUNTIME_SUCCESS]==="false"){
-          // runtime error
-          console.log(result[RUNTIME_MESSAGE]);
-          setMessage("runtime error:\n"+result[RUNTIME_MESSAGE]);
-        } else {
-          // compiler error
-          console.log(result[RUNTIME_MESSAGE]);
-          setMessage("compile error: \n"+result[COMPILE_MESSAGE]);
-        }
-      }, function(error) {
-        console.log(error);
-        alert("Unexpected error! "+error);
+function setupJavaKnoxelPage(compileandrunbutton){
+  alert(compileandrunbutton);
+  /*
+  // Register the HTML buttons to run the relevant scripts
+  document.addEventListener("DOMContentLoaded", function(event) {
+    // TODO: test DOMContentLoaded with IE8 (does anyone still use IE8?)
+    // DOMContentLoaded may not be supported by IE8
+
+    document.getElementById(compileandrunbutton).addEventListener("click", function() {
+      running();
+      JavaPoly.type('org.knoxcraft.javapoly.JavaPolyCompiler').then(function(JavaPolyCompiler){
+        // constants that tell us where things are in the array returned
+        // from the JavaPolyCompiler
+        var TOTAL_SUCCESS=0;
+        var JSON_RESULT=1;
+        var RUNTIME_SUCCESS=2;
+        var RUNTIME_MESSAGE=3;
+        var COMPILE_SUCCESS=4;
+        var COMPILE_MESSAGE=5;
+        var code=editor.getValue();
+        // TODO: someday timeout if this call takes too long
+        JavaPolyCompiler.compileAndRun('HelloWorld', code).then(function(result){
+          console.log("result is "+result);
+          if (result[TOTAL_SUCCESS]==='true'){
+            // success
+            //alert("success");
+            // TODO: I hope this is the correct place to send the JSON commands
+            extractCommandsFromJSON(result[JSON_RESULT]);
+            setMessage("successfully compiled and loaded code!");
+          } else if (result[COMPILE_SUCCESS]==='true' && result[RUNTIME_SUCCESS]==="false"){
+            // runtime error
+            console.log(result[RUNTIME_MESSAGE]);
+            setMessage("runtime error:\n"+result[RUNTIME_MESSAGE]);
+          } else {
+            // compiler error
+            console.log(result[RUNTIME_MESSAGE]);
+            setMessage("compile error: \n"+result[COMPILE_MESSAGE]);
+          }
+        }, function(error) {
+          console.log(error);
+          alert("Unexpected error! "+error);
+        });
       });
     });
   });
-});
+  */
+}
+
+function foo(msg) {
+  alert(msg);
+}

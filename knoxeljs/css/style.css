@@ -32,3 +32,8 @@
   height: 400px;
   overflow-y: scroll;
 }
+#blocklyArea {
+  height: 99%;
+  background: #fc9;
+  text-align: center;
+}

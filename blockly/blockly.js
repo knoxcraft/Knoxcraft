@@ -13,12 +13,6 @@ require('./generators/javascript/turtle.js');
 
 //blocklySetup : function(blocklyAreaName, blocklyDivName, toolboxName) {
 var blocklySetup = function(blocklyAreaName, blocklyDivName, toolboxName) {
-  // var blocklyArea = document.getElementById('blocklyArea');
-  // var blocklyDiv = document.getElementById('blocklyDiv');
-  // var workspace = Blockly.inject(blocklyDiv,
-  //   {toolbox: document.getElementById('toolbox')
-  // });
-
   var blocklyArea = document.getElementById(blocklyAreaName);
   var blocklyDiv = document.getElementById(blocklyDivName);
   var workspace = Blockly.inject(blocklyDiv,
@@ -45,7 +39,7 @@ var blocklySetup = function(blocklyAreaName, blocklyDivName, toolboxName) {
 }
 
 //showCode : function() {
-var showCode = function() {
+var showBlocklyCode = function() {
   // Generate JavaScript code and display it.
   Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
   var code = Blockly.JavaScript.workspaceToCode(workspace);
@@ -53,13 +47,13 @@ var showCode = function() {
 }
 
 //displayCode : function() {
-var displayCode = function() {
-  var code=runCode();
+var displayBlocklyCode = function() {
+  var code=runBlocklyCode();
   alert(code);
 }
 
 //runCode : function() {
-var runCode = function() {
+var runBlocklyCode = function() {
   // Generate JavaScript code and run it.
   window.LoopTrap = 10000;	//TODO:  Will this cause problems for us?  Can increase if necessary.
   Blockly.JavaScript.INFINITE_LOOP_TRAP =
@@ -75,13 +69,14 @@ var runCode = function() {
   }
 }
 
-var upload = function() {
+var uploadBlockly = function(url) {
   //console.log("trying to upload");
   var formData = {};
+  //TODO: get player name out of page
   var playerName="spacdog";
   formData["playerName"]=playerName;
 
-  var jsontext=runCode();
+  var jsontext=runBlocklyCode();
   formData["jsontext"]=jsontext;
   //TODO: figure out how to get a representation of the blocks
   // that we can use to regenerate our blocks
@@ -96,7 +91,8 @@ var upload = function() {
     }
   }
   // TODO: fix this URL
-  xhttp.open("POST", "http://localhost:8888/kctupload", true);
+  // typical url is: http://localhost:8888/kctupload
+  xhttp.open("POST", url, true);
   // pick a boundary character
   var boundary='Pqrfh'+Math.random().toString().substr(5);
   xhttp.setRequestHeader("content-type",

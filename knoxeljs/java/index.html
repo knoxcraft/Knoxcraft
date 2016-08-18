@@ -32,7 +32,7 @@ public class HelloWorld {
 }
   </div>
   <div id="blocktypes"> </div>
-  
+
 </div>
 
 <!-- load code for the embedded ACE editor -->
@@ -58,19 +58,43 @@ editor.setAutoScrollEditorIntoView(true);
 </div>
 
 <!-- These are more buttons. Their click action handlers are set in index.js as well -->
+<!--
 <div>
   <input type="file" id="JSONUploadButton" onchange="parseJSON(this.files)">
 </div>
+-->
 <div>
 <p>Script Status: <span id="scriptstatus">No script loaded</span></p>
+</div>
+
+<div>
 <button type="button" id="runscript">Run Current Script</button>
 <button type="button" id="undo">Undo Last Script</button>
+</div>
 
+<div id="debug">
 <p>Debug Look Location: <span id="looklocation">n/a</span></p>
 </div>
 
+<script type="text/javascript" src="foo.js"></script>
+
+<script type="text/javascript">
+//foo('the msg');
+</script>
+
 <!-- Load the voxeljs code. Needs to be loaded before the rest of our code -->
-<script src="/bundle.js"></script>
+<script type="text/javascript" src="../bundle.js"></script>
+
+<p></p>
+
+<script type="text/javascript">
+  foo('message fuckers');
+  setupJavaKnoxelPage('compileandrun');
+  document.getElementById('runscript').addEventListener('click', runScript);
+  document.getElementById('undo').addEventListener('click', undo);
+  document.getElementById('JSONUploadButton').addEventListener('change', parseJSON, false);
+
+</script>
 
 
 </body>
