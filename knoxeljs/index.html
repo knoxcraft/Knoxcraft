@@ -1,99 +1,85 @@
 <html>
 <head>
-<title> KnoxelJS </title>
+
+<title> Knoxeljs </title>
+
 <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+<!-- Embed the Javapoly code into this HTML page for future use (note that javapoly provides
+       a JVM and Java compiler written in javascript that can run in the browser) -->
+<!--script type="text/javascript" src="https://www.javapoly.com/javapoly.js"></script-->
+
+<!-- Embed the Turtle3D library in the HTML page so that we can use it to compile
+       the in-page scripts written by the users. This works despite the fact that the
+       library is written in Java because of JavaPoly -->
+<script type="text/java" src="/java/lib/knoxeljs-0.2.jar"></script>
+<script type="text/java" src="/java/lib/knoxcraft-0.2.jar"></script>
+
 </head>
+
+
 <body>
-<!--
-<img src="/images/Knoxcraft.png" id="middle" height="189" width="256"/>
--->
-<div class="center">
-  Welcome to Knoxcraft!
+
+<div id="sidebyside">
+  <!-- <div id="tablerow"> -->
+  <!-- This is the embedded IDE -->
+  <div id="editor">// Do not change the imports.
+
+import org.knoxcraft.turtle3d.Turtle3D;
+import static org.knoxcraft.turtle3d.KCTBlockTypes.*;
+
+public class HelloWorld {
+  public static void main(String[] args) {
+    Turtle3D t=Turtle3D.createTurtle("myturtle");
+    t.setBlock(RED_WOOL);
+    t.forward(10);
+  }
+}
 </div>
 
-<div class="center">
-  <a href="https://sites.google.com/a/knox.edu/knoxcraft/"><img src="/images/Knoxcraft.png" id="middle" height="189" width="256"/></a>
-  Check out <a href="https://sites.google.com/a/knox.edu/knoxcraft/">KnoxCraft</a>, our Spongepowered mod that lets you 
-</div>
-<hr/>
-<div class="center">
-  Try out 
-</div>
-<hr/>
-
-<div class="center">
-  <p>
-  Knoxcraft brings programming 3D Logo to life using Minecraft-themed visualizations.
-  Write code in Java, Python, or Scratch (Blockly), and visualize your voxel-based creations, through Minecraft or in your web browser!
-  </p>
-  <p>
-  Knoxcraft comes in two flavors:
-  <ul class="center">
-    <li> Knoxcraft: A Minecraft mod for Spongepowered, a Forge-compliant modding API</li>
-    <li> KnoxelJS: A voxel-based environent that runs in your web browser using WebG, VoxelJS, and Sphax textures </li>
-  </ul>
-  </p>
-  <p>
+  <!-- This is the display for the different block types. It's filled in index.js -->
+  <div id="blocktypes"> </div>
   
+</div>
+
+<!-- load code for the embedded ACE editor -->
+<script src="/ace-builds/src-min/ace.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript">
+// setup the ACE editor
+var editor = ace.edit("editor");
+editor.setTheme("ace/theme/solarized_light");
+editor.getSession().setMode("ace/mode/java");
+editor.setAutoScrollEditorIntoView(true);
+</script>
+
+<div id="message">
+  <br>
+</div>
+
+<!-- This is the compile button. Its click action handler is set in index.js -->
+<div>
+  <p>
+  <button type="button" id="compileandrun">Compile code</button>
+  <button type="button" id="downloadButton">Download code</button>
   </p>
 </div>
-<hr/>
-<div class="center">
-  Check out the full documentation for <a href="">"Knoxcraft Complete"</a>, our Forge-compliant mod 
-</div>
-<hr/>
-<div class="center">
-  <a href="blockly">
-  Try KnoxelJS in Scratch!<br>
-  <img src="http://www.thecomputing.zone/Year-7/Scratch/files/stacks-image-A80B0AC.jpg" width="256"/>
-  </a>
-</div>
-<hr/>
-<div class="center">
-  <a href="java">
-  Try VoxelJS in Java!<br>
-  <img src="https://upload.wikimedia.org/wikipedia/en/8/88/Java_logo.png" width="256"/>
-  </a>
-</div>
-<hr/>
 
+<!-- These are more buttons. Their click action handlers are set in index.js as well -->
+<div>
+  <input type="file" id="JSONUploadButton" onchange="parseJSON(this.files)">
+</div>
+<div>
+<p>Script Status: <span id="scriptstatus">No script loaded</span></p>
+<button type="button" class="button" id="runscript">Run Current Script</button>
+<button type="button" id="undo">Undo Last Script</button>
 
-  <div class="center">
-    Built using these amazing projects:
-    <ul class="center">
-      <li><a href="https://minecraft.net/"> Minecraft </a></li>
-      <li><a href="https://github.com/MinecraftForge/MinecraftForge"> Forge </a></li>
-      <li><a href="https://www.spongepowered.org/"> Spongepowered </a></li>
-      <li><a href="https://developers.google.com/blockly/">Blockly</a></li>
-      <li><a href="http://voxeljs.com/"> VoxelJS </a></li>
-      <li><a href="https://www.javapoly.com/"> JavaPoly</a></li>
-      <li><a href="https://ace.c9.io/">Ace Editor</a></li>
-      <li><a href="https://en.wikipedia.org/wiki/WebGL">WebGL</a></li>
-      <li><a href="http://bdcraft.net/sphax-purebdcraft-texturepack">Sphax textures</a></li>
-    </ul>
-  </div>
-  <hr/>
-  <div class="center">
-    The Knoxcraft Team is:
-  <div class="center">
-    Emily Hastings (Knox '16)  
-  </div>
-  <div class="center">
-    Michael Gerten (Knox '16)
-  </div>
-  <div class="center">
-    Matt Moe (Knox '17)
-  </div>
-  <div class="center">
-    John Damits (Knox '17)
-  </div>
-  <div class="center">
-    Lucas Kasser (Brown '19)
-  </div>
-  <div class="center">
-    Jaime Spacco 
-  </div>
-  </div>
+<p>Debug Look Location: <span id="looklocation">n/a</span></p>
+</div>
+
+<!-- Load the voxeljs code. Needs to be loaded after all the HTML stuff -->
+<script src="/bundle.js"></script>
+
 
 </body>
 </html>
