@@ -13,22 +13,21 @@
        the in-page scripts written by the users. This works despite the fact that the
        library is written in Java because of JavaPoly -->
 <script type="text/java" src="/java/lib/knoxeljs-0.2.jar"></script>
-<script type="text/java" src="/java/lib/knoxcraft-0.2.jar"></script>
 
 </head>
 
 <body>
 
 <ul class="tab">
-  <li><a href="#" class="tablinks" id="codingTab" onclick="openTab(event, 'Coding')">Coding</a></li>
+  <li><a href="#" class="tablinks" id="javaTab" onclick="openTab(event, 'Java')">Java</a></li>
   <li><a href="#" class="tablinks" id="blocklyTab" onclick="openTab(event, 'Blockly')">Blockly</a></li>
-  <li><a href="#" class="tablinks" id="optionsTab" onclick="openTab(event, 'Options')">Options</a></li>
   <li><a href="#" class="tablinks" id="gameTab" onclick="openTab(event, 'Game')">Game</a></li>
+  <li><a href="#" class="tablinks" id="optionsTab" onclick="openTab(event, 'Options')">Options</a></li>
 </ul>
 
 <!-- All buttons' click action handlers are set in index.js -->
 
-<div id="Coding" class="tabcontent">
+<div id="Java" class="tabcontent">
   <div id="sidebyside">
   <!-- <div id="tablerow"> -->
   <!-- This is the embedded IDE -->
@@ -46,9 +45,9 @@ public class HelloWorld {
 }
 </div>
 
-  <!-- This is the display for the different block types. It's filled in index.js -->
+  <!-- This is the display for the different block types. It's filled in gameScript.js -->
   <div id="blocktypes"> </div>
-  
+
 </div>
 
 <p>
@@ -62,10 +61,10 @@ public class HelloWorld {
   <br>
 </div>
 
-</div> <!-- End the Coding Tab Div-->
+</div> <!-- End the Java Coding Tab Div-->
 
 <div id="Blockly" class="tabcontent">
-  <h3>Blockly</h3>
+  <h3>Coming soon: Blockly</h3>
 </div>
 
 <div id="Options" class="tabcontent">
@@ -95,7 +94,8 @@ public class HelloWorld {
   <p>WASD to move</p>
   <p>SPACE to jump (Double tap to fly)</p>
   <p>SHIFT to fall when flying</p>
-  <p>Look and click to set new script launch position
+  <p>Look and click to set new script launch position</p>
+  <h3>Java programs run automatically when you compile them</h3>
 
 </div>
 
@@ -109,7 +109,7 @@ public class HelloWorld {
 </div>
 
 <!-- load code for the embedded ACE editor -->
-<script src="/ace-builds/src-min/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
 // setup the ACE editor
