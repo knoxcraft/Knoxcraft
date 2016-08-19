@@ -156,59 +156,71 @@ public class HelloWorld {
       element.parentNode.removeChild(element);
     }
   }
-  // TODO: figure out how to backup and restore the workspace
+
+  // backup and restore the workspace
   var backupWorkspaceExists=false;
-    // add handlers to the buttons we click to switch tabs
-    var elements=document.getElementsByClassName('tablinks');
-    for (var i=0; i<elements.length; i++){
-      var elm=elements[i];
-      elm.addEventListener('click', function(){
-        // HACK
-        var workspace = Blockly.getMainWorkspace();
-        console.log('workspace is '+workspace);
-        if (workspace != null) {
-          var xml = Blockly.Xml.workspaceToDom(workspace);
-          // Gets the current URL, not including the hash.
-          var url = window.location.href.split('#')[0];
-          window.localStorage.setItem(url, Blockly.Xml.domToText(xml));
-          backupWorkspaceExists=true;
-        }
-
-        // HACK clearing out the blockly div and area,
-        // and also removing DOMs that are added by
-        // calls to Blockly.inject()
-        // otherwise we leave a giant blockly tooltip div
-        // sitting around in the other tabs
-
-        //console.log('clearing blockly area and blockly div');
-
-        document.getElementById('blocklyDiv').innerHTML='';
-        document.getElementById('blocklyArea').innerHTML='';
-        //removeFromDOMByClass('blocklyWidgetDiv');
-        removeFromDOMByClass('blocklyToolboxDiv');
-        //removeFromDOMByClass('blocklyTooltipDiv');
-
-      });
-      if (elm.id=='blocklyTab'){
-        elm.addEventListener('click', function(){
-          //console.log('hey-yo!');
-          // we have to re-inject blockly each time for it to show up properly
-          blocklySetup('blocklyArea', 'blocklyDiv', 'toolbox');
-          console.log('backup workspace? '+backupWorkspaceExists);
-          if (backupWorkspaceExists){
-            window.setTimeout(BlocklyStorage.restoreBlocks, 0);
-          }
-          onresize();
-        });
+  // add handlers to the buttons we click to switch tabs
+  var elements=document.getElementsByClassName('tablinks');
+  for (var i=0; i<elements.length; i++){
+    var elm=elements[i];
+    elm.addEventListener('click', function(){
+      // HACK using some of the code from appengine/storage.js
+      // to save the workspace locally so we can restore it
+      var workspace = Blockly.getMainWorkspace();
+      //console.log('workspace is '+workspace);
+      if (workspace != null) {
+        var xml = Blockly.Xml.workspaceToDom(workspace);
+        // Gets the current URL, not including the hash.
+        var url = window.location.href.split('#')[0];
+        //console.log('url is '+url);
+        // apparently window.localStorage is a magical dictionary
+        // where Javascript can put things.
+        window.localStorage.setItem(url, Blockly.Xml.domToText(xml));
+        backupWorkspaceExists=true;
       }
-    }
 
-    // event handler to run the actual code
-    document.getElementById('runblockly').addEventListener('click', function(){
-      var code=runBlocklyCode();
-      //knoxeljs.extractCommandsFromJSON(code);
-      extractCommandsFromJSON(code);
+      // HACK clearing out the blockly div and area,
+      // and also removing the blocklyToolboxDiv that is added by
+      // calls to Blockly.inject().
+      // Otherwise we leave a giant blockly tooltip div
+      // sitting around in the other tabs.
+      // Note that injecting blockly actually creates several divs
+      // (blocklyWidgetDiv, blocklyToolboxDiv, blocklyTooltipDiv),
+      // but we only need to remove blocklyToolboxDiv. If we remove
+      // the other two, we can add blocks, but we can't edit them.
+      // FIXME Still not sure if we also need to clear out
+      // the innerHTML of blocklyDiv and blocklyArea.
+
+      //console.log('clearing blockly area and blockly div');
+
+      document.getElementById('blocklyDiv').innerHTML='';
+      document.getElementById('blocklyArea').innerHTML='';
+      removeFromDOMByClass('blocklyToolboxDiv');
+
     });
+    if (elm.id=='blocklyTab'){
+      elm.addEventListener('click', function(){
+        //console.log('hey-yo!');
+        // we have to re-inject blockly each time for it to show up properly
+        // If we don't, we get the placeholder div that says "Blockly will be
+        // positioned here", but it doesn't show up until we re-size the window.
+        // For some reason, calling the onresize() function created in blockly.js
+        // doesn't seem to count as a resize event.
+        blocklySetup('blocklyArea', 'blocklyDiv', 'toolbox');
+        //console.log('backup workspace? '+backupWorkspaceExists);
+        if (backupWorkspaceExists){
+          window.setTimeout(BlocklyStorage.restoreBlocks, 0);
+        }
+        onresize();
+      });
+    }
+  }
+
+  // event handler to run the actual code
+  document.getElementById('runblockly').addEventListener('click', function(){
+    var code=runBlocklyCode();
+    extractCommandsFromJSON(code);
+  });
   </script>
 
 </div>
