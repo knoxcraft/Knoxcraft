@@ -197,3 +197,12 @@ ul.tab li a:focus, .active {
     left: 0 !important;
     z-index:20
 }
+#blocklyArea {
+  height: 99%;
+  background: #fc9;
+  text-align: center;
+}
+#blocklyTable {
+  height: 100%;
+  width: 100%;
+}
