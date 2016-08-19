@@ -11,14 +11,19 @@ require('./blocks/turtle.js');
 require('./generators/javascript/turtle.js');
 */
 
+var onresize=function(){}
+
 //blocklySetup : function(blocklyAreaName, blocklyDivName, toolboxName) {
 var blocklySetup = function(blocklyAreaName, blocklyDivName, toolboxName) {
   var blocklyArea = document.getElementById(blocklyAreaName);
   var blocklyDiv = document.getElementById(blocklyDivName);
+  //blocklyArea.svg="";
+  //blocklyDiv.innerHTML="";
   var workspace = Blockly.inject(blocklyDiv,
     {toolbox: document.getElementById(toolboxName)}
   );
-  var onresize = function(e) {
+  onresize = function(e) {
+    console.log('resizing blockly');
     // Compute the absolute coordinates and dimensions of blocklyArea.
     var element = blocklyArea;
     var x = 0;
