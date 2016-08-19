@@ -607,4 +607,4 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 // No tabs are open by default, which is sort of strange. This opens the coding tab.
-goToTab("codingTab");
+goToTab("javaTab");
