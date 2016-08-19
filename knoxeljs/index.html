@@ -156,11 +156,22 @@ public class HelloWorld {
       element.parentNode.removeChild(element);
     }
   }
+  // TODO: figure out how to backup and restore the workspace
+  var backupWorkspaceExists=false;
     // add handlers to the buttons we click to switch tabs
     var elements=document.getElementsByClassName('tablinks');
     for (var i=0; i<elements.length; i++){
       var elm=elements[i];
       elm.addEventListener('click', function(){
+        // HACK
+        if (BlocklyStorage!=null){
+          // TODO: restore the workspace if there is one; otherwise create a new workspace
+          BlocklyStorage.backupBlocks_();
+          backupWorkspaceExists=true;
+        } else {
+          console.log("blockly storage null");
+        }
+
         // HACK clearing out the blockly div and area,
         // and also removing DOMs that are added by
         // calls to Blockly.inject()
@@ -179,7 +190,11 @@ public class HelloWorld {
         elm.addEventListener('click', function(){
           //console.log('hey-yo!');
           // we have to re-inject blockly each time for it to show up properly
-          blocklySetup('blocklyArea', 'blocklyDiv', 'toolbox');
+          if (backupWorkspaceExists){
+            window.setTimeout(BlocklyStorage.restoreBlocks, 0);
+          } else {
+            blocklySetup('blocklyArea', 'blocklyDiv', 'toolbox');
+          }
           onresize();
         });
       }
