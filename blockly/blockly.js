@@ -23,7 +23,7 @@ var blocklySetup = function(blocklyAreaName, blocklyDivName, toolboxName) {
     {toolbox: document.getElementById(toolboxName)}
   );
   onresize = function(e) {
-    console.log('resizing blockly');
+    //console.log('resizing blockly');
     // Compute the absolute coordinates and dimensions of blocklyArea.
     var element = blocklyArea;
     var x = 0;

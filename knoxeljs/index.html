@@ -164,12 +164,14 @@ public class HelloWorld {
       var elm=elements[i];
       elm.addEventListener('click', function(){
         // HACK
-        if (BlocklyStorage!=null){
-          // TODO: restore the workspace if there is one; otherwise create a new workspace
-          BlocklyStorage.backupBlocks_();
+        var workspace = Blockly.getMainWorkspace();
+        console.log('workspace is '+workspace);
+        if (workspace != null) {
+          var xml = Blockly.Xml.workspaceToDom(workspace);
+          // Gets the current URL, not including the hash.
+          var url = window.location.href.split('#')[0];
+          window.localStorage.setItem(url, Blockly.Xml.domToText(xml));
           backupWorkspaceExists=true;
-        } else {
-          console.log("blockly storage null");
         }
 
         // HACK clearing out the blockly div and area,
@@ -179,21 +181,22 @@ public class HelloWorld {
         // sitting around in the other tabs
 
         //console.log('clearing blockly area and blockly div');
+
         document.getElementById('blocklyDiv').innerHTML='';
         document.getElementById('blocklyArea').innerHTML='';
+        //removeFromDOMByClass('blocklyWidgetDiv');
         removeFromDOMByClass('blocklyToolboxDiv');
-        removeFromDOMByClass('blocklyWidgetDiv');
-        removeFromDOMByClass('blocklyToolboxDiv');
-        removeFromDOMByClass('blocklyTooltipDiv');
+        //removeFromDOMByClass('blocklyTooltipDiv');
+
       });
       if (elm.id=='blocklyTab'){
         elm.addEventListener('click', function(){
           //console.log('hey-yo!');
           // we have to re-inject blockly each time for it to show up properly
+          blocklySetup('blocklyArea', 'blocklyDiv', 'toolbox');
+          console.log('backup workspace? '+backupWorkspaceExists);
           if (backupWorkspaceExists){
             window.setTimeout(BlocklyStorage.restoreBlocks, 0);
-          } else {
-            blocklySetup('blocklyArea', 'blocklyDiv', 'toolbox');
           }
           onresize();
         });
@@ -203,7 +206,8 @@ public class HelloWorld {
     // event handler to run the actual code
     document.getElementById('runblockly').addEventListener('click', function(){
       var code=runBlocklyCode();
-      knoxeljs.extractCommandsFromJSON(code);
+      //knoxeljs.extractCommandsFromJSON(code);
+      extractCommandsFromJSON(code);
     });
   </script>
 

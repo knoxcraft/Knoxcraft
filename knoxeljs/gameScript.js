@@ -275,7 +275,7 @@ function updateJSON(e) {
 }
 
 // Called once the JSON has been loaded
-var extractCommandsFromJSON = function(jsontext) {
+window.extractCommandsFromJSON = function(jsontext) {
   var json = JSON.parse(jsontext);
   // Sets the current script to be the JSON's list of commands
   curScript = json.commands;
@@ -289,6 +289,7 @@ var extractCommandsFromJSON = function(jsontext) {
     setStatus("LOADED JSON BUT COULD NOT FIND COMMANDS! (Did you upload the right JSON file?)");
   }
 }
+// HACK exporting this one function from browserify so that Blockly can call it
 var exports = module.exports = {};
 exports.extractCommandsFromJSON=extractCommandsFromJSON;
 // Registers the function onLoadCallBack to run after file has been loaded
