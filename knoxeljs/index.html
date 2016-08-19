@@ -33,6 +33,7 @@
   <div id="sidebyside">
   <!-- <div id="tablerow"> -->
   <!-- This is the embedded IDE -->
+  <div id="editorDiv">
   <div id="editor">// Do not remove the existing imports.
 
 import org.knoxcraft.turtle3d.Turtle3D;
@@ -45,6 +46,15 @@ public class HelloWorld {
     t.forward(10);
   }
 }
+  </div>
+  <div>
+    <p>
+      <button type="button" id="compileandrun">Compile code</button>
+      <button type="button" id="downloadButton">Download code</button>
+      <input type="file" id="codeUploadButton" class="inputfile">
+      <label for="codeUploadButton">Upload code</label>
+    </p>
+  </div>
 </div>
 
   <!-- This is the display for the different block types. It's filled in gameScript.js -->
@@ -52,12 +62,7 @@ public class HelloWorld {
 
 </div>
 
-<p>
-  <button type="button" id="compileandrun">Compile code</button>
-  <button type="button" id="downloadButton">Download code</button>
-  <input type="file" id="codeUploadButton" class="inputfile">
-  <label for="codeUploadButton">Upload code</label>
-</p>
+
 
 <div id="message">
   <br>
@@ -71,7 +76,10 @@ public class HelloWorld {
   <p>Create your Knoxcraft Turtle scripts below.  For help and examples, see our Student Guide <a href="https://sites.google.com/a/knox.edu/knoxcraft/student-guide-blockly">here</a>.</p>
 
   <div>
-    <p><button id="runblockly">Run this turtle in the Game window</button></p>
+    <p>
+      <button id="runblockly">Run this turtle in the Game window</button>
+      <button onclick="alert(runBlocklyCode())"> Show the JSON produced by this turtle</button>
+    </p>
   </div>
 
   <div id="blocklyTable">
@@ -89,8 +97,8 @@ public class HelloWorld {
     <block type="turtle_move" gap="8"></block>
     <block type="turtle_turn" gap="32"></block>
     <block type="turtle_setblockplace" gap="32"></block>
-    <block type="turtle_setblocktype2" gap="8"></block>
-    <block type="turtle_setblocktype" gap="32"></block>
+    <block type="turtle_setblocktype2" gap="32"></block>
+    <!-- <block type="turtle_setblocktype" gap="32"></block> -->
     <block type="turtle_setpos" gap="8"></block>
     <block type="turtle_setdir"></block>
     </category>
@@ -193,8 +201,6 @@ public class HelloWorld {
       // FIXME Still not sure if we also need to clear out
       // the innerHTML of blocklyDiv and blocklyArea.
 
-      //console.log('clearing blockly area and blockly div');
-
       document.getElementById('blocklyDiv').innerHTML='';
       document.getElementById('blocklyArea').innerHTML='';
       removeFromDOMByClass('blocklyToolboxDiv');
@@ -202,14 +208,12 @@ public class HelloWorld {
     });
     if (elm.id=='blocklyTab'){
       elm.addEventListener('click', function(){
-        //console.log('hey-yo!');
         // we have to re-inject blockly each time for it to show up properly
         // If we don't, we get the placeholder div that says "Blockly will be
         // positioned here", but it doesn't show up until we re-size the window.
         // For some reason, calling the onresize() function created in blockly.js
         // doesn't seem to count as a resize event.
         blocklySetup('blocklyArea', 'blocklyDiv', 'toolbox');
-        //console.log('backup workspace? '+backupWorkspaceExists);
         if (backupWorkspaceExists){
           window.setTimeout(BlocklyStorage.restoreBlocks, 0);
         }

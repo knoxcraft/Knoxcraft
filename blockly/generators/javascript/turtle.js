@@ -5,18 +5,18 @@
 Blockly.JavaScript['turtle_init'] = function(block) {
   var text_name = block.getFieldValue('name');
   var statements_script = Blockly.JavaScript.statementToCode(block, 'script');
-			
+
   var code = 'var json = \'\';\n';
   code += 'json += \'{\\n     "scriptname" : "' + text_name + '",\\n     "commands" : [\\n\';';
-  code += statements_script; 
-  
+  code += statements_script;
+
   //remove trailing comma
   code += 'if (json.endsWith(\',\\n\'))  {';
   code += '     json = json.substring(0, json.length-2) + \'\\n\';\n';
   code += '}';
-  
+
   code += 'json += \'     ]\\n}\';\n';
-	
+
   return code;
 };
 
@@ -24,7 +24,7 @@ Blockly.JavaScript['turtle_move'] = function(block) {
   var text_dist = block.getFieldValue('dist');
   var dropdown_dir = block.getFieldValue('dir');
   var code = 'json += \'     {"cmd" : "' + dropdown_dir.toLowerCase() + '", \\n          "args" : {"dist" : ' + text_dist + '}},\\n\';\n';
-  
+
   return code;
 };
 
@@ -48,13 +48,13 @@ Blockly.JavaScript['turtle_setblockplace'] = function(block) {
 
 Blockly.JavaScript['turtle_setblocktype'] = function(block) {
   var text_type = block.getFieldValue('type');
-  var code = 'json += \'     {"cmd" : "setBlock", \\n          "args" : {"type" : ' + text_type + '}},\\n\';\n';
+  var code = 'json += \'     {"cmd" : "setBlock", \\n          "args" : {"blockType" : ' + text_type + '}},\\n\';\n';
   return code;
 };
 
 Blockly.JavaScript['turtle_setblocktype2'] = function(block) {
-  var dropdown_type = block.getFieldValue('type');
-  var code = 'json += \'     {"cmd" : "setBlock", \\n          "args" : {"type" : ' + dropdown_type + '}},\\n\';\n';
+  var dropdown_type = block.getFieldValue('blockType');
+  var code = 'json += \'     {"cmd" : "setBlock", \\n          "args" : {"blockType" : ' + dropdown_type + '}},\\n\';\n';
   return code;
 };
 

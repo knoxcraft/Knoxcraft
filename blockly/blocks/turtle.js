@@ -482,10 +482,10 @@ function blockOptions() {
 
 Blockly.Blocks['turtle_setblocktype2'] = {
   init: function() {
-    var dropdown = new Blockly.FieldDropdown(blockOptions);
+    var dropdown = new Blockly.FieldDropdown(blockOptions());
     this.appendDummyInput()
         .appendField("set block type to")
-        .appendField(dropdown, 'blockType');
+        .appendField(dropdown, "blockType");
     this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);

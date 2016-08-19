@@ -1,7 +1,6 @@
 /*
 This is what we would require if Blockly used module.exports
-Instead we are going to just concatenate all of files together,
-and then minify them.
+Instead we are going to just concatenate all of files together.
 
 require('./js/blockly_compressed.js');
 require('./js/blocks_compressed.js');
@@ -11,7 +10,7 @@ require('./blocks/turtle.js');
 require('./generators/javascript/turtle.js');
 */
 
-// HACK global variables
+// HACK global variables because we aren't using module.exports
 var onresize=function(){}
 var workspace=null;
 
@@ -83,8 +82,6 @@ var uploadBlockly = function(url) {
 
   var jsontext=runBlocklyCode();
   formData["jsontext"]=jsontext;
-  //TODO: figure out how to get a representation of the blocks
-  // that we can use to regenerate our blocks
   formData["sourcetext"]=jsontext;
   formData["language"]="blockly";
   formData["client"]="web";
