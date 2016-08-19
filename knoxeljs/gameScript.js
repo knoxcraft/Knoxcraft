@@ -289,7 +289,8 @@ var extractCommandsFromJSON = function(jsontext) {
     setStatus("LOADED JSON BUT COULD NOT FIND COMMANDS! (Did you upload the right JSON file?)");
   }
 }
-
+var exports = module.exports = {};
+exports.extractCommandsFromJSON=extractCommandsFromJSON;
 // Registers the function onLoadCallBack to run after file has been loaded
 function readFile(file, onLoadCallback){
     var reader = new FileReader();

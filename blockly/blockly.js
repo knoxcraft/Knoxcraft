@@ -11,15 +11,15 @@ require('./blocks/turtle.js');
 require('./generators/javascript/turtle.js');
 */
 
+// HACK global variables
 var onresize=function(){}
+var workspace=null;
 
 //blocklySetup : function(blocklyAreaName, blocklyDivName, toolboxName) {
 var blocklySetup = function(blocklyAreaName, blocklyDivName, toolboxName) {
   var blocklyArea = document.getElementById(blocklyAreaName);
   var blocklyDiv = document.getElementById(blocklyDivName);
-  //blocklyArea.svg="";
-  //blocklyDiv.innerHTML="";
-  var workspace = Blockly.inject(blocklyDiv,
+  workspace = Blockly.inject(blocklyDiv,
     {toolbox: document.getElementById(toolboxName)}
   );
   onresize = function(e) {
