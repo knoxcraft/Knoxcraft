@@ -2,17 +2,17 @@
 
 var allMaterials = [];
 var materialNames = {};
-var materialNameToFilename = {};
 materialNames['AIR'] = 0;
 
 // Registers a material
 function addMat(name, filename) {
+  // Attaches the new filename to the end of the allMaterials array
+
   allMaterials.push(filename);
   /* Note that the first index in the materials array is actually
-   * item '1' (air is 0)
+   * item '1' (air is 0).
    */
   materialNames[name] = allMaterials.length;
-  materialNameToFilename[name]=filename;
 }
 
 addMat("STONE", "stone");
@@ -118,7 +118,7 @@ var game = createGame({
   texturePath: '/textures/'
 });
 // TODO: should we attach this to a div?
-game.appendTo(document.body);
+game.appendTo(document.getElementById("Game"));
 
 // Set origin to RED_WOOL
 game.setBlock(new Array(0, 0, 0), materialNames['RED_WOOL']);
@@ -141,12 +141,6 @@ var hl = game.highlighter = highlight(game, { color: 0x00ff00 })
 hl.on('highlight', function (voxelPos) { highlightPos = voxelPos })
 hl.on('remove', function (voxelPos) { highlightPos = null })
 
-// Updates the lookLocation indicator when the mouse is clicked ("fired")
-game.on('fire', function (target, state) {
-  // Purely for debugging purposes
-  document.getElementById("looklocation").innerHTML = highlightPos + " (type: " + game.getBlock(highlightPos) + ")";
-});
-
 //
 // Create a div containing all of the textures
 //
@@ -160,11 +154,20 @@ function th(val){
   return '<th>'+val+'</th>';
 }
 function makeTextureTable() {
-  var table="<table border=1>" +tr(th('blocktype')+th('texture'));
-  for (var key in materialNameToFilename) {
-    if (materialNameToFilename.hasOwnProperty(key)){
-      var filename=materialNameToFilename[key]+'.png';
-      table += tr(td(key)+td('<img src="https://knoxcraft.github.io/textures/' +filename+ '" widht="64" height="64"/>'));
+  var table="<table border=1>" +tr(th('Name of Block')+th('Texture'));
+  for (var key in materialNames) {
+    if (materialNames.hasOwnProperty(key)){
+      if (allMaterials[materialNames[key]-1] instanceof Array) {
+        var filename=allMaterials[materialNames[key]-1][0]+'.png';
+      } else {
+        var filename=allMaterials[materialNames[key]-1]+'.png';
+      }
+      if (key != 'AIR') {
+        // table += tr(td(key)+td('<img src="https://knoxcraft.github.io/textures/' +filename+ '" width="64" height="64"/>'));
+        table += tr(td(key)+td('<img src="/textures/' +filename+ '" width="64" height="64"/>'));
+      } else {
+        table += tr(td(key)+td('<img src="/textures/air.png" width="64" height="64"/>'));
+      }
     }
   }
   table += "</table>";
@@ -181,10 +184,15 @@ var position = new Array(0,1,0)
 var turnAngle = 0;
 var blockPlace = true;
 var defaultBlockName = "STONE";
+var scriptLaunchLocation = new Array(0,1,0);
 var blockType = materialNames[defaultBlockName];
 
 // The current commands that will be run (extracted directly from the JSON)
 var curScript = null;
+var curACEErrorMarker = null;
+
+// The name of the turtle class
+var className = 'HelloWorld';
 
 // Undo functionality
 var curUndo = [];
@@ -218,6 +226,30 @@ function running() {
   setMessage('Java code compiling and running!<br><img src="/images/loading.gif"/><br>');
 }
 
+
+// Updates the lookLocation indicator when the mouse is clicked ("fired")
+game.on('fire', function (target, state) {
+  // Purely for debugging purposes
+  document.getElementById("looklocation").innerHTML = "(" + highlightPos + ")";
+  scriptLaunchLocation = highlightPos;
+});
+
+function uploadCode(evt) {
+  setStatus("Loading script...");
+  readFile(evt.target.files[0], updateCode);
+}
+
+function updateCode(e) {
+  try {
+    var result = e.target.result;
+    editor.setValue(result);
+  }
+  catch(err) {
+    setStatus("ERROR READING FILE");
+  }
+}
+
+
 // Called when user presses JSONUploadButton- begins
 // reading the uploaded file
 function parseJSON(evt) {
@@ -248,7 +280,11 @@ var extractCommandsFromJSON = function(jsontext) {
   // Sets the current script to be the JSON's list of commands
   curScript = json.commands;
   if (curScript != null) {
+    goToTab("gameTab");
     setStatus(json.scriptname + " has been loaded successfully!");
+    if (document.getElementById("autoRunScript").checked) {
+      runScript();
+    }
   } else {
     setStatus("LOADED JSON BUT COULD NOT FIND COMMANDS! (Did you upload the right JSON file?)");
   }
@@ -267,6 +303,17 @@ var runScript = function() {
     window.alert("There is no loaded script!");
     return;
   }
+  if (!(allUndos === null) && (allUndos.length > 0) && document.getElementById("clearMapBeforeScript").checked) {
+    while(allUndos.length > 0) {
+      undo();
+    }
+  }
+  // Set turtle's position to the player's current location
+  // and its rotation to 0
+  position[0] = scriptLaunchLocation[0];
+  position[1] = scriptLaunchLocation[1];
+  position[2] = scriptLaunchLocation[2];
+  turnAngle = 0;
   for (i = 0; i < curScript.length; i++) {
     //window.alert("Executing command: " + curScript[i].cmd);
     var cmd = curScript[i]
@@ -316,12 +363,16 @@ var runScript = function() {
 
 // Runs when the user presses the undo button
 function undo() {
-  var undo = allUndos[allUndos.length - 1];
-  // Removes the last element from the array (the second parameter is the number of elements
-  // to remove- in this case 1
-  allUndos.splice(allUndos.length - 1, 1);
-  for (var i = 0; i < undo.length; i++) {
-    game.setBlock(undo[i].pos, undo[i].type);
+  if (!(allUndos === null) && allUndos.length > 0) {
+    var undo = allUndos[allUndos.length - 1];
+    // Removes the last element from the array (the second parameter is the number of elements
+    // to remove- in this case 1
+    allUndos.splice(allUndos.length - 1, 1);
+    for (var i = 0; i < undo.length; i++) {
+      game.setBlock(undo[i].pos, undo[i].type);
+    }
+  } else {
+    window.alert("There are no actions to undo!");
   }
 }
 
@@ -424,71 +475,136 @@ function setPosition(args) {
   position[2] = args.z;
 }
 
-function setupBlocklyKnoxelPage(runscriptbutton, undobutton){
-  document.addEventListener("DOMContentLoaded", function(event) {
-    // TODO: test DOMContentLoaded with IE8 (does anyone still use IE8?)
-    // DOMContentLoaded may not be supported by IE8
-    if (runscript!=null){
-      document.getElementById(runscript).addEventListener("click", runScript);
-    }
-    if (undobutton!=null) {
-      document.getElementById(undo).addEventListener("click", undo);
-    }
-    // TODO: set the blockly button to put code into the local var
 
-  });
+function saveToFile(filename, data) {
+    var blob = new Blob([data], {type: 'text/csv'});
+    if(window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveBlob(blob, filename);
+    }
+    else{
+        var elem = window.document.createElement('a');
+        elem.href = window.URL.createObjectURL(blob);
+        elem.download = filename;
+        document.body.appendChild(elem);
+        elem.click();
+        document.body.removeChild(elem);
+        window.URL.revokeObjectURL(blob);
+    }
 }
 
-//////////////////////////////////// functions to Setup HTML Page /////////////
+function downloadEditorCode() {
+  var code = editor.getValue();
+  saveToFile(getClassName(code) + ' ' + js_yyyy_mm_dd_hh_mm_ss(), code);
+}
 
-function setupJavaKnoxelPage(compileandrunbutton){
-  alert(compileandrunbutton);
-  /*
-  // Register the HTML buttons to run the relevant scripts
-  document.addEventListener("DOMContentLoaded", function(event) {
-    // TODO: test DOMContentLoaded with IE8 (does anyone still use IE8?)
-    // DOMContentLoaded may not be supported by IE8
+function js_yyyy_mm_dd_hh_mm_ss () {
+  now = new Date();
+  year = "" + now.getFullYear();
+  month = "" + (now.getMonth() + 1); if (month.length == 1) { month = "0" + month; }
+  day = "" + now.getDate(); if (day.length == 1) { day = "0" + day; }
+  hour = "" + now.getHours(); if (hour.length == 1) { hour = "0" + hour; }
+  minute = "" + now.getMinutes(); if (minute.length == 1) { minute = "0" + minute; }
+  second = "" + now.getSeconds(); if (second.length == 1) { second = "0" + second; }
+  return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+}
 
-    document.getElementById(compileandrunbutton).addEventListener("click", function() {
-      running();
-      JavaPoly.type('org.knoxcraft.javapoly.JavaPolyCompiler').then(function(JavaPolyCompiler){
-        // constants that tell us where things are in the array returned
-        // from the JavaPolyCompiler
-        var TOTAL_SUCCESS=0;
-        var JSON_RESULT=1;
-        var RUNTIME_SUCCESS=2;
-        var RUNTIME_MESSAGE=3;
-        var COMPILE_SUCCESS=4;
-        var COMPILE_MESSAGE=5;
-        var code=editor.getValue();
-        // TODO: someday timeout if this call takes too long
-        JavaPolyCompiler.compileAndRun('HelloWorld', code).then(function(result){
-          console.log("result is "+result);
-          if (result[TOTAL_SUCCESS]==='true'){
-            // success
-            //alert("success");
-            // TODO: I hope this is the correct place to send the JSON commands
-            extractCommandsFromJSON(result[JSON_RESULT]);
-            setMessage("successfully compiled and loaded code!");
-          } else if (result[COMPILE_SUCCESS]==='true' && result[RUNTIME_SUCCESS]==="false"){
-            // runtime error
-            console.log(result[RUNTIME_MESSAGE]);
-            setMessage("runtime error:\n"+result[RUNTIME_MESSAGE]);
-          } else {
-            // compiler error
-            console.log(result[RUNTIME_MESSAGE]);
-            setMessage("compile error: \n"+result[COMPILE_MESSAGE]);
-          }
-        }, function(error) {
-          console.log(error);
-          alert("Unexpected error! "+error);
-        });
+function getClassName(code) {
+  var rx = /class ([^\s]*)[\s]*?[\n]*?{/;
+  return rx.exec(code)[1];
+}
+
+function goToTab(tab) {
+  document.getElementById(tab).click();
+}
+
+function highlightErrors(compilerError) {
+  window.alert(compilerError);
+
+  var regLineStart = /startLine: ([0-9]*)/;
+  var regLineEnd = /endLine: ([0-9]*)/;
+  var regColStart = /startColumn: ([0-9]*)/;
+  var regColEnd = /endColumn: ([0-9]*)/;
+
+  var lineStart = Number(regLineStart.exec(compilerError)[1]);
+  var lineEnd = Number(regLineEnd.exec(compilerError)[1]);
+  var colStart = Number(regColStart.exec(compilerError)[1]);
+  var colEnd = Number(regColEnd.exec(compilerError)[1]);
+
+  colStart = colStart - 1;
+
+  if (colStart >= colEnd) {
+    colEnd = colStart + 1;
+  }
+
+  var Range = ace.require('ace/range').Range;
+  var range = new Range(lineStart, colStart, lineEnd, colEnd);
+  //var range = new Range(1,1,1,1);
+  window.alert(lineStart + " " + colStart + " " + lineEnd + " " + colEnd);
+  curACEErrorMarker = editor.getSession().addMarker(range,"aceErrorMarker", "text");
+}
+
+//////////////////////////////////// Setup HTML Page /////////////////////////////////
+
+// Register the HTML buttons to run the relevant scripts
+document.addEventListener("DOMContentLoaded", function(event) {
+  // TODO: test DOMContentLoaded with IE8 (does anyone still use IE8?)
+  // DOMContentLoaded may not be supported by IE8
+  document.getElementById("runscript").addEventListener("click", runScript);
+  document.getElementById("codeUploadButton").addEventListener('change', uploadCode, false);
+  document.getElementById("JSONUploadButton").addEventListener('change', parseJSON, false);
+  document.getElementById("downloadButton").addEventListener('click', downloadEditorCode);
+  document.getElementById("undo").addEventListener("click", undo);
+  document.getElementById("compileandrun").addEventListener("click", function() {
+    running();
+    downloadEditorCode();
+    editor.getSession().removeMarker(curACEErrorMarker);
+    JavaPoly.type('org.knoxcraft.javapoly.JavaPolyCompiler').then(function(JavaPolyCompiler){
+      // constants that tell us where things are in the array returned
+      // from the JavaPolyCompiler
+      var TOTAL_SUCCESS=0;
+      var JSON_RESULT=1;
+      var RUNTIME_SUCCESS=2;
+      var RUNTIME_MESSAGE=3;
+      var COMPILE_SUCCESS=4;
+      var COMPILE_MESSAGE=5;
+      var code = editor.getValue();
+      var className;
+      var userClassName = document.getElementById("classname").value;
+      if (userClassName != null && userClassName != "") {
+        className = userClassName;
+      } else {
+        className = getClassName(code);
+      }
+      // TODO: someday timeout if this call takes too long
+      JavaPolyCompiler.compileAndRun(code, className).then(function(result){
+        console.log("result is "+result);
+        if (result[TOTAL_SUCCESS]==='true'){
+          // success
+          // alert("success");
+	  // TODO: I hope this is the correct place to send the JSON commands
+	  extractCommandsFromJSON(result[JSON_RESULT]);
+          setMessage("successfully compiled and loaded code!");
+        } else if (result[COMPILE_SUCCESS]==='true' && result[RUNTIME_SUCCESS]==="false"){
+	  // runtime error
+          console.log(result[RUNTIME_MESSAGE]);
+          setMessage("runtime error:\n"+result[RUNTIME_MESSAGE]);
+          highlightErrors(result[COMPILE_MESSAGE]);
+        } else {
+          // compiler error
+          console.log(result[RUNTIME_MESSAGE]);
+          setMessage("compile error: \n"+result[COMPILE_MESSAGE]);
+          highlightErrors(result[COMPILE_MESSAGE]);
+        }
+      }, function(error) {
+        console.log(error);
+        window.alert("Unexpected error! "+error);
+        setMessage("Unexpected internal error! In all likelyhood, we could not determine your class name correctly, or you don't have a main method. Try overriding the class name in Options.");
       });
     });
-  });
-  */
-}
+  }, function(error) {
+       setMessage("A very bad error occurred (JavaPoly isn't working or we can't find an essential dependency- probably JavaPolyCompiler). There is nothing that you can do. I'm sorry.")
+});
+});
 
-function foo(msg) {
-  alert(msg);
-}
+// No tabs are open by default, which is sort of strange. This opens the coding tab.
+goToTab("codingTab");

@@ -7,7 +7,7 @@
 
 <!-- Embed the Javapoly code into this HTML page for future use (note that javapoly provides
        a JVM and Java compiler written in javascript that can run in the browser) -->
-<!--script type="text/javascript" src="https://www.javapoly.com/javapoly.js"></script-->
+<script type="text/javascript" src="https://www.javapoly.com/javapoly.js"></script>
 
 <!-- Embed the Turtle3D library in the HTML page so that we can use it to compile
        the in-page scripts written by the users. This works despite the fact that the
@@ -17,13 +17,22 @@
 
 </head>
 
-
 <body>
 
-<div id="sidebyside">
+<ul class="tab">
+  <li><a href="#" class="tablinks" id="codingTab" onclick="openTab(event, 'Coding')">Coding</a></li>
+  <li><a href="#" class="tablinks" id="blocklyTab" onclick="openTab(event, 'Blockly')">Blockly</a></li>
+  <li><a href="#" class="tablinks" id="optionsTab" onclick="openTab(event, 'Options')">Options</a></li>
+  <li><a href="#" class="tablinks" id="gameTab" onclick="openTab(event, 'Game')">Game</a></li>
+</ul>
+
+<!-- All buttons' click action handlers are set in index.js -->
+
+<div id="Coding" class="tabcontent">
+  <div id="sidebyside">
   <!-- <div id="tablerow"> -->
   <!-- This is the embedded IDE -->
-  <div id="editor">// Do not change the imports.
+  <div id="editor">// Do not remove the existing imports.
 
 import org.knoxcraft.turtle3d.Turtle3D;
 import static org.knoxcraft.turtle3d.KCTBlockTypes.*;
@@ -42,40 +51,90 @@ public class HelloWorld {
   
 </div>
 
+<p>
+  <button type="button" id="compileandrun">Compile code</button>
+  <button type="button" id="downloadButton">Download code</button>
+  <input type="file" id="codeUploadButton" class="inputfile">
+  <label for="codeUploadButton">Upload code</label>
+</p>
+
+<div id="message">
+  <br>
+</div>
+
+</div> <!-- End the Coding Tab Div-->
+
+<div id="Blockly" class="tabcontent">
+  <h3>Blockly</h3>
+</div>
+
+<div id="Options" class="tabcontent">
+  <p>Upload a Turtle3D JSON file (exported from BlueJay or Eclipse).</p>
+  <div>
+    <input type="file" id="JSONUploadButton" class="inputfile">
+    <label for="JSONUploadButton">Choose a file</label>
+  </div>
+
+  <hr>
+
+  <p>Override the automatic classname detector (useful for if you have multiple classes or commented-out classes):</p>
+  <form action="#">
+    Classname: <input type="text" id="classname"><br>
+  </form>
+
+  <hr>
+
+  <form action="#">
+    <input type="checkbox" id="clearMapBeforeScript">Clear the entire map when running a script<br>
+    <input type="checkbox" id="autoRunScript" checked>Auto run scripts
+  </form>
+
+  <hr>
+
+  <h3>Controls:</h3>
+  <p>WASD to move</p>
+  <p>SPACE to jump (Double tap to fly)</p>
+  <p>SHIFT to fall when flying</p>
+  <p>Look and click to set new script launch position
+
+</div>
+
+<div id="Game" class="tabcontent">
+  <div>
+    <p>Script Status: <span id="scriptstatus">No script loaded</span></p>
+    <button type="button" class="button" id="runscript">Run Current Script</button>
+    <button type="button" id="undo">Undo Last Script</button>
+    <p>Script Launch Location: <span id="looklocation">(0,0,0)</span></p>
+  </div>
+</div>
+
 <!-- load code for the embedded ACE editor -->
 <script src="/ace-builds/src-min/ace.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
 // setup the ACE editor
 var editor = ace.edit("editor");
-editor.setTheme("ace/theme/solarized_light");
+editor.setTheme("ace/theme/chrome");
 editor.getSession().setMode("ace/mode/java");
 editor.setAutoScrollEditorIntoView(true);
 </script>
 
-<div id="message">
-  <br>
-</div>
-
-<!-- This is the compile button. Its click action handler is set in index.js -->
-<div>
-  <p>
-  <button type="button" id="compileandrun">Compile code</button>
-  <button type="button" id="downloadButton">Download code</button>
-  </p>
-</div>
-
-<!-- These are more buttons. Their click action handlers are set in index.js as well -->
-<div>
-  <input type="file" id="JSONUploadButton" onchange="parseJSON(this.files)">
-</div>
-<div>
-<p>Script Status: <span id="scriptstatus">No script loaded</span></p>
-<button type="button" class="button" id="runscript">Run Current Script</button>
-<button type="button" id="undo">Undo Last Script</button>
-
-<p>Debug Look Location: <span id="looklocation">n/a</span></p>
-</div>
+<!-- Script to manage tab logic-->
+<script>
+function openTab(evt, cityName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(cityName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+</script>
 
 <!-- Load the voxeljs code. Needs to be loaded after all the HTML stuff -->
 <script src="/bundle.js"></script>
