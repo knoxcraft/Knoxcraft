@@ -23,6 +23,8 @@
   <li><a href="#" class="tablinks" id="blocklyTab" onclick="openTab(event, 'Blockly')">Blockly</a></li>
   <li><a href="#" class="tablinks" id="gameTab" onclick="openTab(event, 'Game')">Game</a></li>
   <li><a href="#" class="tablinks" id="optionsTab" onclick="openTab(event, 'Options')">Options</a></li>
+  <li><a href="#" class="tablinks" id="aboutTab" onclick="openTab(event, 'About')">About</a></li>
+  <li><a href="http://www.knoxcraft.org" class="tablinks" id="knoxcraft">Knoxcraft.org</a></li>
 </ul>
 
 <!-- All buttons' click action handlers are set in index.js -->
@@ -263,6 +265,83 @@ public class HelloWorld {
     <button type="button" id="undo">Undo Last Script</button>
     <p>Script Launch Location: <span id="looklocation">(0,0,0)</span></p>
   </div>
+</div>
+
+<div id="About" class="tabcontent">
+  <div>
+    <p>
+      Knoxeljs is part of <a href="http://www.knoxcraft.org"> Knoxcraft</a>, a
+      set of educational tools designed to bring the joy of Minecraft
+      to CS-0 and CS-1 courses.
+    </p>
+  </div>
+  <div>
+    <p>
+    Team Knoxcraft is:
+    </p>
+    <table id="aboutTable">
+      <tr>
+        <td>
+          <img id="avatarHeadshot" src="/images/kakoijohnAvatar.png"> John Damits, Knox College '17, funded by the Mellon Foundation and the <a href="https://www.knox.edu/academics/research-and-creative-work/student-research-grants/richter-awards">Richter Memorial Trust</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img id="avatarHeadshot" src="/images/moemattAvatar.png"> Matt Moe, Knox College '17, funded by the <a href="https://www.knox.edu/academics/research-and-creative-work/student-research-grants/richter-awards">Richter Memorial Trust</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img id="avatarHeadshot" src="/images/steveAvatar.png"> Lucas Kasser, Brown University '19
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img id="avatarHeadshot" src="/images/EmhastingsAvatar.png"> Emily Hastings, Knox College '16, funded by the <a href="https://www.knox.edu/Documents/PDFs/CRAS/ASSET%20Program%20Description.pdf"> ASSET </a> program, and the <a href="https://www.knox.edu/academics/research-and-creative-work/student-research-grants/richter-awards">Richter Memorial Trust</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img id="avatarHeadshot" src="/images/steveAvatar.png"> Michael Gerten, Knox College '16, funded by Knox's Baker-Velde award, and the <a href="https://www.knox.edu/academics/research-and-creative-work/student-research-grants/richter-awards">Richter Memorial Trust</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img id="avatarHeadshot" src="/images/SpacdogAvatar.png"> Jaime Spacco, Haverford College '98
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div>
+    <p>Knoxcraft is made possible by the following projects:</p>
+    <ul>
+      <li><a href="https://minecraft.net/">Minecraft</a></li>
+      <li><a href="http://files.minecraftforge.net/">Minecraft Forge</a>, the community-supported moddable Minecraft server</li>
+      <li><a href="https://www.spongepowered.org/">Spongepowered</a>, a Minecraft modding API built on Forge</li>
+      <li><a href="http://voxeljs.com/">VoxelJS</a>, blocks in yo browser (required <a href="http://get.webgl.org/">WebGL</a>)</li>
+      <li><a href="https://www.javapoly.com/">JavaPoly</a>, Java(script) in your browser</li>
+      <li><a href="https://ace.c9.io">ACE editor</a>, part of <a href="https://c9.io/">Cloud9</a></li>
+      <li><a href="https://developers.google.com/blockly/">Blockly</a>, a block-based visual programming language</li>
+      <li><a href="http://www.eclipse.org/jetty/">Jetty</a>, a webserver and servlet container</li>
+      <li><a href="http://bdcraft.net/sphax-purebdcraft-texturepack">Sphax</a> texture pack</li>
+      <!--
+      <li><a href=""></a></li>
+    -->
+    </ul>
+  </div>
+  <div>
+    <p>Knoxcraft was inspired by, or is similar to, the following projects:</p>
+    <ul>
+      <li><a href="http://scriptcraftjs.org/">ScriptCraftJS</a></li>
+      <li><a href="http://computercraftedu.com/">ComputerCraftEDU</a></li>
+      <li><a href="https://canarymod.net/">Canarymod</a></li>
+<!--
+      <li><a href=""></a></li>
+      <li><a href=""></a></li>
+-->
+    </ul>
+  </div>
+
 </div>
 
 <!-- load code for the embedded ACE editor -->

@@ -39,7 +39,7 @@ body {
     font-size:16px;
 }
 
-table {
+#textureTable {
     font-size:16px;
     font-family: sans-serif, "Trebuchet MS", Arial, Helvetica;
     border-collapse: collapse;
@@ -205,4 +205,12 @@ ul.tab li a:focus, .active {
 #blocklyTable {
   height: 100%;
   width: 100%;
+}
+#avatarHeadshot {
+  vertical-align: middle;
+  border-radius: 35px;
+  border-color: white;
+}
+#aboutTable {
+  table-layout: auto;
 }

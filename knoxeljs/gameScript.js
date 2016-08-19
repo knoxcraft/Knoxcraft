@@ -154,7 +154,7 @@ function th(val){
   return '<th>'+val+'</th>';
 }
 function makeTextureTable() {
-  var table="<table border=1>" +tr(th('Name of Block')+th('Texture'));
+  var table='<table id="textureTable" border=1>' +tr(th('Name of Block')+th('Texture'));
   for (var key in materialNames) {
     if (materialNames.hasOwnProperty(key)){
       if (allMaterials[materialNames[key]-1] instanceof Array) {
