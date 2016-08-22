@@ -91,11 +91,11 @@ public class HelloWorld {
     var myCustomFiles = {};
     var pykcLibraryCode='';
     var client = new XMLHttpRequest();
-    client.open('GET', '/pykc/pykc.py');
+    client.open('GET', '/pykc/pykcbase.py');
     client.onreadystatechange = function() {
       // add a couple of newlines to the end of the file
       pykcLibraryCode=client.responseText+"\n\n";
-      myCustomFiles['./pykc.py']=pykcLibraryCode;
+      myCustomFiles['./pykcbase.py']=pykcLibraryCode;
       //console.log(pykcLibraryCode);
     }
     client.send();
@@ -168,7 +168,7 @@ public class HelloWorld {
 
 <div id="sidebyside">
   <div id="editorDiv">
-    <div id="pyeditor" class="editor">
+    <div id="pyeditor" class="editor"># many imports will not work
 t = Turtle('jamal')
 
 t.setBlock(bt.red_wool)
