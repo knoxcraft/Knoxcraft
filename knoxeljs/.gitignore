@@ -8,3 +8,4 @@ lib
 npm-debug.log
 gradle.properties
 blockly-bundle.js
+pykc

@@ -89,22 +89,25 @@ public class HelloWorld {
   <script type="text/javascript">
     // look up the pykc code
     var myCustomFiles = {};
+    var pykcLibraryCode='';
     var client = new XMLHttpRequest();
     client.open('GET', '/pykc/pykc.py');
     client.onreadystatechange = function() {
-      var pykcCode=client.responseText;
-      myCustomFiles['./pykc.py']=pykcCode;
-      //console.log(pykcCode);
+      // add a couple of newlines to the end of the file
+      pykcLibraryCode=client.responseText+"\n\n";
+      myCustomFiles['./pykc.py']=pykcLibraryCode;
+      //console.log(pykcLibraryCode);
     }
     client.send();
 
-    myCustomFiles['./pykc.py']='print "hello"\nprint "test"';
-
     function builtinRead(x) {
+      // FIXME this function gets called, but we still get an error
+      // that the pykc module cannot be found. That's why we are just
+      // concatenating the entire file together
       //console.log('builtin read of '+x);
       if (myCustomFiles[x] !== undefined) {
-        console.log('found '+x);
-        console.log(myCustomFiles[x]);
+        //console.log('found '+x);
+        //console.log(myCustomFiles[x]);
         return myCustomfiles[x];
       }
       if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
@@ -112,50 +115,53 @@ public class HelloWorld {
       return Sk.builtinFiles["files"][x];
     }
     function outf(text) {
-      var mypre = document.getElementById("output");
-      mypre.innerHTML = mypre.innerHTML + text;
+      console.log('outf');
+      extractCommandsFromJSON(text);
     }
 
     function runit() {
       // configure
-      var mypre = document.getElementById("output");
-      mypre.innerHTML = '';
-      Sk.pre = "output";
       Sk.configure({output:outf, read:builtinRead});
 
-      // try to load pykc
-      // Sk.misceval.asyncToPromise(function() {
-      //   return Sk.importMainWithBody("<stdin>", false, pykcCode, true);
-      // }).then(function() {
-      //   console.log('success');
-      // }, function(err) {
-      //   console.log(err.toString());
-      // })
-      //var pykc = Sk.importMainWithBody("<stdin>", false, pykcCode, true);
-
-      //Sk.importModuleInternal_('pykcdoodle', false, 'pykc', pykcProgramBody, false);
       var studentCode = pyeditor.getValue();
+      var pykcCodeLen=pykcLibraryCode.split(/\r\n|\r|\n/).length;
+      studentCode=pykcLibraryCode+studentCode;
       Sk.misceval.asyncToPromise(function() {
         return Sk.importMainWithBody("<stdin>", false, studentCode, true);
       }).then(function(){
         console.log('success 2');
       }, function(err){
-        console.log(err.toString())
+        console.log('error!!!');
+        var errmsg=err.toString();
+
+        if (errmsg.indexOf('in JSON at position') !== -1) {
+          alert("Make sure you don't have any print() statements other than the final print(t.toJson())");
+          return;
+        }
+        // TODO: better post-processing of errors
+        var regex = /line ([0-9]+)/g;
+        var newmsg=errmsg;
+        match = regex.exec(errmsg);
+        while (match != null) {
+          // matched text: match[0]
+          // match start: match.index
+          // capturing group n: match[n]
+          var oldline=match[0];
+          var num=match[1];
+
+          var newline='line '+(num-pykcCodeLen);
+
+          newmsg=newmsg.replace(oldline, newline);
+
+          console.log(match[0]);
+          console.log(match[1]);
+          match = regex.exec(errmsg);
+        }
+        console.log("\n\nFOO\n\n");
+        var pymessage=document.getElementById("pymessage");
+        pymessage.innerHTML=newmsg;
+        console.log(newmsg);
       });
-
-    //Sk.importMainWithBody("<stdin>", false, prog);
-
-    /*
-    var myPromise = Sk.misceval.asyncToPromise(function() {
-      return Sk.importMainWithBody("<stdin>", false, prog, true);
-    });
-    myPromise.then(function(mod) {
-      console.log('success');
-    },
-    function(err) {
-      console.log(err.toString());
-    });
-    */
   }
 </script>
 
@@ -163,13 +169,10 @@ public class HelloWorld {
 <div id="sidebyside">
   <div id="editorDiv">
     <div id="pyeditor" class="editor">
-from pykc import Turtle, BlockType
-bt=BlockType
-
-t = Turtle('francois')
+t = Turtle('jamal')
 
 t.setBlock(bt.red_wool)
-size=1
+size=3
 for j in range(size):
 	for i in range(size):
 		t.blockPlace(True)
@@ -192,8 +195,7 @@ print(t.toJson())
     <p>
       <button onclick="runit()">Run Python!</button>
     </p>
-    <div id="output">
-      output goes here
+    <div id="pymessage">
     </div>
   </div>
   <div id="blocktypes"> </div>
