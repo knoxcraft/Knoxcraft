@@ -13,7 +13,7 @@ fi
 echo "browserify gameScript.js -o bundle.js"
 browserify gameScript.js -o bundle.js
 
-for f in textures css images ace-builds bundle.js blockly-bundle.js java ; do
+for f in textures css images ace-builds bundle.js blockly-bundle.js java pykc ; do
     echo "updating $LOCATION/$f, if necessary"
     $CMD $f $LOCATION/$f
 done
