@@ -14,12 +14,20 @@
        library is written in Java because of JavaPoly -->
 <script type="text/java" src="/java/lib/knoxeljs-0.2.jar"></script>
 
+<!-- load code for the embedded ACE editor -->
+<script src="/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- load Skulpt, a Python interpreter written in Javascript -->
+<script src="http://www.skulpt.org/static/skulpt.min.js" type="text/javascript"></script>
+<script src="http://www.skulpt.org/static/skulpt-stdlib.js" type="text/javascript"></script>
+
 </head>
 
 <body>
 
 <ul class="tab">
   <li><a href="#" class="tablinks" id="javaTab" onclick="openTab(event, 'Java')">Java</a></li>
+  <li><a href="#" class="tablinks" id="pythonTab" onclick="openTab(event, 'Python')">Python</a></li>
   <li><a href="#" class="tablinks" id="blocklyTab" onclick="openTab(event, 'Blockly')">Blockly</a></li>
   <li><a href="#" class="tablinks" id="gameTab" onclick="openTab(event, 'Game')">Game</a></li>
   <li><a href="#" class="tablinks" id="optionsTab" onclick="openTab(event, 'Options')">Options</a></li>
@@ -31,10 +39,9 @@
 
 <div id="Java" class="tabcontent">
   <div id="sidebyside">
-  <!-- <div id="tablerow"> -->
   <!-- This is the embedded IDE -->
   <div id="editorDiv">
-  <div id="editor">// Do not remove the existing imports.
+  <div id="editor" class="editor">// Do not remove the existing imports.
 
 import org.knoxcraft.turtle3d.Turtle3D;
 import static org.knoxcraft.turtle3d.KCTBlockTypes.*;
@@ -55,6 +62,13 @@ public class HelloWorld {
       <label for="codeUploadButton">Upload code</label>
     </p>
   </div>
+  <script type="text/javascript">
+  // setup the ACE editor
+  var editor = ace.edit("editor");
+  editor.setTheme("ace/theme/chrome");
+  editor.getSession().setMode("ace/mode/java");
+  editor.setAutoScrollEditorIntoView(true);
+  </script>
 </div>
 
   <!-- This is the display for the different block types. It's filled in gameScript.js -->
@@ -69,6 +83,122 @@ public class HelloWorld {
 </div>
 
 </div> <!-- End the Java Coding Tab Div-->
+
+<div id="Python" class="tabcontent">
+
+  <script type="text/javascript">
+    // look up the pykc code
+    var myCustomFiles = {};
+    var client = new XMLHttpRequest();
+    client.open('GET', '/pykc/pykc.py');
+    client.onreadystatechange = function() {
+      var pykcCode=client.responseText;
+      myCustomFiles['./pykc.py']=pykcCode;
+      //console.log(pykcCode);
+    }
+    client.send();
+
+    myCustomFiles['./pykc.py']='print "hello"\nprint "test"';
+
+    function builtinRead(x) {
+      //console.log('builtin read of '+x);
+      if (myCustomFiles[x] !== undefined) {
+        console.log('found '+x);
+        console.log(myCustomFiles[x]);
+        return myCustomfiles[x];
+      }
+      if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+        throw "File not found: '" + x + "'";
+      return Sk.builtinFiles["files"][x];
+    }
+    function outf(text) {
+      var mypre = document.getElementById("output");
+      mypre.innerHTML = mypre.innerHTML + text;
+    }
+
+    function runit() {
+      // configure
+      var mypre = document.getElementById("output");
+      mypre.innerHTML = '';
+      Sk.pre = "output";
+      Sk.configure({output:outf, read:builtinRead});
+
+      // try to load pykc
+      // Sk.misceval.asyncToPromise(function() {
+      //   return Sk.importMainWithBody("<stdin>", false, pykcCode, true);
+      // }).then(function() {
+      //   console.log('success');
+      // }, function(err) {
+      //   console.log(err.toString());
+      // })
+      //var pykc = Sk.importMainWithBody("<stdin>", false, pykcCode, true);
+
+      //Sk.importModuleInternal_('pykcdoodle', false, 'pykc', pykcProgramBody, false);
+      var studentCode = pyeditor.getValue();
+      Sk.misceval.asyncToPromise(function() {
+        return Sk.importMainWithBody("<stdin>", false, studentCode, true);
+      }).then(function(){
+        console.log('success 2');
+      }, function(err){
+        console.log(err.toString())
+      });
+
+    //Sk.importMainWithBody("<stdin>", false, prog);
+
+    /*
+    var myPromise = Sk.misceval.asyncToPromise(function() {
+      return Sk.importMainWithBody("<stdin>", false, prog, true);
+    });
+    myPromise.then(function(mod) {
+      console.log('success');
+    },
+    function(err) {
+      console.log(err.toString());
+    });
+    */
+  }
+</script>
+
+
+<div id="sidebyside">
+  <div id="editorDiv">
+    <div id="pyeditor" class="editor">
+from pykc import Turtle, BlockType
+bt=BlockType
+
+t = Turtle('francois')
+
+t.setBlock(bt.red_wool)
+size=1
+for j in range(size):
+	for i in range(size):
+		t.blockPlace(True)
+		t.forward(size)
+		t.blockPlace(False)
+		t.right(1)
+		t.backward(size)
+	t.blockPlace(False)
+	t.left(size)
+	t.up(1)
+print(t.toJson())
+    </div>
+    <script type="text/javascript">
+      // setup the ACE editor for python
+      var pyeditor = ace.edit("pyeditor");
+      pyeditor.setTheme("ace/theme/chrome");
+      pyeditor.getSession().setMode("ace/mode/python");
+      pyeditor.setAutoScrollEditorIntoView(true);
+    </script>
+    <p>
+      <button onclick="runit()">Run Python!</button>
+    </p>
+    <div id="output">
+      output goes here
+    </div>
+  </div>
+  <div id="blocktypes"> </div>
+</div>
+</div> <!-- end Python coding tab div -->
 
 <div id="Blockly" class="tabcontent">
   <script src="/blockly-bundle.js"></script>
@@ -342,24 +472,12 @@ public class HelloWorld {
       <li><a href="http://coweb.cc.gatech.edu/mediaComp-plan">Media Computation</a></li>
 
 <!--
-
       <li><a href=""></a></li>
 -->
     </ul>
   </div>
 
 </div>
-
-<!-- load code for the embedded ACE editor -->
-<script src="/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-
-<script type="text/javascript">
-// setup the ACE editor
-var editor = ace.edit("editor");
-editor.setTheme("ace/theme/chrome");
-editor.getSession().setMode("ace/mode/java");
-editor.setAutoScrollEditorIntoView(true);
-</script>
 
 <!-- Script to manage tab logic-->
 <script>
