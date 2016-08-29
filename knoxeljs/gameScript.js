@@ -615,5 +615,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 });
 
-// No tabs are open by default, which is sort of strange. This opens the coding tab.
-goToTab("javaTab");
+// No tabs are open by default.
+// Let users pick tabs using #python, #blockly, etc
+// Default to Java if they don't pick a tab
+var tab=window.location.href.split('#')[1];
+//console.log('tab is '+tab);
+if (tab=='') {
+  goToTab("javaTab");
+} else {
+  goToTab(tab+"Tab");
+}
