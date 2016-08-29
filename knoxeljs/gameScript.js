@@ -173,7 +173,12 @@ function makeTextureTable() {
   table += "</table>";
   return table;
 }
-var blocktypes=document.getElementById("blocktypes").innerHTML = makeTextureTable();
+var blocktypes=document.getElementsByClassName("blocktypes");
+for (var i=0; i<blocktypes.length; i++) {
+  var blocktype=blocktypes[i];
+  blocktype.innerHTML = makeTextureTable();
+}
+//var blocktypes=document.getElementById("blocktypes").innerHTML = makeTextureTable();
 
 
 /////////////////////////////////////Begin Turtle related code/////////////////

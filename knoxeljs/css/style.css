@@ -29,7 +29,7 @@
   height: 400px;
 }
 
-#blocktypes {
+.blocktypes {
   width: 25%;
   float: right;
   height: 550px;
