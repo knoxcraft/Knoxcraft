@@ -50,7 +50,9 @@
   <li><a href="http://www.knoxcraft.org" class="tablinks" id="knoxcraft">Knoxcraft.org</a></li>
 </ul>
 
-<!-- All buttons' click action handlers are set in index.js -->
+<!-- Many button click action handlers are set in gameScript.js
+  TODO can we refactor this?
+-->
 
 <div id="Java" class="tabcontent">
   <div id="sidebyside">
@@ -90,8 +92,6 @@ public class HelloWorld {
   <div class="blocktypes"> </div>
 
 </div>
-
-
 
 <div id="message">
   <br>
@@ -225,8 +225,13 @@ print(t.toJson())
 
   <div>
     <p>
-      <button id="runblockly">Run this turtle in the Game window</button>
-      <button onclick="alert(runBlocklyCode())"> Show the JSON produced by this turtle</button>
+      <button id="runblockly">Run code in Game window </button>
+      <!-- <button onclick="alert(runBlocklyCode())"> Show the JSON</button> -->
+      <button onclick="downloadBlocklyWorkspace()"> Download workspace </button>
+      
+      <input type="file" id="restoreWorkspace" class="inputfile">
+      <label for="restoreWorkspace">Upload saved workspace</label>
+
     </p>
   </div>
 
@@ -315,6 +320,53 @@ print(t.toJson())
     }
   }
 
+  function uploadBlocklyWorkspace(evt) {
+    console.log("upload blockly");
+    var file = evt.target.files[0];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var xmlText = reader.result;
+      var workspace = Blockly.getMainWorkspace();
+      //console.log('workspace is '+workspace);
+      if (workspace != null) {
+        console.log('xml text is '+xmlText);
+        var xml = Blockly.Xml.textToDom(xmlText);
+        console.log(xml);
+        // NOTE: documentation at https://developers.google.com/blockly/guides/get-started/web
+        // is wrong! The parameters for domToWorkspace() should be workspace, then xml.
+        Blockly.Xml.domToWorkspace(workspace, xml);
+      }
+    };
+    reader.readAsText(file);
+  }
+  // HACK can't figure out how to add this in the HTML; maybe it needs to be declared first?
+  document.getElementById('restoreWorkspace').addEventListener('change', uploadBlocklyWorkspace, false);
+
+  function downloadBlocklyWorkspace() {
+    var workspace = Blockly.getMainWorkspace();
+    //console.log('workspace is '+workspace);
+    if (workspace != null) {
+      var xml = Blockly.Xml.workspaceToDom(workspace);
+      var data = Blockly.Xml.domToText(xml);
+      // TODO: fix browserify so that this call works
+      // saveToFile('blockly.xml', xml);
+      var blob = new Blob([data], {type: 'text/plain'});
+      var filename='blockly.xml';
+      if(window.navigator.msSaveOrOpenBlob) {
+          window.navigator.msSaveBlob(blob, filename);
+      }
+      else{
+          var elem = window.document.createElement('a');
+          elem.href = window.URL.createObjectURL(blob);
+          elem.download = filename;
+          document.body.appendChild(elem);
+          elem.click();
+          document.body.removeChild(elem);
+          window.URL.revokeObjectURL(blob);
+      }
+    }
+  }
+
   // backup and restore the workspace
   var backupWorkspaceExists=false;
   // add handlers to the buttons we click to switch tabs
@@ -322,7 +374,8 @@ print(t.toJson())
   for (var i=0; i<elements.length; i++){
     var elm=elements[i];
     elm.addEventListener('click', function(){
-      // HACK using some of the code from appengine/storage.js
+      // HACK ALERT
+      // using some of the code from appengine/storage.js
       // to save the workspace locally so we can restore it
       var workspace = Blockly.getMainWorkspace();
       //console.log('workspace is '+workspace);
