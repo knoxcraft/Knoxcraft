@@ -485,7 +485,7 @@ function setPosition(args) {
 
 
 function saveToFile(filename, data) {
-    var blob = new Blob([data], {type: 'text/csv'});
+    var blob = new Blob([data], {type: 'text/plain'});
     if(window.navigator.msSaveOrOpenBlob) {
         window.navigator.msSaveBlob(blob, filename);
     }
@@ -500,9 +500,16 @@ function saveToFile(filename, data) {
     }
 }
 
+function downloadPythonEditorCode() {
+  var code = pyeditor.getValue();
+  //saveToFile('pykc' + js_yyyy_mm_dd_hh_mm_ss(), code);
+  saveToFile('pykc.py', code);
+}
+
 function downloadEditorCode() {
   var code = editor.getValue();
-  saveToFile(getClassName(code) + ' ' + js_yyyy_mm_dd_hh_mm_ss(), code);
+  //saveToFile(getClassName(code) + ' ' + js_yyyy_mm_dd_hh_mm_ss(), code);
+  saveToFile(getClassName(code)+'.java', code);
 }
 
 function js_yyyy_mm_dd_hh_mm_ss () {
@@ -561,6 +568,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   document.getElementById("codeUploadButton").addEventListener('change', uploadCode, false);
   document.getElementById("JSONUploadButton").addEventListener('change', parseJSON, false);
   document.getElementById("downloadButton").addEventListener('click', downloadEditorCode);
+  document.getElementById("downloadPythonButton").addEventListener('click', downloadPythonEditorCode);
   document.getElementById("undo").addEventListener("click", undo);
   document.getElementById("compileandrun").addEventListener("click", function() {
     running();

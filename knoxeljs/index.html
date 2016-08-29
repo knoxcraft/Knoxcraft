@@ -172,7 +172,7 @@ public class HelloWorld {
           console.log(match[1]);
           match = regex.exec(errmsg);
         }
-        console.log("\n\nFOO\n\n");
+        //console.log("\n\nFOO\n\n");
         var pymessage=document.getElementById("pymessage");
         pymessage.innerHTML=newmsg;
         console.log(newmsg);
@@ -209,6 +209,7 @@ print(t.toJson())
     </script>
     <p>
       <button onclick="runit()">Run Python!</button>
+      <button type="button" id="downloadPythonButton">Download code</button>
     </p>
     <div id="pymessage">
     </div>
