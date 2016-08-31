@@ -131,6 +131,7 @@ public class HelloWorld {
     }
     function outf(text) {
       console.log('outf');
+      console.log(text);
       extractCommandsFromJSON(text);
     }
 
@@ -140,14 +141,23 @@ public class HelloWorld {
 
       var studentCode = pyeditor.getValue();
       var pykcCodeLen=pykcLibraryCode.split(/\r\n|\r|\n/).length;
-      studentCode=pykcLibraryCode+studentCode;
+      var fullCode=pykcLibraryCode+studentCode;
       Sk.misceval.asyncToPromise(function() {
-        return Sk.importMainWithBody("<stdin>", false, studentCode, true);
+        return Sk.importMainWithBody("<stdin>", false, fullCode, true);
       }).then(function(){
         console.log('success 2');
       }, function(err){
-        console.log('error!!!');
+        // HACK alert!
+        // Not sure why we keep seeing this error in syntactically correct Python:
+        // ExternalError: SyntaxError: Unexpected end of JSON input on line XYZ
+        console.log(err);
         var errmsg=err.toString();
+        if (errmsg.indexOf("ExternalError: SyntaxError: Unexpected end of JSON input on line")==0 ||
+          errmsg.indexOf("ExternalError: SyntaxError: JSON.parse: unexpected end of data at line")==0)
+        {
+          // Ignore this error message
+          return;
+        }
 
         if (errmsg.indexOf('in JSON at position') !== -1) {
           alert("Make sure you don't have any print() statements other than the final print(t.toJson())");
@@ -166,13 +176,14 @@ public class HelloWorld {
 
           var newline='line '+(num-pykcCodeLen);
 
+          console.log("bad line at "+oldline+": "+fullCode.split("\n")[num-1]);
+
           newmsg=newmsg.replace(oldline, newline);
 
-          console.log(match[0]);
-          console.log(match[1]);
+          //console.log(match[0]);
+          //console.log(match[1]);
           match = regex.exec(errmsg);
         }
-        //console.log("\n\nFOO\n\n");
         var pymessage=document.getElementById("pymessage");
         pymessage.innerHTML=newmsg;
         console.log(newmsg);
@@ -228,7 +239,7 @@ print(t.toJson())
       <button id="runblockly">Run code in Game window </button>
       <!-- <button onclick="alert(runBlocklyCode())"> Show the JSON</button> -->
       <button onclick="downloadBlocklyWorkspace()"> Download workspace </button>
-      
+
       <input type="file" id="restoreWorkspace" class="inputfile">
       <label for="restoreWorkspace">Upload saved workspace</label>
 
