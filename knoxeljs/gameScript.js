@@ -533,7 +533,7 @@ function goToTab(tab) {
 }
 
 function highlightErrors(compilerError) {
-  window.alert(compilerError);
+  window.alert(compilerError.replace("\n", "<br>"));
 
   var regLineStart = /startLine: ([0-9]*)/;
   var regLineEnd = /endLine: ([0-9]*)/;
@@ -553,8 +553,6 @@ function highlightErrors(compilerError) {
 
   var Range = ace.require('ace/range').Range;
   var range = new Range(lineStart, colStart, lineEnd, colEnd);
-  //var range = new Range(1,1,1,1);
-  window.alert(lineStart + " " + colStart + " " + lineEnd + " " + colEnd);
   curACEErrorMarker = editor.getSession().addMarker(range,"aceErrorMarker", "text");
 }
 
@@ -626,8 +624,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 // No tabs are open by default.
 // Let users pick tabs using #python, #blockly, etc
 // Default to Java if they don't pick a tab
-var tab=window.location.href.split('#')[1];
-//console.log('tab is '+tab);
+var tab='';
+var splits=window.location.href.split('#');
+if (splits.length>1) {
+  tab=splits[1];
+}
+console.log('tab is '+tab);
 if (tab=='') {
   goToTab("javaTab");
 } else {
