@@ -533,7 +533,7 @@ function goToTab(tab) {
 }
 
 function highlightErrors(compilerError) {
-  window.alert(compilerError.replace("\n", "<br>"));
+  window.alert(compilerError);
 
   var regLineStart = /startLine: ([0-9]*)/;
   var regLineEnd = /endLine: ([0-9]*)/;
@@ -602,12 +602,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
         } else if (result[COMPILE_SUCCESS]==='true' && result[RUNTIME_SUCCESS]==="false"){
 	  // runtime error
           console.log(result[RUNTIME_MESSAGE]);
-          setMessage("runtime error:\n"+result[RUNTIME_MESSAGE]);
+          setMessage("runtime error:<br>"+result[RUNTIME_MESSAGE]);
           highlightErrors(result[COMPILE_MESSAGE]);
         } else {
           // compiler error
           console.log(result[RUNTIME_MESSAGE]);
-          setMessage("compile error: \n"+result[COMPILE_MESSAGE]);
+          setMessage("compile error: <br>"+result[COMPILE_MESSAGE]);
           highlightErrors(result[COMPILE_MESSAGE]);
         }
       }, function(error) {
@@ -629,7 +629,7 @@ var splits=window.location.href.split('#');
 if (splits.length>1) {
   tab=splits[1];
 }
-console.log('tab is '+tab);
+//console.log('tab is '+tab);
 if (tab=='') {
   goToTab("javaTab");
 } else {
